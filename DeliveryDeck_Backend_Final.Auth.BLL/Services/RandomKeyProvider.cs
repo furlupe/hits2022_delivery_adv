@@ -1,6 +1,6 @@
 ﻿using DeliveryDeck_Backend_Final.Common.Interfaces;
 
-namespace DeliveryDeck_Backend_Final.BLL.Services
+namespace DeliveryDeck_Backend_Final.Auth.BLL.Services
 {
     public class RandomKeyProvider : IKeyProvider
     {

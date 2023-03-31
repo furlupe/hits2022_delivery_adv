@@ -1,9 +1,9 @@
-﻿using DeliveryDeck_Backend_Final.DAL.Auth.Entities;
+﻿using DeliveryDeck_Backend_Final.Auth.DAL.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace DeliveryDeck_Backend_Final.DAL.Auth
+namespace DeliveryDeck_Backend_Final.Auth.DAL
 {
     public class AuthContext : IdentityDbContext<AppUser, Role, Guid, IdentityUserClaim<Guid>, UserRole, IdentityUserLogin<Guid>, IdentityRoleClaim<Guid>, IdentityUserToken<Guid>>
     {

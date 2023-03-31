@@ -5,7 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
-namespace DeliveryDeck_Backend_Final.BLL.Services
+namespace DeliveryDeck_Backend_Final.Auth.BLL.Services
 {
     public class JwtTokenService : ITokenService
     {

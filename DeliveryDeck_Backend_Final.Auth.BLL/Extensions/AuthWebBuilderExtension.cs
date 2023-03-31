@@ -1,15 +1,15 @@
-﻿using DeliveryDeck_Backend_Final.DAL.Auth;
-using DeliveryDeck_Backend_Final.DAL.Auth.Entities;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using DeliveryDeck_Backend_Final.Common.Interfaces;
-using DeliveryDeck_Backend_Final.BLL.Services;
-using DeliveryDeck_Backend_Final.DAL.Auth.Extensions;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
 using DeliveryDeck_Backend_Final.JWT.Extenions;
+using DeliveryDeck_Backend_Final.Auth.DAL.Entities;
+using DeliveryDeck_Backend_Final.Auth.DAL.Extensions;
+using DeliveryDeck_Backend_Final.Auth.DAL;
+using DeliveryDeck_Backend_Final.Auth.BLL.Services;
 
-namespace DeliveryDeck_Backend_Final.BLL.Extensions
+namespace DeliveryDeck_Backend_Final.Auth.BLL.Extensions
 {
     public static class AuthWebBuilderExtension
     {

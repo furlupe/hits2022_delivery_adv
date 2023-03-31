@@ -1,14 +1,14 @@
 ﻿using DeliveryDeck_Backend_Final.Common.DTO;
 using DeliveryDeck_Backend_Final.Common.Interfaces;
-using DeliveryDeck_Backend_Final.DAL.Auth;
-using DeliveryDeck_Backend_Final.DAL.Auth.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
 using System.Security.Claims;
+using DeliveryDeck_Backend_Final.Auth.DAL.Entities;
+using DeliveryDeck_Backend_Final.Auth.DAL;
 
-namespace DeliveryDeck_Backend_Final.BLL.Services
+namespace DeliveryDeck_Backend_Final.Auth.BLL.Services
 {
     public class AuthService : IAuthService
     {
@@ -72,7 +72,7 @@ namespace DeliveryDeck_Backend_Final.BLL.Services
                 FullName = data.FullName,
                 BirthDate = data.BirthDate,
                 Gender = data.Gender,
-                Phone = data.Phone,
+                PhoneNumber = data.Phone,
                 Email = data.Email,
             };
 
@@ -106,12 +106,12 @@ namespace DeliveryDeck_Backend_Final.BLL.Services
 
             return new TokenPairDto
             {
-                AccessToken = _tokenService.CreateAccessToken(await GetIdentity(user)),
+                AccessToken = _tokenService.CreateAccessToken(await CreateIdentity(user)),
                 RefreshToken = rt
             };
         }
 
-        private async Task<ClaimsIdentity> GetIdentity(AppUser user)
+        private async Task<ClaimsIdentity> CreateIdentity(AppUser user)
         {
             var claims = new List<Claim>
             {
