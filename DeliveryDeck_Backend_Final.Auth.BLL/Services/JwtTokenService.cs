@@ -7,7 +7,7 @@ using System.Security.Claims;
 
 namespace DeliveryDeck_Backend_Final.Auth.BLL.Services
 {
-    public class JwtTokenService : ITokenService
+    internal class JwtTokenService : ITokenService
     {
         private readonly IKeyProvider _keyProvider;
         public JwtTokenService(IKeyProvider keyProvider) 

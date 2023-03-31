@@ -16,6 +16,7 @@ namespace DeliveryDeck_Backend_Final.Auth.DAL
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
             builder.Entity<UserRole>(o =>
             {
                 o.HasOne(x => x.Role)
@@ -27,7 +28,6 @@ namespace DeliveryDeck_Backend_Final.Auth.DAL
                     .HasForeignKey(x => x.UserId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
-
         }
     }
 }
