@@ -8,7 +8,7 @@ using System.Security.Claims;
 namespace DeliveryDeck_Backend_Final.Auth.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/auth")]
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
@@ -39,14 +39,6 @@ namespace DeliveryDeck_Backend_Final.Auth.Controllers
         public async Task<ActionResult<TokenPairDto>> Refresh(RefreshDto token)
         {
             return Ok(await _authService.Refresh(token.Value));
-        }
-
-        [Authorize]
-        [HttpPatch("change_password")]
-        public async Task<IActionResult> ChangePassword(ChangePasswordDto passwords)
-        {
-            await _authService.ChangePassword(ClaimsHelper.GetUserId(User.Claims), passwords);
-            return Ok();
         }
 
         [Authorize]

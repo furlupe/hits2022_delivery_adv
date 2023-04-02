@@ -11,5 +11,6 @@ namespace DeliveryDeck_Backend_Final.Common.Interfaces
     {
         Task<UserProfileDto> GetProfile(Guid userId);
         Task UpdateProfile(Guid userId, UserUpdateProfileDto data);
+        Task ChangePassword(Guid userId, ChangePasswordDto passwords);
     }
 }

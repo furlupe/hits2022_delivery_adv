@@ -23,19 +23,6 @@ namespace DeliveryDeck_Backend_Final.Auth.BLL.Services
             _tokenService = tokenService;
             _roleMgr = roleManager;
         }
-
-        public async Task ChangePassword(Guid userId, ChangePasswordDto passwords)
-        {
-            var user = await _userMgr.FindByIdAsync(userId.ToString());
-            var result = await _userMgr.ChangePasswordAsync(user, passwords.OldPassword, passwords.NewPassword);
-
-            if (!result.Succeeded)
-            {
-                throw new BadHttpRequestException("Could not change the password");
-            }
-
-        }
-
         public async Task<TokenPairDto> Login(LoginCredentials credentials)
         {
             var user = await _userMgr.FindByEmailAsync(credentials.Email);

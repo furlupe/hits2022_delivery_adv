@@ -9,6 +9,5 @@ namespace DeliveryDeck_Backend_Final.Common.Interfaces
         Task<TokenPairDto> Login(LoginCredentials credentials);
         Task Logout(Guid userId);
         Task<TokenPairDto> Refresh(string refreshToken);
-        Task ChangePassword(Guid userId, ChangePasswordDto passwords);
     }
 }
