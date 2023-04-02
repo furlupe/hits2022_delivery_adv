@@ -10,7 +10,7 @@ namespace DeliveryDeck_Backend_Final.Auth.BLL.Services
     internal class JwtTokenService : ITokenService
     {
         private readonly IKeyProvider _keyProvider;
-        public JwtTokenService(IKeyProvider keyProvider) 
+        public JwtTokenService(IKeyProvider keyProvider)
         {
             _keyProvider = keyProvider;
         }

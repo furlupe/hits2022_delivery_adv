@@ -1,9 +1,7 @@
-﻿using DeliveryDeck_Backend_Final.Auth.BLL.Services;
-using DeliveryDeck_Backend_Final.Common.DTO;
+﻿using DeliveryDeck_Backend_Final.Common.DTO;
 using DeliveryDeck_Backend_Final.Common.Interfaces;
 using DeliveryDeck_Backend_Final.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DeliveryDeck_Backend_Final.Auth.Controllers

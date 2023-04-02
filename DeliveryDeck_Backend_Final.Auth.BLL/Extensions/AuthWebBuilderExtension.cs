@@ -1,22 +1,24 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using DeliveryDeck_Backend_Final.Common.Interfaces;
-using DeliveryDeck_Backend_Final.Common.Enumerations;
-using DeliveryDeck_Backend_Final.JWT.Extenions;
+﻿using DeliveryDeck_Backend_Final.Auth.BLL.Services;
+using DeliveryDeck_Backend_Final.Auth.DAL;
 using DeliveryDeck_Backend_Final.Auth.DAL.Entities;
 using DeliveryDeck_Backend_Final.Auth.DAL.Extensions;
-using DeliveryDeck_Backend_Final.Auth.DAL;
-using DeliveryDeck_Backend_Final.Auth.BLL.Services;
+using DeliveryDeck_Backend_Final.Common.Enumerations;
+using DeliveryDeck_Backend_Final.Common.Interfaces;
+using DeliveryDeck_Backend_Final.Common.Middlewares;
 using DeliveryDeck_Backend_Final.Common.Utils;
+using DeliveryDeck_Backend_Final.JWT.Extenions;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DeliveryDeck_Backend_Final.Auth.BLL.Extensions
 {
     public static class AuthWebBuilderExtension
     {
-        public static void UseAuthComponent(this WebApplicationBuilder builder)
+        public static void AddAuth(this WebApplicationBuilder builder)
         {
+
             builder.UseAuthDAL();
 
             builder.Services.AddIdentity<AppUser, Role>()
@@ -30,9 +32,16 @@ namespace DeliveryDeck_Backend_Final.Auth.BLL.Extensions
             builder.Services.AddScoped<IUserService, UserService>();
 
             builder.AddJwtAuthentification();
+            builder.Services.AddAuthorization();
         }
 
-        public static async Task AddAuthRoles(this WebApplication app)
+        public static async Task UseAuth(this WebApplication app)
+        {
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
+            await app.AddAuthRoles();
+        }
+
+        private static async Task AddAuthRoles(this WebApplication app)
         {
             using var scope = app.Services.CreateScope();
 

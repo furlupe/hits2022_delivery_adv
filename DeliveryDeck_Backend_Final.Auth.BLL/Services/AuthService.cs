@@ -1,12 +1,13 @@
-﻿using DeliveryDeck_Backend_Final.Common.DTO;
-using DeliveryDeck_Backend_Final.Common.Interfaces;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
-using DeliveryDeck_Backend_Final.Common.Enumerations;
-using System.Security.Claims;
+﻿using DeliveryDeck_Backend_Final.Auth.DAL;
 using DeliveryDeck_Backend_Final.Auth.DAL.Entities;
-using DeliveryDeck_Backend_Final.Auth.DAL;
+using DeliveryDeck_Backend_Final.Common.DTO;
+using DeliveryDeck_Backend_Final.Common.Enumerations;
+using DeliveryDeck_Backend_Final.Common.Exceptions;
+using DeliveryDeck_Backend_Final.Common.Interfaces;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace DeliveryDeck_Backend_Final.Auth.BLL.Services
 {
@@ -16,7 +17,7 @@ namespace DeliveryDeck_Backend_Final.Auth.BLL.Services
         private readonly RoleManager<Role> _roleMgr;
         private readonly AuthContext _authContext;
         private readonly ITokenService _tokenService;
-        public AuthService(UserManager<AppUser> userManager, RoleManager<Role> roleManager,AuthContext authContext, ITokenService tokenService)
+        public AuthService(UserManager<AppUser> userManager, RoleManager<Role> roleManager, AuthContext authContext, ITokenService tokenService)
         {
             _userMgr = userManager;
             _authContext = authContext;
@@ -69,7 +70,7 @@ namespace DeliveryDeck_Backend_Final.Auth.BLL.Services
 
             if (!result.Succeeded)
             {
-                throw new BadImageFormatException("Could not register");
+                throw new IdentityException("Could not register", StatusCodes.Status400BadRequest, result.Errors);
             }
 
             await _userMgr.AddToRoleAsync(user, RoleType.Customer.ToString());

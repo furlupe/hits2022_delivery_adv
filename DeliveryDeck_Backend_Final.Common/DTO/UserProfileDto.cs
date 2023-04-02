@@ -1,5 +1,4 @@
 ﻿using DeliveryDeck_Backend_Final.Common.Enumerations;
-using System.ComponentModel.DataAnnotations;
 
 namespace DeliveryDeck_Backend_Final.Common.DTO
 {

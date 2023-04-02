@@ -1,5 +1,4 @@
-﻿using DeliveryDeck_Backend_Final.Auth.DAL;
-using DeliveryDeck_Backend_Final.Auth.DAL.Entities;
+﻿using DeliveryDeck_Backend_Final.Auth.DAL.Entities;
 using DeliveryDeck_Backend_Final.Common.DTO;
 using DeliveryDeck_Backend_Final.Common.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -53,7 +52,7 @@ namespace DeliveryDeck_Backend_Final.Auth.BLL.Services
             user.Address = data.Address;
 
             await _userMgr.UpdateAsync(user);
-            
+
         }
     }
 }

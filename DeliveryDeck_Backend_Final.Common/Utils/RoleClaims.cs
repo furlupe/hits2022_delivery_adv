@@ -8,9 +8,9 @@ namespace DeliveryDeck_Backend_Final.Common.Utils
     {
         public static Dictionary<RoleType, IEnumerable<Claim>> Claims = new()
         {
-            { 
-                RoleType.Customer, 
-                new List<Claim> 
+            {
+                RoleType.Customer,
+                new List<Claim>
                 {
                     new Claim(CustomClaimTypes.Permission, OrderPermissions.Add),
                     new Claim(CustomClaimTypes.Permission, OrderPermissions.ReadOwnOrderHistory),
@@ -20,14 +20,14 @@ namespace DeliveryDeck_Backend_Final.Common.Utils
                     new Claim(CustomClaimTypes.Permission, RatingPermissions.Read),
                     new Claim(CustomClaimTypes.Permission, RatingPermissions.Add),
                     new Claim(CustomClaimTypes.Permission, RatingPermissions.Update)
-                } 
+                }
             },
 
             {
                 RoleType.Manager,
                 new List<Claim>
                 {
-                    new Claim(CustomClaimTypes.Permission, OrderPermissions.ReadRestaurant)                
+                    new Claim(CustomClaimTypes.Permission, OrderPermissions.ReadRestaurant)
                 }
             },
 

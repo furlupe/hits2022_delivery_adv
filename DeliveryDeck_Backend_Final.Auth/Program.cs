@@ -1,5 +1,5 @@
-﻿using Microsoft.OpenApi.Models;
-using DeliveryDeck_Backend_Final.Auth.BLL.Extensions;
+﻿using DeliveryDeck_Backend_Final.Auth.BLL.Extensions;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,8 +36,7 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
-builder.UseAuthComponent(); // наш authService
-builder.Services.AddAuthorization();
+builder.AddAuth(); // наш authService
 
 var app = builder.Build();
 
@@ -53,7 +52,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-await app.AddAuthRoles(); // вносим пользовательские роли
+await app.UseAuth(); // вносим пользовательские роли
 
 app.MapControllers();
 
