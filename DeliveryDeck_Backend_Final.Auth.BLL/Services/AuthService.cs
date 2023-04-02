@@ -124,14 +124,13 @@ namespace DeliveryDeck_Backend_Final.Auth.BLL.Services
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
 
-                var roleClaims = await _roleMgr
-                    .GetClaimsAsync
-                        (user.Roles.First(r => r.Role.Name == role).Role
-                    );
+                var actualRole = await _roleMgr.Roles
+                    .Include(r => r.RoleClaims)
+                    .FirstAsync(x => x.Name == role);
 
-                foreach (var claim in roleClaims)
+                foreach (var claim in actualRole.RoleClaims)
                 {
-                    claims.Add(claim);
+                    claims.Add(claim.ToClaim());
                 }
             }
 

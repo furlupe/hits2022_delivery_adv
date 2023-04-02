@@ -36,7 +36,7 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
-builder.AddAuth(); // наш authService
+builder.UseAuthComponent(); // наш authService
 builder.Services.AddAuthorization();
 
 var app = builder.Build();

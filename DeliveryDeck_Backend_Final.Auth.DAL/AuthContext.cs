@@ -5,28 +5,38 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DeliveryDeck_Backend_Final.Auth.DAL
 {
-    public class AuthContext : IdentityDbContext<AppUser, Role, Guid, IdentityUserClaim<Guid>, UserRole, IdentityUserLogin<Guid>, IdentityRoleClaim<Guid>, IdentityUserToken<Guid>>
+    public class AuthContext : IdentityDbContext<AppUser, Role, Guid, IdentityUserClaim<Guid>, UserRole, IdentityUserLogin<Guid>, RoleClaim, IdentityUserToken<Guid>>
     {
         public AuthContext(DbContextOptions<AuthContext> options) : base(options) { }
         public override DbSet<AppUser> Users { get; set; }
         public override DbSet<Role> Roles { get; set; }
         public override DbSet<UserRole> UserRoles { get; set; }
+        public override DbSet<RoleClaim> RoleClaims { get; set; }
         public DbSet<RefreshUserToken> RefreshTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
 
-            builder.Entity<UserRole>(o =>
+            builder.Entity<AppUser>(o =>
             {
-                o.HasOne(x => x.Role)
-                    .WithMany(x => x.Users)
-                    .HasForeignKey(x => x.RoleId)
-                    .OnDelete(DeleteBehavior.Cascade);
-                o.HasOne(x => x.User)
-                    .WithMany(x => x.Roles)
-                    .HasForeignKey(x => x.UserId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                o.HasMany(o => o.Roles)
+                    .WithOne(e => e.User)
+                    .HasForeignKey(ur => ur.UserId)
+                    .IsRequired();
+            });
+
+            builder.Entity<Role>(o =>
+            {
+                o.HasMany(r => r.Users)
+                    .WithOne(r => r.Role)
+                    .HasForeignKey(r => r.RoleId)
+                    .IsRequired();
+
+                o.HasMany(r => r.RoleClaims)
+                    .WithOne(c => c.Role)
+                    .HasForeignKey(r => r.RoleId)
+                    .IsRequired();
             });
         }
     }

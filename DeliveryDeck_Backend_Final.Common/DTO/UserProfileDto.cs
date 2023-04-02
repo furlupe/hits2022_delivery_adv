@@ -1,16 +1,15 @@
 ﻿using DeliveryDeck_Backend_Final.Common.Enumerations;
-using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
-namespace DeliveryDeck_Backend_Final.Auth.DAL.Entities
+namespace DeliveryDeck_Backend_Final.Common.DTO
 {
-    public class AppUser : IdentityUser<Guid>
+    public class UserProfileDto
     {
         public string FullName { get; set; }
         public DateTime BirthDate { get; set; }
         public Gender Gender { get; set; }
-        public ICollection<UserRole> Roles { get; set; }
-        public override string? UserName => Email;
+        public string Email { get; set; }
+        public string PhoneNumber { get; set; }
         public string? Address { get; set; }
     }
-
 }

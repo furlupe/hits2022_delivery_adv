@@ -9,12 +9,13 @@ using DeliveryDeck_Backend_Final.Auth.DAL.Extensions;
 using DeliveryDeck_Backend_Final.Auth.DAL;
 using DeliveryDeck_Backend_Final.Auth.BLL.Services;
 using DeliveryDeck_Backend_Final.Common.Utils;
+using Microsoft.EntityFrameworkCore;
 
 namespace DeliveryDeck_Backend_Final.Auth.BLL.Extensions
 {
     public static class AuthWebBuilderExtension
     {
-        public static void AddAuth(this WebApplicationBuilder builder)
+        public static void UseAuthComponent(this WebApplicationBuilder builder)
         {
             builder.UseAuthDAL();
 
@@ -26,20 +27,22 @@ namespace DeliveryDeck_Backend_Final.Auth.BLL.Extensions
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<ITokenService, JwtTokenService>();
             builder.Services.AddScoped<IKeyProvider, RandomKeyProvider>();
+            builder.Services.AddScoped<IUserService, UserService>();
 
             builder.AddJwtAuthentification();
         }
 
         public static async Task AddAuthRoles(this WebApplication app)
         {
-            using (var scope = app.Services.CreateScope())
-            {
-                var roleManager = scope.ServiceProvider.GetService<RoleManager<Role>>();
-                
-                foreach(RoleType role in Enum.GetValues(typeof(RoleType)))
-                {
-                    if (await roleManager.RoleExistsAsync(role.ToString())) continue;
+            using var scope = app.Services.CreateScope();
 
+            var roleManager = scope.ServiceProvider.GetService<RoleManager<Role>>();
+
+            foreach (RoleType role in Enum.GetValues(typeof(RoleType)))
+            {
+
+                if (!await roleManager.RoleExistsAsync(role.ToString()))
+                {
                     var newRole = new Role
                     {
                         Name = role.ToString(),
@@ -47,10 +50,16 @@ namespace DeliveryDeck_Backend_Final.Auth.BLL.Extensions
                     };
 
                     await roleManager.CreateAsync(newRole);
-                    foreach(var claim in RoleClaims.Claims.First(kvp => kvp.Key == role).Value)
-                    {
-                        await roleManager.AddClaimAsync(newRole, claim);
-                    }
+                }
+
+                var existingRole = await roleManager.Roles.SingleAsync(r => r.Type == role);
+                var existingClaims = await roleManager.GetClaimsAsync(existingRole);
+
+                foreach (var claim in RoleClaims.Claims.First(kvp => kvp.Key == role).Value)
+                {
+                    if (existingClaims.Any(c => c.Value == claim.Value && c.Type == claim.Type)) continue;
+
+                    await roleManager.AddClaimAsync(existingRole, claim);
                 }
             }
         }

@@ -3,6 +3,7 @@ using System;
 using DeliveryDeck_Backend_Final.Auth.DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DeliveryDeck_Backend_Final.Auth.DAL.Migrations
 {
     [DbContext(typeof(AuthContext))]
-    partial class AuthContextModelSnapshot : ModelSnapshot
+    [Migration("20230402060747_AddAdressFieldToUser")]
+    partial class AddAdressFieldToUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -145,7 +148,22 @@ namespace DeliveryDeck_Backend_Final.Auth.DAL.Migrations
                     b.ToTable("AspNetRoles", (string)null);
                 });
 
-            modelBuilder.Entity("DeliveryDeck_Backend_Final.Auth.DAL.Entities.RoleClaim", b =>
+            modelBuilder.Entity("DeliveryDeck_Backend_Final.Auth.DAL.Entities.UserRole", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -167,21 +185,6 @@ namespace DeliveryDeck_Backend_Final.Auth.DAL.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetRoleClaims", (string)null);
-                });
-
-            modelBuilder.Entity("DeliveryDeck_Backend_Final.Auth.DAL.Entities.UserRole", b =>
-                {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("UserId", "RoleId");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AspNetUserRoles", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
@@ -259,17 +262,6 @@ namespace DeliveryDeck_Backend_Final.Auth.DAL.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("DeliveryDeck_Backend_Final.Auth.DAL.Entities.RoleClaim", b =>
-                {
-                    b.HasOne("DeliveryDeck_Backend_Final.Auth.DAL.Entities.Role", "Role")
-                        .WithMany("RoleClaims")
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Role");
-                });
-
             modelBuilder.Entity("DeliveryDeck_Backend_Final.Auth.DAL.Entities.UserRole", b =>
                 {
                     b.HasOne("DeliveryDeck_Backend_Final.Auth.DAL.Entities.Role", "Role")
@@ -287,6 +279,15 @@ namespace DeliveryDeck_Backend_Final.Auth.DAL.Migrations
                     b.Navigation("Role");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
+                {
+                    b.HasOne("DeliveryDeck_Backend_Final.Auth.DAL.Entities.Role", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
@@ -323,8 +324,6 @@ namespace DeliveryDeck_Backend_Final.Auth.DAL.Migrations
 
             modelBuilder.Entity("DeliveryDeck_Backend_Final.Auth.DAL.Entities.Role", b =>
                 {
-                    b.Navigation("RoleClaims");
-
                     b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
