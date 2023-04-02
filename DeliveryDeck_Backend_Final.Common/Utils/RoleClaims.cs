@@ -1,4 +1,5 @@
-﻿using DeliveryDeck_Backend_Final.Common.Enumerations;
+﻿using DeliveryDeck_Backend_Final.Common.CustomPermission;
+using DeliveryDeck_Backend_Final.Common.Enumerations;
 using System.Security.Claims;
 
 namespace DeliveryDeck_Backend_Final.Common.Utils
@@ -12,8 +13,13 @@ namespace DeliveryDeck_Backend_Final.Common.Utils
                 new List<Claim> 
                 {
                     new Claim(CustomClaimTypes.Permission, OrderPermissions.Add),
-                    new Claim(CustomClaimTypes.Permission, OrderPermissions.ReadOwn),
-                    new Claim(CustomClaimTypes.Permission, OrderPermissions.ChangeStatus)
+                    new Claim(CustomClaimTypes.Permission, OrderPermissions.ReadOwnOrderHistory),
+                    new Claim(CustomClaimTypes.Permission, OrderPermissions.Cancel),
+                    new Claim(CustomClaimTypes.Permission, CartPermissions.Read),
+                    new Claim(CustomClaimTypes.Permission, CartPermissions.Adjust),
+                    new Claim(CustomClaimTypes.Permission, RatingPermissions.Read),
+                    new Claim(CustomClaimTypes.Permission, RatingPermissions.Add),
+                    new Claim(CustomClaimTypes.Permission, RatingPermissions.Update)
                 } 
             },
 
@@ -21,9 +27,7 @@ namespace DeliveryDeck_Backend_Final.Common.Utils
                 RoleType.Manager,
                 new List<Claim>
                 {
-                    new Claim(CustomClaimTypes.Permission, OrderPermissions.Add),
-                    new Claim(CustomClaimTypes.Permission, OrderPermissions.ReadRestaurant),
-                    new Claim(CustomClaimTypes.Permission, OrderPermissions.ChangeStatus)
+                    new Claim(CustomClaimTypes.Permission, OrderPermissions.ReadRestaurant)                
                 }
             },
 
@@ -32,9 +36,9 @@ namespace DeliveryDeck_Backend_Final.Common.Utils
                 new List<Claim>
                 {
                     new Claim(CustomClaimTypes.Permission, OrderPermissions.Add),
-                    new Claim(CustomClaimTypes.Permission, OrderPermissions.ReadOwn),
+                    new Claim(CustomClaimTypes.Permission, OrderPermissions.ReadOwnDeliveryHistory),
                     new Claim(CustomClaimTypes.Permission, OrderPermissions.GetAvailableForDelivery),
-                    new Claim(CustomClaimTypes.Permission, OrderPermissions.ChangeStatus)
+                    new Claim(CustomClaimTypes.Permission, OrderPermissions.ChangeStatusToDelivered)
                 }
             },
 
@@ -43,9 +47,9 @@ namespace DeliveryDeck_Backend_Final.Common.Utils
                 new List<Claim>
                 {
                     new Claim(CustomClaimTypes.Permission, OrderPermissions.Add),
-                    new Claim(CustomClaimTypes.Permission, OrderPermissions.ReadOwn),
+                    new Claim(CustomClaimTypes.Permission, OrderPermissions.ReadOwnCookingHistory),
                     new Claim(CustomClaimTypes.Permission, OrderPermissions.GetAvailableForCooking),
-                    new Claim(CustomClaimTypes.Permission, OrderPermissions.ChangeStatus)
+                    new Claim(CustomClaimTypes.Permission, OrderPermissions.ChangeStatusUntilDelivery)
                 }
             },
         };

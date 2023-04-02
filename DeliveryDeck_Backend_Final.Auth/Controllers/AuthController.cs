@@ -7,7 +7,7 @@ using System.Security.Claims;
 namespace DeliveryDeck_Backend_Final.Auth.Controllers
 {
     [ApiController]
-    [Route("auth")]
+    [Route("api/auth")]
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
@@ -35,7 +35,7 @@ namespace DeliveryDeck_Backend_Final.Auth.Controllers
         }
 
         [HttpPost("refresh")]
-        public async Task<IActionResult> Refresh(RefreshDto token)
+        public async Task<ActionResult<TokenPairDto>> Refresh(RefreshDto token)
         {
             return Ok(await _authService.Refresh(token.Value));
         }
