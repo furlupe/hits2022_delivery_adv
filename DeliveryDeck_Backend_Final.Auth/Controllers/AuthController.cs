@@ -1,5 +1,6 @@
 ﻿using DeliveryDeck_Backend_Final.Common.DTO;
 using DeliveryDeck_Backend_Final.Common.Interfaces;
+using DeliveryDeck_Backend_Final.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -44,7 +45,7 @@ namespace DeliveryDeck_Backend_Final.Auth.Controllers
         [HttpPatch("change_password")]
         public async Task<IActionResult> ChangePassword(ChangePasswordDto passwords)
         {
-            await _authService.ChangePassword(GetUserIdFromClaims(), passwords);
+            await _authService.ChangePassword(ClaimsHelper.GetUserIdFromClaims(User.Claims), passwords);
             return Ok();
         }
 
@@ -52,17 +53,8 @@ namespace DeliveryDeck_Backend_Final.Auth.Controllers
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
-            await _authService.Logout(GetUserIdFromClaims());
+            await _authService.Logout(ClaimsHelper.GetUserIdFromClaims(User.Claims));
             return Ok();
         }
-
-        private Guid GetUserIdFromClaims()
-        {
-            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name);
-            _ = Guid.TryParse(userIdClaim.Value, out Guid userId);
-
-            return userId;
-        }
-
     }
 }

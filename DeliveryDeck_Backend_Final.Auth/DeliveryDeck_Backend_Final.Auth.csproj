@@ -17,7 +17,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DeliveryDeck_Backend_Final.Auth.BLL\DeliveryDeck_Backend_Final.Auth.BLL.csproj" />
-    <ProjectReference Include="..\DeliveryDeck_Backend_Final.Auth.DAL\DeliveryDeck_Backend_Final.Auth.DAL.csproj" />
     <ProjectReference Include="..\DeliveryDeck_Backend_Final.Common\DeliveryDeck_Backend_Final.Common.csproj" />
     <ProjectReference Include="..\DeliveryDeck_Backend_Final.JWT\DeliveryDeck_Backend_Final.JWT.csproj" />
   </ItemGroup>

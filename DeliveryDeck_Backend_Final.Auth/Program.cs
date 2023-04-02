@@ -1,5 +1,5 @@
-﻿using Microsoft.OpenApi.Models;
-using DeliveryDeck_Backend_Final.Auth.BLL.Extensions;
+﻿using DeliveryDeck_Backend_Final.Auth.BLL.Extensions;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 

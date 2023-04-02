@@ -1,14 +1,14 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using DeliveryDeck_Backend_Final.Common.Interfaces;
-using DeliveryDeck_Backend_Final.Common.Enumerations;
-using DeliveryDeck_Backend_Final.JWT.Extenions;
+﻿using DeliveryDeck_Backend_Final.Auth.BLL.Services;
+using DeliveryDeck_Backend_Final.Auth.DAL;
 using DeliveryDeck_Backend_Final.Auth.DAL.Entities;
 using DeliveryDeck_Backend_Final.Auth.DAL.Extensions;
-using DeliveryDeck_Backend_Final.Auth.DAL;
-using DeliveryDeck_Backend_Final.Auth.BLL.Services;
+using DeliveryDeck_Backend_Final.Common.Enumerations;
+using DeliveryDeck_Backend_Final.Common.Interfaces;
 using DeliveryDeck_Backend_Final.Common.Utils;
+using DeliveryDeck_Backend_Final.JWT.Extenions;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DeliveryDeck_Backend_Final.Auth.BLL.Extensions
 {
@@ -35,8 +35,8 @@ namespace DeliveryDeck_Backend_Final.Auth.BLL.Extensions
             using (var scope = app.Services.CreateScope())
             {
                 var roleManager = scope.ServiceProvider.GetService<RoleManager<Role>>();
-                
-                foreach(RoleType role in Enum.GetValues(typeof(RoleType)))
+
+                foreach (RoleType role in Enum.GetValues(typeof(RoleType)))
                 {
                     if (await roleManager.RoleExistsAsync(role.ToString())) continue;
 
@@ -47,7 +47,7 @@ namespace DeliveryDeck_Backend_Final.Auth.BLL.Extensions
                     };
 
                     await roleManager.CreateAsync(newRole);
-                    foreach(var claim in RoleClaims.Claims.First(kvp => kvp.Key == role).Value)
+                    foreach (var claim in RoleClaims.Claims.First(kvp => kvp.Key == role).Value)
                     {
                         await roleManager.AddClaimAsync(newRole, claim);
                     }
