@@ -1,4 +1,6 @@
 using Microsoft.OpenApi.Models;
+using DeliveryDeck_Backend_Final.Backend.BLL;
+using DeliveryDeck_Backend_Final.Backend.BLL.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +37,7 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
+builder.UseBackendComponent();
 builder.Services.AddAuthorization();
 
 var app = builder.Build();

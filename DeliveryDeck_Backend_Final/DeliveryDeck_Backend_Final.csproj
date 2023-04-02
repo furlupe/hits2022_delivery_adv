@@ -19,7 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
+    <ProjectReference Include="..\DeliveryDeck_Backend_Final.Backend.BLL\DeliveryDeck_Backend_Final.Backend.BLL.csproj" />
+    <ProjectReference Include="..\DeliveryDeck_Backend_Final.Common\DeliveryDeck_Backend_Final.Common.csproj" />
   </ItemGroup>
 
 </Project>
