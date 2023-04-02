@@ -13,13 +13,15 @@ namespace DeliveryDeck_Backend_Final.Auth.BLL.Services
     public class AuthService : IAuthService
     {
         private readonly UserManager<AppUser> _userMgr;
+        private readonly RoleManager<Role> _roleMgr;
         private readonly AuthContext _authContext;
         private readonly ITokenService _tokenService;
-        public AuthService(UserManager<AppUser> userManager, AuthContext authContext, ITokenService tokenService)
+        public AuthService(UserManager<AppUser> userManager, RoleManager<Role> roleManager,AuthContext authContext, ITokenService tokenService)
         {
             _userMgr = userManager;
             _authContext = authContext;
             _tokenService = tokenService;
+            _roleMgr = roleManager;
         }
 
         public async Task ChangePassword(Guid userId, ChangePasswordDto passwords)
@@ -121,6 +123,16 @@ namespace DeliveryDeck_Backend_Final.Auth.BLL.Services
             foreach (var role in await _userMgr.GetRolesAsync(user))
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
+
+                var roleClaims = await _roleMgr
+                    .GetClaimsAsync
+                        (user.Roles.First(r => r.Role.Name == role).Role
+                    );
+
+                foreach (var claim in roleClaims)
+                {
+                    claims.Add(claim);
+                }
             }
 
             return new ClaimsIdentity(claims, "Token");

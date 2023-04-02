@@ -8,6 +8,7 @@ using DeliveryDeck_Backend_Final.Auth.DAL.Entities;
 using DeliveryDeck_Backend_Final.Auth.DAL.Extensions;
 using DeliveryDeck_Backend_Final.Auth.DAL;
 using DeliveryDeck_Backend_Final.Auth.BLL.Services;
+using DeliveryDeck_Backend_Final.Common.Utils;
 
 namespace DeliveryDeck_Backend_Final.Auth.BLL.Extensions
 {
@@ -39,11 +40,17 @@ namespace DeliveryDeck_Backend_Final.Auth.BLL.Extensions
                 {
                     if (await roleManager.RoleExistsAsync(role.ToString())) continue;
 
-                    await roleManager.CreateAsync(new Role
+                    var newRole = new Role
                     {
                         Name = role.ToString(),
                         Type = role
-                    });
+                    };
+
+                    await roleManager.CreateAsync(newRole);
+                    foreach(var claim in RoleClaims.Claims.First(kvp => kvp.Key == role).Value)
+                    {
+                        await roleManager.AddClaimAsync(newRole, claim);
+                    }
                 }
             }
         }

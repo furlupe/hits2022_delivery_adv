@@ -35,7 +35,7 @@ namespace DeliveryDeck_Backend_Final.Auth.Controllers
         }
 
         [HttpPost("refresh")]
-        public async Task<IActionResult> Refresh(RefreshDto token)
+        public async Task<ActionResult<TokenPairDto>> Refresh(RefreshDto token)
         {
             return Ok(await _authService.Refresh(token.Value));
         }
