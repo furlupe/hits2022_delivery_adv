@@ -112,7 +112,7 @@ namespace DeliveryDeck_Backend_Final.Auth.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshTokens");
+                    b.ToTable("RefreshTokens", (string)null);
                 });
 
             modelBuilder.Entity("DeliveryDeck_Backend_Final.Auth.DAL.Entities.Role", b =>

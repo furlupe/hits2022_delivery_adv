@@ -3,6 +3,7 @@ using DeliveryDeck_Backend_Final.Common.Interfaces;
 using DeliveryDeck_Backend_Final.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace DeliveryDeck_Backend_Final.Auth.Controllers
 {
@@ -31,13 +32,17 @@ namespace DeliveryDeck_Backend_Final.Auth.Controllers
             return Ok();
         }
 
-        [HttpPatch("change_password")]
-        [Authorize]
-
-        public async Task<IActionResult> ChangePassword(ChangePasswordDto passwords)
+        [HttpPost("reset_password")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordDto data)
         {
-            await _userService.ChangePassword(ClaimsHelper.GetUserId(User.Claims), passwords);
+            await _userService.ResetPassword(data);
             return Ok();
+        }
+
+        [HttpPost("forgot_password")]
+        public async Task<ActionResult<ResetPasswordToken>> GetResetPasswordToken(ResetPasswordShortDto data)
+        {
+            return Ok(await _userService.GetResetPasswordToken(data.Email));
         }
     }
 }

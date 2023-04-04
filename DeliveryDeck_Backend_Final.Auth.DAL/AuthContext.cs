@@ -8,10 +8,6 @@ namespace DeliveryDeck_Backend_Final.Auth.DAL
     public class AuthContext : IdentityDbContext<AppUser, Role, Guid, IdentityUserClaim<Guid>, UserRole, IdentityUserLogin<Guid>, RoleClaim, IdentityUserToken<Guid>>
     {
         public AuthContext(DbContextOptions<AuthContext> options) : base(options) { }
-        public override DbSet<AppUser> Users { get; set; }
-        public override DbSet<Role> Roles { get; set; }
-        public override DbSet<UserRole> UserRoles { get; set; }
-        public override DbSet<RoleClaim> RoleClaims { get; set; }
         public DbSet<RefreshUserToken> RefreshTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)

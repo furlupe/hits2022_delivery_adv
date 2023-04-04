@@ -2,10 +2,13 @@
 
 namespace DeliveryDeck_Backend_Final.Common.DTO
 {
-    public class ChangePasswordDto
+    public class ResetPasswordDto
     {
         [Required]
-        public string OldPassword { get; set; }
+        public string ResetToken { get; set; }
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; }
         [Required]
         public string NewPassword { get; set; }
     }

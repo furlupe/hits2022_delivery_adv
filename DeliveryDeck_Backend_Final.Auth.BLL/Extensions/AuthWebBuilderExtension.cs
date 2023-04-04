@@ -18,11 +18,11 @@ namespace DeliveryDeck_Backend_Final.Auth.BLL.Extensions
     {
         public static void AddAuth(this WebApplicationBuilder builder)
         {
-
             builder.UseAuthDAL();
 
             builder.Services.AddIdentity<AppUser, Role>()
                 .AddEntityFrameworkStores<AuthContext>()
+                .AddDefaultTokenProviders()
                 .AddUserManager<UserManager<AppUser>>()
                 .AddRoleManager<RoleManager<Role>>();
 
