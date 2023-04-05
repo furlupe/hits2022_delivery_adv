@@ -10,7 +10,6 @@ namespace DeliveryDeck_Backend_Final.Backend.DAL.Entities
         public Cart Cart { get; set; }
         public int Price { get; set; }
         public OrderStatus Status { get; set; }
-
         public Cook? Cook { get; set; }
         public Courier? Courier { get; set; }
         public Customer Customer { get; set; }

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Security.Claims;
 
 namespace DeliveryDeck_Backend_Final.Common.Utils
 {
@@ -15,6 +10,11 @@ namespace DeliveryDeck_Backend_Final.Common.Utils
             _ = Guid.TryParse(userIdClaim.Value, out Guid userId);
 
             return userId;
+        }
+
+        public static bool HasPermission(IEnumerable<Claim> claims, string permission)
+        {
+            return claims.Any(c => c.Type == CustomClaimTypes.Permission && c.Value == permission);
         }
     }
 }

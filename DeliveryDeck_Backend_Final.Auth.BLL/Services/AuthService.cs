@@ -38,7 +38,8 @@ namespace DeliveryDeck_Backend_Final.Auth.BLL.Services
 
         public async Task<TokenPairDto> Login(LoginCredentials credentials)
         {
-            var user = await _userMgr.FindByEmailAsync(credentials.Email);
+            var user = await _userMgr
+                .FindByEmailAsync(credentials.Email);
             if (user == null || !await _userMgr.CheckPasswordAsync(user, credentials.Password))
             {
                 throw new BadHttpRequestException("Invalid credentials");
@@ -126,7 +127,7 @@ namespace DeliveryDeck_Backend_Final.Auth.BLL.Services
 
                 var roleClaims = await _roleMgr
                     .GetClaimsAsync
-                        (user.Roles.First(r => r.Role.Name == role).Role
+                        (_roleMgr.Roles.First(r => r.Name == role)
                     );
 
                 foreach (var claim in roleClaims)
