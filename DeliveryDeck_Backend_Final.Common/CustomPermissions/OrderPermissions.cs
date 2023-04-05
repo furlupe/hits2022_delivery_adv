@@ -1,4 +1,4 @@
-﻿namespace DeliveryDeck_Backend_Final.Common.CustomPermission
+﻿namespace DeliveryDeck_Backend_Final.Common.CustomPermissions
 {
     public static class OrderPermissions
     {

@@ -1,18 +1,17 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
-    <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.4" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DeliveryDeck_Backend_Final.Auth.BLL\DeliveryDeck_Backend_Final.Auth.BLL.csproj" />
+    <ProjectReference Include="..\DeliveryDeck_Backend_Final.Backend.DAL\DeliveryDeck_Backend_Final.Backend.DAL.csproj" />
     <ProjectReference Include="..\DeliveryDeck_Backend_Final.Common\DeliveryDeck_Backend_Final.Common.csproj" />
     <ProjectReference Include="..\DeliveryDeck_Backend_Final.JWT\DeliveryDeck_Backend_Final.JWT.csproj" />
   </ItemGroup>

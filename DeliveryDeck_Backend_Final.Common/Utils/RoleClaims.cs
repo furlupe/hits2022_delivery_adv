@@ -1,4 +1,4 @@
-﻿using DeliveryDeck_Backend_Final.Common.CustomPermission;
+﻿using DeliveryDeck_Backend_Final.Common.CustomPermissions;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
 using System.Security.Claims;
 

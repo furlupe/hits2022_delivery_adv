@@ -11,5 +11,10 @@ namespace DeliveryDeck_Backend_Final.Common.Utils
 
             return userId;
         }
+
+        public static bool HasPermission(IEnumerable<Claim> claims, string permission)
+        {
+            return claims.Any(c => c.Type == CustomClaimTypes.Permission && c.Value == permission);
+        }
     }
 }
