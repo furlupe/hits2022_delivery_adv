@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace DeliveryDeck_Backend_Final.Controllers
 {
-    [Route("api/cart")]
+    [Route("api/backend/cart")]
     [Authorize]
     [ApiController]
     public class CartController : ControllerBase
@@ -30,7 +30,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
             return Ok(await _cartService.GetCart(ClaimsHelper.GetUserId(User.Claims)));
         }
 
-        [HttpPost("{dishId}")]
+        [HttpPost("{dishId}/remove")]
         public async Task<IActionResult> AddDish(Guid dishId, [FromQuery, BindRequired] int amount = 1)
         {
             if (! ClaimsHelper.HasPermission(User.Claims, CartPermissions.Adjust))
