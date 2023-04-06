@@ -1,5 +1,10 @@
 using Microsoft.OpenApi.Models;
 using DeliveryDeck_Backend_Final.Backend.BLL.Extensions;
+using Microsoft.AspNetCore.Authorization;
+using DeliveryDeck_Backend_Final.ClaimAuthorize;
+using DeliveryDeck_Backend_Final.Common.Utils;
+using DeliveryDeck_Backend_Final.Common.CustomPermissions;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,7 +42,6 @@ builder.Services.AddSwaggerGen(option =>
 });
 
 builder.UseBackendComponent();
-builder.Services.AddAuthorization();
 
 var app = builder.Build();
 

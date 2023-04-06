@@ -3,6 +3,5 @@
     public class Cook
     {
         public Guid Id { get; set; }
-        public ICollection<Order> Orders { get; set; }
     }
 }

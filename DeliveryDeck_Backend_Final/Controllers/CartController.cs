@@ -1,4 +1,5 @@
-﻿using DeliveryDeck_Backend_Final.Common.CustomPermissions;
+﻿using DeliveryDeck_Backend_Final.ClaimAuthorize;
+using DeliveryDeck_Backend_Final.Common.CustomPermissions;
 using DeliveryDeck_Backend_Final.Common.DTO;
 using DeliveryDeck_Backend_Final.Common.Interfaces;
 using DeliveryDeck_Backend_Final.Common.Utils;
@@ -21,6 +22,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
         }
 
         [HttpGet]
+        [ClaimPermissionRequirement(CartPermissions.Read)]
         public async Task<ActionResult<CartDto>> GetCart()
         {
             if (! ClaimsHelper.HasPermission(User.Claims, CartPermissions.Read))
@@ -31,6 +33,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
         }
 
         [HttpPost("{dishId}/remove")]
+        [ClaimPermissionRequirement(CartPermissions.Adjust)]
         public async Task<IActionResult> AddDish(Guid dishId, [FromQuery, BindRequired] int amount = 1)
         {
             if (! ClaimsHelper.HasPermission(User.Claims, CartPermissions.Adjust))
@@ -42,6 +45,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
         }
 
         [HttpPatch("{dishId}")]
+        [ClaimPermissionRequirement(CartPermissions.Adjust)]
         public async Task<IActionResult> RemoveDish(Guid dishId, [FromQuery, BindRequired] int amount = 1)
         {
             if (!ClaimsHelper.HasPermission(User.Claims, CartPermissions.Adjust))
@@ -54,6 +58,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
         }
 
         [HttpDelete("{dishId}")]
+        [ClaimPermissionRequirement(CartPermissions.Adjust)]
         public async Task<IActionResult> RemoveDishCompletely(Guid dishId)
         {
             if (!ClaimsHelper.HasPermission(User.Claims, CartPermissions.Adjust))

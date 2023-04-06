@@ -3,6 +3,7 @@ using System;
 using DeliveryDeck_Backend_Final.Backend.DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DeliveryDeck_Backend_Final.Backend.DAL.Migrations
 {
     [DbContext(typeof(BackendContext))]
-    partial class BackendContextModelSnapshot : ModelSnapshot
+    [Migration("20230406092245_new")]
+    partial class @new
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -73,6 +76,7 @@ namespace DeliveryDeck_Backend_Final.Backend.DAL.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Photo")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("Price")
@@ -81,17 +85,6 @@ namespace DeliveryDeck_Backend_Final.Backend.DAL.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Dishes");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("57ae80f9-90de-47ff-9cce-0d743b43c158"),
-                            Category = 3,
-                            Description = "aaaaa",
-                            IsVegeterian = false,
-                            Name = "Fish w/ Qiwi",
-                            Price = 50
-                        });
                 });
 
             modelBuilder.Entity("DeliveryDeck_Backend_Final.Backend.DAL.Entities.DishInCart", b =>

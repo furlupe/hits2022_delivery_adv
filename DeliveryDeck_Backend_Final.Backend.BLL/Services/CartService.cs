@@ -16,9 +16,9 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
         }
         public async Task AddDish(Guid userId, Guid dishId, int amount = 1)
         {
-            var customer = await GetCustomer(userId);
+            var cart = await GetCartByUserId(userId);
 
-            var existingDish = customer.Cart.Dishes
+            var existingDish = cart.Dishes
                 .SingleOrDefault(d => d.Dish.Id == dishId);
 
             if(existingDish != null)
@@ -27,7 +27,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             } 
             else
             {
-                customer.Cart.Dishes.Add(new DishInCart
+                cart.Dishes.Add(new DishInCart
                 {
                     Dish = await _backendContext.Dishes.SingleAsync(d => d.Id == dishId),
                     Amount = amount
@@ -39,11 +39,11 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
         public async Task<CartDto> GetCart(Guid userId)
         {
-            var customer = await GetCustomer(userId);
+            var cart = await GetCartByUserId(userId);
 
             var dishes = new List<DishCartDto>();
             var totalPrice = 0;
-            foreach(var dishInCart in customer.Cart.Dishes)
+            foreach(var dishInCart in cart.Dishes)
             {
                 var dish = await _backendContext.Dishes.SingleAsync(d => d == dishInCart.Dish);
 
@@ -70,16 +70,16 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
         public async Task RemoveDish(Guid userId, Guid dishId, int amount = 1)
         {
-            var customer = await GetCustomer(userId);
+            var cart = await GetCartByUserId(userId);
 
-            var dishInCart = customer.Cart.Dishes.SingleOrDefault(d => d.Dish.Id == dishId)
+            var dishInCart = cart.Dishes.SingleOrDefault(d => d.Dish.Id == dishId)
                 ?? throw new BadHttpRequestException("Dish is not in the cart already, moron");
 
             dishInCart.Amount -= amount;
 
             if (dishInCart.Amount <= 0)
             {
-                customer.Cart.Dishes.Remove(dishInCart);
+                cart.Dishes.Remove(dishInCart);
             }
 
             await _backendContext.SaveChangesAsync();
@@ -87,23 +87,36 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
         public async Task RemoveDishCompletely(Guid userId, Guid dishId)
         {
-            var customer = await GetCustomer(userId);
+            var cart = await GetCartByUserId(userId);
 
-            var dishInCart = customer.Cart.Dishes.SingleOrDefault(d => d.Dish.Id == dishId)
+            var dishInCart = cart.Dishes.SingleOrDefault(d => d.Dish.Id == dishId)
                 ?? throw new BadHttpRequestException("Dish is not in the cart already, moron");
 
-            customer.Cart.Dishes.Remove(dishInCart);
+            cart.Dishes.Remove(dishInCart);
 
             await _backendContext.SaveChangesAsync();
         }
 
-        private async Task<Customer> GetCustomer(Guid id)
+        private async Task<Cart> GetCartByUserId(Guid customerId)
         {
-            return await _backendContext.Customers
-                .Include(c => c.Cart)
-                    .ThenInclude(c => c.Dishes)
-                        .ThenInclude(d => d.Dish)
-                .SingleAsync(c => c.Id == id);
+            return await _backendContext.Carts
+                .Include(c => c.Dishes)
+                    .ThenInclude(d => d.Dish)
+                .SingleOrDefaultAsync(c => c.CustomerId == customerId && c.Order == null)
+                ?? await CreateCart(customerId);
+        }
+
+        private async Task<Cart> CreateCart(Guid customerId)
+        {
+            var cart = new Cart
+            {
+                CustomerId = customerId
+            };
+
+            await _backendContext.Carts.AddAsync(cart);
+            await _backendContext.SaveChangesAsync();
+
+            return cart;
         }
     }
 }
