@@ -1,4 +1,4 @@
-﻿using DeliveryDeck_Backend_Final.Common.DTO;
+﻿using DeliveryDeck_Backend_Final.Common.DTO.Auth;
 using DeliveryDeck_Backend_Final.Common.Interfaces;
 using DeliveryDeck_Backend_Final.JWT.Classes;
 using Microsoft.IdentityModel.Tokens;

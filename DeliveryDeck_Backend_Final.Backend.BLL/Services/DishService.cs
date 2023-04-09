@@ -1,14 +1,9 @@
 ﻿using DeliveryDeck_Backend_Final.Backend.DAL;
-using DeliveryDeck_Backend_Final.Common.DTO;
+using DeliveryDeck_Backend_Final.Common.DTO.Backend;
 using DeliveryDeck_Backend_Final.Common.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 {

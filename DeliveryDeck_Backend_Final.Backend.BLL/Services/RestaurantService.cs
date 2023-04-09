@@ -1,8 +1,8 @@
 ﻿using DeliveryDeck_Backend_Final.Backend.DAL;
 using DeliveryDeck_Backend_Final.Backend.DAL.Entities;
-using DeliveryDeck_Backend_Final.Common.DTO;
-using DeliveryDeck_Backend_Final.Common.Interfaces;
+using DeliveryDeck_Backend_Final.Common.DTO.Backend;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
+using DeliveryDeck_Backend_Final.Common.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -45,7 +45,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
                 }
             };
 
-            foreach(var restaurant in restaurants)
+            foreach (var restaurant in restaurants)
             {
                 response.Restaurants.Add(new RestaurantShortDto
                 {
@@ -61,7 +61,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
         {
             var menu = await _backendContext.Menus
                 .Where(m => m.Id == menuId)
-                .Select(m => new { m.Restaurant.Id , m.Name})
+                .Select(m => new { m.Restaurant.Id, m.Name })
                 .SingleAsync();
 
             filters.Menu = menu.Name;
@@ -87,7 +87,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             var response = new PagedDishesDto();
             var filteredDishes = new List<Dish>();
 
-            foreach(var menu in menus)
+            foreach (var menu in menus)
             {
                 filteredDishes.AddRange(menu);
             }
@@ -145,7 +145,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
                 .Select(m => new { m.Id, m.Name })
                 .ToListAsync();
 
-            var pagesAmount = (int) Math.Ceiling( (double) menus.Count / _MenusPageSize);
+            var pagesAmount = (int)Math.Ceiling((double)menus.Count / _MenusPageSize);
 
             if (pagesAmount < page || page < 1)
             {
@@ -184,7 +184,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
     {
         public static ICollection<Dish> FilterByCategories(this ICollection<Dish> collection, ICollection<FoodCategory> categories)
         {
-            if (! categories.IsNullOrEmpty())
+            if (!categories.IsNullOrEmpty())
             {
                 collection = collection
                     .Where(d => categories.Contains(d.Category))
@@ -210,9 +210,9 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
     {
         public static ICollection<DishDto> SortBy(this ICollection<DishDto> collection, SortingType? sortBy)
         {
-            if(sortBy != null)
+            if (sortBy != null)
             {
-                var sortedCollection = (IEnumerable<DishDto>) collection;
+                var sortedCollection = (IEnumerable<DishDto>)collection;
                 switch (sortBy)
                 {
                     case SortingType.NAME_DESCENDING:

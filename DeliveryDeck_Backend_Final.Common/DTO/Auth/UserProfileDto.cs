@@ -1,6 +1,6 @@
 ﻿using DeliveryDeck_Backend_Final.Common.Enumerations;
 
-namespace DeliveryDeck_Backend_Final.Common.DTO
+namespace DeliveryDeck_Backend_Final.Common.DTO.Auth
 {
     public class UserProfileDto
     {

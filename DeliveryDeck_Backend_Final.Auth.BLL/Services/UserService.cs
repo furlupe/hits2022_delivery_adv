@@ -1,5 +1,5 @@
 ﻿using DeliveryDeck_Backend_Final.Auth.DAL.Entities;
-using DeliveryDeck_Backend_Final.Common.DTO;
+using DeliveryDeck_Backend_Final.Common.DTO.Auth;
 using DeliveryDeck_Backend_Final.Common.Exceptions;
 using DeliveryDeck_Backend_Final.Common.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -35,8 +35,9 @@ namespace DeliveryDeck_Backend_Final.Auth.BLL.Services
             var user = await _userMgr.FindByEmailAsync(email)
                 ?? throw new BadHttpRequestException(string.Format($"No such user with email {0}", email));
 
-            return new ResetPasswordToken {
-                Token = await _userMgr.GeneratePasswordResetTokenAsync(user) 
+            return new ResetPasswordToken
+            {
+                Token = await _userMgr.GeneratePasswordResetTokenAsync(user)
             };
         }
 
@@ -46,7 +47,7 @@ namespace DeliveryDeck_Backend_Final.Auth.BLL.Services
                 ?? throw new BadHttpRequestException(string.Format($"No such user with email {0}", data.Email));
 
             var result = await _userMgr.ResetPasswordAsync(user, data.ResetToken, data.NewPassword);
-            if(!result.Succeeded)
+            if (!result.Succeeded)
             {
                 throw new IdentityException("Could not change the password", StatusCodes.Status400BadRequest, result.Errors);
             }

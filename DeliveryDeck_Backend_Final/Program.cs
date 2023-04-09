@@ -1,10 +1,5 @@
-using Microsoft.OpenApi.Models;
 using DeliveryDeck_Backend_Final.Backend.BLL.Extensions;
-using Microsoft.AspNetCore.Authorization;
-using DeliveryDeck_Backend_Final.ClaimAuthorize;
-using DeliveryDeck_Backend_Final.Common.Utils;
-using DeliveryDeck_Backend_Final.Common.CustomPermissions;
-using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 

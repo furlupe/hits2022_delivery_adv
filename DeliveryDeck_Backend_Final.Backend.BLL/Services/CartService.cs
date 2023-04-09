@@ -1,6 +1,6 @@
 ﻿using DeliveryDeck_Backend_Final.Backend.DAL;
 using DeliveryDeck_Backend_Final.Backend.DAL.Entities;
-using DeliveryDeck_Backend_Final.Common.DTO;
+using DeliveryDeck_Backend_Final.Common.DTO.Backend;
 using DeliveryDeck_Backend_Final.Common.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -21,10 +21,10 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             var existingDish = cart.Dishes
                 .SingleOrDefault(d => d.Dish.Id == dishId);
 
-            if(existingDish != null)
+            if (existingDish != null)
             {
                 existingDish.Amount += amount;
-            } 
+            }
             else
             {
                 cart.Dishes.Add(new DishInCart
@@ -43,7 +43,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
             var dishes = new List<DishCartDto>();
             var totalPrice = 0;
-            foreach(var dishInCart in cart.Dishes)
+            foreach (var dishInCart in cart.Dishes)
             {
                 var dish = await _backendContext.Dishes.SingleAsync(d => d == dishInCart.Dish);
 

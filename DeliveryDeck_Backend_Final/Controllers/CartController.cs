@@ -1,10 +1,9 @@
 ﻿using DeliveryDeck_Backend_Final.ClaimAuthorize;
 using DeliveryDeck_Backend_Final.Common.CustomPermissions;
-using DeliveryDeck_Backend_Final.Common.DTO;
+using DeliveryDeck_Backend_Final.Common.DTO.Backend;
 using DeliveryDeck_Backend_Final.Common.Interfaces;
 using DeliveryDeck_Backend_Final.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
@@ -25,7 +24,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
         [ClaimPermissionRequirement(CartPermissions.Read)]
         public async Task<ActionResult<CartDto>> GetCart()
         {
-            if (! ClaimsHelper.HasPermission(User.Claims, CartPermissions.Read))
+            if (!ClaimsHelper.HasPermission(User.Claims, CartPermissions.Read))
             {
                 return Forbid();
             }
@@ -36,7 +35,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
         [ClaimPermissionRequirement(CartPermissions.Adjust)]
         public async Task<IActionResult> AddDish(Guid dishId, [FromQuery, BindRequired] int amount = 1)
         {
-            if (! ClaimsHelper.HasPermission(User.Claims, CartPermissions.Adjust))
+            if (!ClaimsHelper.HasPermission(User.Claims, CartPermissions.Adjust))
             {
                 return Forbid();
             }

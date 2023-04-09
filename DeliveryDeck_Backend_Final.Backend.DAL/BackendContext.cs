@@ -39,7 +39,7 @@ namespace DeliveryDeck_Backend_Final.Backend.DAL
                     new Restaurant { Id = Guid.NewGuid(), Name = "New Amogus" },
                     new Restaurant { Id = Guid.NewGuid(), Name = "Old Amogus" },
                     new Restaurant { Id = Guid.NewGuid(), Name = "FeastingHub" }
-                    ) ;
+                    );
         }
     }
 }

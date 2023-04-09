@@ -22,7 +22,7 @@ namespace DeliveryDeck_Backend_Final.ClaimAuthorize
         }
         public void OnAuthorization(AuthorizationFilterContext context)
         {
-            if(! context.HttpContext.User
+            if (!context.HttpContext.User
                 .HasClaim(c => c.Type == CustomClaimTypes.Permission && c.Value == _permission)
                 )
             {

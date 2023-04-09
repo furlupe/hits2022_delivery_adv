@@ -1,4 +1,4 @@
-﻿using DeliveryDeck_Backend_Final.Common.DTO;
+﻿using DeliveryDeck_Backend_Final.Common.DTO.Auth;
 using System.Security.Claims;
 
 namespace DeliveryDeck_Backend_Final.Common.Interfaces
