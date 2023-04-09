@@ -8,7 +8,7 @@ namespace DeliveryDeck_Backend_Final.Common.DTO
 {
     public class PagedDishesDto
     {
-        public ICollection<DishShortDto> Dishes { get; set; } = new List<DishShortDto> ();
+        public ICollection<DishDto> Dishes { get; set; } = new List<DishDto> ();
         public PageInfo PageInfo { get; set; }
     }
 }

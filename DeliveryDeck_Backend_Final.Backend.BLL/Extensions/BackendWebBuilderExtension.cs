@@ -14,6 +14,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Extensions
             builder.UseBackendDAL();
             builder.Services.AddScoped<ICartService, CartService>();
             builder.Services.AddScoped<IRestaurantService, RestaurantService>();
+            builder.Services.AddScoped<IDishService, DishService>();
 
             builder.AddJwtAuthentification();
         }

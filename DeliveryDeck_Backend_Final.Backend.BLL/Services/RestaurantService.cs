@@ -99,7 +99,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
             foreach (var dish in filteredDishes)
             {
-                response.Dishes.Add(new DishShortDto
+                response.Dishes.Add(new DishDto
                 {
                     Id = dish.Id,
                     Name = dish.Name,
@@ -208,11 +208,11 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
     public static class DishShortDtoEnumerableExtensions
     {
-        public static ICollection<DishShortDto> SortBy(this ICollection<DishShortDto> collection, SortingType? sortBy)
+        public static ICollection<DishDto> SortBy(this ICollection<DishDto> collection, SortingType? sortBy)
         {
             if(sortBy != null)
             {
-                var sortedCollection = (IEnumerable<DishShortDto>) collection;
+                var sortedCollection = (IEnumerable<DishDto>) collection;
                 switch (sortBy)
                 {
                     case SortingType.NAME_DESCENDING:
