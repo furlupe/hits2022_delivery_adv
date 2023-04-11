@@ -1,4 +1,4 @@
-﻿using DeliveryDeck_Backend_Final.Common.Interfaces;
+﻿using DeliveryDeck_Backend_Final.Common.Interfaces.Auth;
 
 namespace DeliveryDeck_Backend_Final.Auth.BLL.Services
 {

@@ -1,6 +1,6 @@
 ﻿using DeliveryDeck_Backend_Final.Common.DTO.Backend;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
-using DeliveryDeck_Backend_Final.Common.Interfaces;
+using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 

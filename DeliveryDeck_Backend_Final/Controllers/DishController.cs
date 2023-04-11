@@ -1,5 +1,5 @@
 ﻿using DeliveryDeck_Backend_Final.Common.DTO.Backend;
-using DeliveryDeck_Backend_Final.Common.Interfaces;
+using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DeliveryDeck_Backend_Final.Controllers

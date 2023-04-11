@@ -3,7 +3,7 @@ using DeliveryDeck_Backend_Final.Auth.DAL;
 using DeliveryDeck_Backend_Final.Auth.DAL.Entities;
 using DeliveryDeck_Backend_Final.Auth.DAL.Extensions;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
-using DeliveryDeck_Backend_Final.Common.Interfaces;
+using DeliveryDeck_Backend_Final.Common.Interfaces.Auth;
 using DeliveryDeck_Backend_Final.Common.Middlewares;
 using DeliveryDeck_Backend_Final.Common.Utils;
 using DeliveryDeck_Backend_Final.JWT.Extenions;

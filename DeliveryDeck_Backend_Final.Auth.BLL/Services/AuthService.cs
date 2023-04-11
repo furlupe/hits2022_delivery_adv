@@ -3,7 +3,7 @@ using DeliveryDeck_Backend_Final.Auth.DAL.Entities;
 using DeliveryDeck_Backend_Final.Common.DTO.Auth;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
 using DeliveryDeck_Backend_Final.Common.Exceptions;
-using DeliveryDeck_Backend_Final.Common.Interfaces;
+using DeliveryDeck_Backend_Final.Common.Interfaces.Auth;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

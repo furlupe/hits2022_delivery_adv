@@ -1,6 +1,6 @@
 ﻿using DeliveryDeck_Backend_Final.Common.DTO.Auth;
 
-namespace DeliveryDeck_Backend_Final.Common.Interfaces
+namespace DeliveryDeck_Backend_Final.Common.Interfaces.Auth
 {
     public interface IUserService
     {

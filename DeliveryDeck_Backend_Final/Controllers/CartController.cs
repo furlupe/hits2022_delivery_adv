@@ -1,7 +1,7 @@
 ﻿using DeliveryDeck_Backend_Final.ClaimAuthorize;
 using DeliveryDeck_Backend_Final.Common.CustomPermissions;
 using DeliveryDeck_Backend_Final.Common.DTO.Backend;
-using DeliveryDeck_Backend_Final.Common.Interfaces;
+using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
 using DeliveryDeck_Backend_Final.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -31,7 +31,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
             return Ok(await _cartService.GetCart(ClaimsHelper.GetUserId(User.Claims)));
         }
 
-        [HttpPost("{dishId}/remove")]
+        [HttpPost("{dishId}")]
         [ClaimPermissionRequirement(CartPermissions.Adjust)]
         public async Task<IActionResult> AddDish(Guid dishId, [FromQuery, BindRequired] int amount = 1)
         {
@@ -40,7 +40,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
                 return Forbid();
             }
             await _cartService.AddDish(ClaimsHelper.GetUserId(User.Claims), dishId, amount);
-            return StatusCode(StatusCodes.Status204NoContent);
+            return NoContent();
         }
 
         [HttpPatch("{dishId}")]
@@ -53,7 +53,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
             }
 
             await _cartService.RemoveDish(ClaimsHelper.GetUserId(User.Claims), dishId, amount);
-            return StatusCode(StatusCodes.Status204NoContent);
+            return NoContent();
         }
 
         [HttpDelete("{dishId}")]
@@ -66,7 +66,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
             }
 
             await _cartService.RemoveDishCompletely(ClaimsHelper.GetUserId(User.Claims), dishId);
-            return StatusCode(StatusCodes.Status204NoContent);
+            return NoContent();
         }
     }
 }

@@ -5,6 +5,6 @@
         public Guid Id { get; set; }
         public ICollection<DishInCart> Dishes { get; set; } = new List<DishInCart>();
         public Guid CustomerId { get; set; }
-        public Order? Order { get; set; } = null;
+        public bool WasOrdered { get; set; } = false;
     }
 }

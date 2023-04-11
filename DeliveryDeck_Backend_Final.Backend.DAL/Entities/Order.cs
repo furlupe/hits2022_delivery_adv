@@ -12,5 +12,6 @@ namespace DeliveryDeck_Backend_Final.Backend.DAL.Entities
         public Guid? Cook { get; set; }
         public Guid? CourierId { get; set; }
         public Guid CustomerId { get; set; }
+        public ICollection<DishInCart> Dishes { get; set; }
     }
 }

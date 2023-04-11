@@ -1,7 +1,7 @@
 ﻿using DeliveryDeck_Backend_Final.Backend.DAL;
 using DeliveryDeck_Backend_Final.Backend.DAL.Entities;
 using DeliveryDeck_Backend_Final.Common.DTO.Backend;
-using DeliveryDeck_Backend_Final.Common.Interfaces;
+using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
@@ -102,7 +102,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             return await _backendContext.Carts
                 .Include(c => c.Dishes)
                     .ThenInclude(d => d.Dish)
-                .SingleOrDefaultAsync(c => c.CustomerId == customerId && c.Order == null)
+                .SingleOrDefaultAsync(c => c.CustomerId == customerId && c.WasOrdered == false)
                 ?? await CreateCart(customerId);
         }
 

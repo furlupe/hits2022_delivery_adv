@@ -1,6 +1,6 @@
 ﻿using DeliveryDeck_Backend_Final.Backend.BLL.Services;
 using DeliveryDeck_Backend_Final.Backend.DAL.Extensions;
-using DeliveryDeck_Backend_Final.Common.Interfaces;
+using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
 using DeliveryDeck_Backend_Final.JWT.Extenions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,6 +15,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Extensions
             builder.Services.AddScoped<ICartService, CartService>();
             builder.Services.AddScoped<IRestaurantService, RestaurantService>();
             builder.Services.AddScoped<IDishService, DishService>();
+            builder.Services.AddScoped<IOrderService, OrderService>();
 
             builder.AddJwtAuthentification();
         }
