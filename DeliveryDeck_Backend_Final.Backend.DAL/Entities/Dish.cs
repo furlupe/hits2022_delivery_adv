@@ -1,4 +1,5 @@
 ﻿using DeliveryDeck_Backend_Final.Common.Enumerations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DeliveryDeck_Backend_Final.Backend.DAL.Entities
 {
@@ -12,5 +13,14 @@ namespace DeliveryDeck_Backend_Final.Backend.DAL.Entities
         public string? Photo { get; set; }
         public ICollection<Rating> Ratings { get; set; }
         public FoodCategory Category { get; set; }
+
+        [NotMapped]
+        public double Rating
+        {
+            get
+            {
+                return (Ratings.Count > 0) ? Ratings.Average(r => r.Value) : 0;
+            }
+        }
     }
 }

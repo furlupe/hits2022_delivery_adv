@@ -27,7 +27,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
                 Id = dishId,
                 Name = dish.Name,
                 Price = dish.Price,
-                Rating = dish.Ratings.IsNullOrEmpty() ? 0 : dish.Ratings.Average(r => r.Value),
+                Rating = dish.Rating,
                 Description = dish.Description,
                 IsVegeterian = dish.IsVegeterian,
                 Photo = dish.Photo,

@@ -21,29 +21,16 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
         }
         public async Task<PagedRestaurantsDto> GetAllRestaurants(int page, string? name = null)
         {
-            var pagesAmount = (int)Math.Ceiling((double)_backendContext.Restaurants.Count() / _RestaurantPageSize);
-
-            if (pagesAmount < page || page < 1)
-            {
-                throw new BadHttpRequestException("Page out of range");
-            }
-
-            var query = _backendContext.Restaurants
-                .Where(r => name == null || r.Name.StartsWith(name))
-                .Skip((page - 1) * _RestaurantPageSize)
-                .Take(_RestaurantPageSize);
-
-            var restaurants = await query.ToListAsync();
-
             var response = new PagedRestaurantsDto
             {
-                PageInfo = new PageInfo
-                {
-                    CurrentPage = page,
-                    Pages = pagesAmount,
-                    PageSize = restaurants.Count()
-                }
+                PageInfo = CreatePageInfo(_backendContext.Restaurants.Count(), _RestaurantPageSize, page)
             };
+
+            var restaurants = await _backendContext.Restaurants
+                .Where(r => name == null || r.Name.StartsWith(name))
+                .Skip((page - 1) * _RestaurantPageSize)
+                .Take(_RestaurantPageSize)
+                .ToListAsync();
 
             foreach (var restaurant in restaurants)
             {
@@ -71,7 +58,6 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
         public async Task<PagedDishesDto> GetRestaurantDishes(Guid restaurantId, int page, Filters filters)
         {
-            // 
             var query = _backendContext.Menus
                 .Include(m => m.Dishes)
                     .ThenInclude(d => d.Ratings)
@@ -82,12 +68,13 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
                 query = query.Where(m => m.Name == filters.Menu);
             }
 
-            var menus = await query.Select(m => m.Dishes).ToListAsync();
+            var menuDishes = await query
+                .Select(m => m.Dishes)
+                .ToListAsync();
 
-            var response = new PagedDishesDto();
             var filteredDishes = new List<Dish>();
 
-            foreach (var menu in menus)
+            foreach (var menu in menuDishes)
             {
                 filteredDishes.AddRange(menu);
             }
@@ -95,8 +82,10 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             filteredDishes = filteredDishes
                 .FilterByCategories(filters.Categories)
                 .FilterByVegetarian(filters.IsVegetarian)
+                .SortByType(filters.SortBy)
                 .ToList();
 
+            var response = new PagedDishesDto();
             foreach (var dish in filteredDishes)
             {
                 response.Dishes.Add(new DishDto
@@ -104,7 +93,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
                     Id = dish.Id,
                     Name = dish.Name,
                     Price = dish.Price,
-                    Rating = dish.Ratings.IsNullOrEmpty() ? 0 : dish.Ratings.Average(r => r.Value),
+                    Rating = dish.Rating,
                     Description = dish.Description,
                     IsVegeterian = dish.IsVegeterian,
                     Photo = dish.Photo,
@@ -112,28 +101,12 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
                 });
             }
 
-            response.Dishes = response.Dishes
-                .SortBy(filters.SortBy)
-                .ToList();
-
-            var pagesAmount = (int)Math.Ceiling((double)response.Dishes.Count() / _DishPageSize);
-
-            if (pagesAmount < page || page < 1)
-            {
-                throw new BadHttpRequestException("Page out of range");
-            }
+            response.PageInfo = CreatePageInfo(response.Dishes.Count, _DishPageSize, page);
 
             response.Dishes = response.Dishes
                 .Skip((page - 1) * _DishPageSize)
                 .Take(_DishPageSize)
                 .ToList();
-
-            response.PageInfo = new PageInfo
-            {
-                CurrentPage = page,
-                Pages = pagesAmount,
-                PageSize = response.Dishes.Count
-            };
 
             return response;
         }
@@ -141,31 +114,23 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
         public async Task<PagedMenusDto> GetRestaurantMenus(Guid restaurantId, int page, string? name = null)
         {
             var menus = await _backendContext.Menus
-                .Where(m => m.Restaurant.Id == restaurantId && (name == null || m.Name.StartsWith(name)))
+                .Where(m => 
+                    m.Restaurant.Id == restaurantId 
+                    && (name == null || m.Name.StartsWith(name))
+                    && m.IsActive == true
+                )
                 .Select(m => new { m.Id, m.Name })
                 .ToListAsync();
 
-            var pagesAmount = (int)Math.Ceiling((double)menus.Count / _MenusPageSize);
-
-            if (pagesAmount < page || page < 1)
+            var response = new PagedMenusDto
             {
-                throw new BadHttpRequestException("Page out of range");
-            }
+                PageInfo = CreatePageInfo(menus.Count, _MenusPageSize, page)
+            };
 
             menus = menus
                 .Skip((page - 1) * _RestaurantPageSize)
                 .Take(_RestaurantPageSize)
                 .ToList();
-
-            var response = new PagedMenusDto
-            {
-                PageInfo = new PageInfo
-                {
-                    CurrentPage = page,
-                    Pages = pagesAmount,
-                    PageSize = menus.Count
-                }
-            };
 
             foreach (var menu in menus)
             {
@@ -177,6 +142,24 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             }
 
             return response;
+        }
+        private static PageInfo CreatePageInfo(int collectionSize, int pageSize, int currPage = 1)
+        {
+            var pagesAmount = (int)Math.Ceiling((double) collectionSize / pageSize);
+
+            if (pagesAmount < currPage || currPage < 1)
+            {
+                throw new BadHttpRequestException("Page out of range");
+            }
+
+            var diff = collectionSize - (currPage - 1) * pageSize;
+
+            return new PageInfo
+            {
+                CurrentPage = currPage,
+                Pages = pagesAmount,
+                PageSize = diff >= pageSize ? pageSize : diff
+            };
         }
     }
 
@@ -204,52 +187,19 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
             return collection;
         }
-    }
 
-    public static class DishShortDtoEnumerableExtensions
-    {
-        public static ICollection<DishDto> SortBy(this ICollection<DishDto> collection, SortingType? sortBy)
+        public static ICollection<Dish> SortByType(this ICollection<Dish> collection, SortingType? sortBy)
         {
-            if (sortBy != null)
+            return (sortBy switch
             {
-                var sortedCollection = (IEnumerable<DishDto>)collection;
-                switch (sortBy)
-                {
-                    case SortingType.NAME_DESCENDING:
-                        sortedCollection = collection
-                            .OrderByDescending(d => d.Name);
-                        break;
-
-                    case SortingType.NAME_ASCENDING:
-                        sortedCollection = collection
-                            .OrderBy(d => d.Name);
-                        break;
-
-                    case SortingType.PRICE_ASCENDING:
-                        sortedCollection = collection
-                            .OrderBy(d => d.Price);
-                        break;
-
-                    case SortingType.PRICE_DESCENDING:
-                        sortedCollection = collection
-                            .OrderByDescending(d => d.Price);
-                        break;
-
-                    case SortingType.RATING_ASCENDING:
-                        sortedCollection = collection
-                            .OrderBy(d => d.Rating);
-                        break;
-
-                    case SortingType.RATING_DESCENDING:
-                        sortedCollection = collection
-                            .OrderByDescending(d => d.Rating);
-                        break;
-                }
-
-                collection = sortedCollection.ToList();
-            }
-
-            return collection;
+                SortingType.RATING_DESCENDING => collection.OrderByDescending(d => d.Rating),
+                SortingType.NAME_DESCENDING => collection.OrderByDescending(d => d.Name),
+                SortingType.NAME_ASCENDING => collection.OrderBy(d => d.Name),
+                SortingType.PRICE_DESCENDING => collection.OrderByDescending(d => d.Price),
+                SortingType.PRICE_ASCENDING => collection.OrderBy(d => d.Price),
+                SortingType.RATING_ASCENDING => collection.OrderBy(d => d.Rating),
+                _ => collection.OrderBy(_ => _),
+            }).ToList();
         }
     }
 }

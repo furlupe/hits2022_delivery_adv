@@ -20,7 +20,6 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="7.0.4" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.3" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.Design" Version="1.1.0" />
   </ItemGroup>
 
   <ItemGroup>
