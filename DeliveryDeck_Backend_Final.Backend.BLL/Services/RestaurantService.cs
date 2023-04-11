@@ -23,7 +23,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
         {
             var response = new PagedRestaurantsDto
             {
-                PageInfo = CreatePageInfo(_backendContext.Restaurants.Count(), _RestaurantPageSize, page)
+                PageInfo = new PageInfo(_backendContext.Restaurants.Count(), _RestaurantPageSize, page)
             };
 
             var restaurants = await _backendContext.Restaurants
@@ -101,7 +101,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
                 });
             }
 
-            response.PageInfo = CreatePageInfo(response.Dishes.Count, _DishPageSize, page);
+            response.PageInfo = new PageInfo(response.Dishes.Count, _DishPageSize, page);
 
             response.Dishes = response.Dishes
                 .Skip((page - 1) * _DishPageSize)
@@ -124,7 +124,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
             var response = new PagedMenusDto
             {
-                PageInfo = CreatePageInfo(menus.Count, _MenusPageSize, page)
+                PageInfo = new PageInfo(menus.Count, _MenusPageSize, page)
             };
 
             menus = menus
@@ -142,24 +142,6 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             }
 
             return response;
-        }
-        private static PageInfo CreatePageInfo(int collectionSize, int pageSize, int currPage = 1)
-        {
-            var pagesAmount = (int)Math.Ceiling((double) collectionSize / pageSize);
-
-            if (pagesAmount < currPage || currPage < 1)
-            {
-                throw new BadHttpRequestException("Page out of range");
-            }
-
-            var diff = collectionSize - (currPage - 1) * pageSize;
-
-            return new PageInfo
-            {
-                CurrentPage = currPage,
-                Pages = pagesAmount,
-                PageSize = diff >= pageSize ? pageSize : diff
-            };
         }
     }
 
