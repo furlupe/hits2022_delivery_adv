@@ -69,6 +69,17 @@ namespace DeliveryDeck_Backend_Final.Backend.DAL.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Dishes");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("2d2ef2de-1f77-4e19-8bf1-a07d4c210c2c"),
+                            Category = 3,
+                            Description = "aaaaa",
+                            IsVegeterian = false,
+                            Name = "Fish w/ Qiwi",
+                            Price = 50
+                        });
                 });
 
             modelBuilder.Entity("DeliveryDeck_Backend_Final.Backend.DAL.Entities.DishInCart", b =>
@@ -86,8 +97,8 @@ namespace DeliveryDeck_Backend_Final.Backend.DAL.Migrations
                     b.Property<Guid>("DishId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("OrderId")
-                        .HasColumnType("uuid");
+                    b.Property<int?>("OrderId")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -125,9 +136,11 @@ namespace DeliveryDeck_Backend_Final.Backend.DAL.Migrations
 
             modelBuilder.Entity("DeliveryDeck_Backend_Final.Backend.DAL.Entities.Order", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Address")
                         .IsRequired()
@@ -144,9 +157,6 @@ namespace DeliveryDeck_Backend_Final.Backend.DAL.Migrations
 
                     b.Property<DateTime>("DeliveryTime")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("Number")
-                        .HasColumnType("integer");
 
                     b.Property<DateTime>("OrderTime")
                         .HasColumnType("timestamp with time zone");
@@ -205,6 +215,29 @@ namespace DeliveryDeck_Backend_Final.Backend.DAL.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Restaurants");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("a936dde0-0ed6-4f66-8ff1-a68fab5eae9f"),
+                            Cooks = new List<Guid>(),
+                            Managers = new List<Guid>(),
+                            Name = "New Amogus"
+                        },
+                        new
+                        {
+                            Id = new Guid("d6966c0c-45c4-4428-951b-9759400829c1"),
+                            Cooks = new List<Guid>(),
+                            Managers = new List<Guid>(),
+                            Name = "Old Amogus"
+                        },
+                        new
+                        {
+                            Id = new Guid("40a809f6-d40b-4ff2-932b-ebe1d4506034"),
+                            Cooks = new List<Guid>(),
+                            Managers = new List<Guid>(),
+                            Name = "FeastingHub"
+                        });
                 });
 
             modelBuilder.Entity("DishMenu", b =>

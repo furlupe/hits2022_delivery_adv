@@ -23,7 +23,11 @@ namespace DeliveryDeck_Backend_Final.Controllers
         }
 
         [HttpGet("{restaurantId}/menus")]
-        public async Task<ActionResult<PagedMenusDto>> GetRestaurantMenus(Guid restaurantId, [FromQuery] string? name, [FromQuery, BindRequired] int page = 1)
+        public async Task<ActionResult<PagedMenusDto>> GetRestaurantMenus(
+            Guid restaurantId,
+            [FromQuery] string? name,
+            [FromQuery, BindRequired] int page = 1
+            )
         {
             return Ok(await _restaurantService.GetRestaurantMenus(restaurantId, page, name));
         }
@@ -37,7 +41,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
             [FromQuery] string? menu,
             int page = 1)
         {
-            return Ok(await _restaurantService.GetRestaurantDishes(restaurantId, page, new Filters
+            return Ok(await _restaurantService.GetRestaurantDishes(restaurantId, page, new DishFilters
             {
                 Categories = categories,
                 Menu = menu,
@@ -54,7 +58,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
             [FromQuery] SortingType? sortBy,
             int page = 1)
         {
-            return Ok(await _restaurantService.GetMenuDishes(menuId, page, new Filters
+            return Ok(await _restaurantService.GetMenuDishes(menuId, page, new DishFilters
             {
                 Categories = categories,
                 IsVegetarian = isVegetarian,

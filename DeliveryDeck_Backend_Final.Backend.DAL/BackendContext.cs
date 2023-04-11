@@ -23,7 +23,10 @@ namespace DeliveryDeck_Backend_Final.Backend.DAL
                 .HasMany(m => m.Dishes)
                 .WithMany();
 
-            /*builder.Entity<Dish>()
+            builder.Entity<Order>()
+                .HasKey(m => m.Id);
+
+            builder.Entity<Dish>()
                 .HasData(new Dish
                 {
                     Id = Guid.NewGuid(),
@@ -39,7 +42,8 @@ namespace DeliveryDeck_Backend_Final.Backend.DAL
                     new Restaurant { Id = Guid.NewGuid(), Name = "New Amogus" },
                     new Restaurant { Id = Guid.NewGuid(), Name = "Old Amogus" },
                     new Restaurant { Id = Guid.NewGuid(), Name = "FeastingHub" }
-                    );*/
+                    );
+
         }
     }
 }

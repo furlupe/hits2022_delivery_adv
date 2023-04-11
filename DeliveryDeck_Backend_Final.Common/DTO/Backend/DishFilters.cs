@@ -2,7 +2,7 @@
 
 namespace DeliveryDeck_Backend_Final.Common.DTO.Backend
 {
-    public class Filters
+    public class DishFilters
     {
         public ICollection<FoodCategory> Categories { get; set; }
         public string? Menu { get; set; }

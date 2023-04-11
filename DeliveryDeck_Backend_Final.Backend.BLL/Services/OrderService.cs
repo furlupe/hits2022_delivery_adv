@@ -18,16 +18,9 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             _backendContext = backendContext;
         }
 
-        public async Task CancelOrder(Guid userId, Guid orderId)
+        public async Task CancelOrder(Guid userId, int orderId)
         {
-            var order = await _backendContext.Orders
-                .SingleOrDefaultAsync(o => o.Id == orderId)
-                ?? throw new BadHttpRequestException("No such order, moron");
-
-            if (order.CustomerId != userId)
-            {
-                throw new BadHttpRequestException("Access denied", StatusCodes.Status403Forbidden);
-            }
+            var order = await GetUserOrder(userId, orderId);
 
             if (order.Status != OrderStatus.Created)
             {
@@ -58,12 +51,12 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
             var orders = new List<Order>();
             var restaurants = menus.Select(m => m.Restaurant).Distinct();
-            foreach(var restaurant in restaurants)
+            foreach (var restaurant in restaurants)
             {
                 var orderPrice = 0;
                 var menuDishes = cart.Dishes
                     .Where(d => menus
-                        .Any(m => m.Restaurant == restaurant 
+                        .Any(m => m.Restaurant == restaurant
                         && m.Dishes.Contains(d.Dish))
                     )
                     .ToList();
@@ -81,10 +74,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
                     Status = OrderStatus.Created,
                     CustomerId = userId,
                     Dishes = menuDishes,
-                    Address = data.Address,
-
-                    // можно сделать через .Aggregate((x, y) => x.Number > y.Number ? x : y), но вызов не будет асинхронным
-                    Number = (await _backendContext.Orders.Select(o => o.Number).Where(_ => true).ToListAsync()).Max() + 1
+                    Address = data.Address
                 });
             }
 
@@ -96,29 +86,41 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             await _backendContext.SaveChangesAsync();
         }
 
-        public async Task<OrderPagedDto> GetHistory(Guid userId, int page = 1, bool activeOnly = false)
+        public async Task<OrderPagedDto> GetHistory(
+            Guid userId,
+            int? number = default,
+            DateTime fromDate = default,
+            int page = 1,
+            bool activeOnly = false
+            )
         {
             var query = _backendContext.Orders
-                .Where(o => o.CustomerId == userId);
-            
-            if(activeOnly)
+                .Where(o => o.CustomerId == userId && o.OrderTime >= fromDate);
+
+            var orders = new List<Order>();
+            var response = new OrderPagedDto();
+
+            if (number == null && activeOnly)
             {
                 query = query
-                    .Where(o => 
+                    .Where(o =>
                         o.Status != OrderStatus.Cancelled
                         && o.Status != OrderStatus.Delivered
                     );
             }
+            else if (number != null)
+            {
+                query = query.Where(o => o.Id == number);
+            }
 
-            var orders = await query.ToListAsync();
-
-            var response = new OrderPagedDto { PageInfo = new PageInfo(orders.Count, _OrdersPageSize, page) };
+            orders = await query.ToListAsync();
+            response = new OrderPagedDto { PageInfo = new PageInfo(orders.Count, _OrdersPageSize, page) };
 
             foreach (var order in orders)
             {
                 response.Orders.Add(new OrderShortDto
                 {
-                    Id = order.Id,
+                    Number = order.Id,
                     DeliveryTime = order.DeliveryTime,
                     OrderTime = order.OrderTime,
                     Price = order.Price,
@@ -128,6 +130,53 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             }
 
             return response;
+        }
+
+        public async Task<OrderDto> GetOrderDetails(Guid userId, int orderId)
+        {
+            var order = await GetUserOrder(userId, orderId);
+            var dishes = new List<DishCartDto>();
+
+            foreach (var dishInCart in order.Dishes)
+            {
+                var dish = dishInCart.Dish;
+                dishes.Add(new DishCartDto
+                {
+                    Id = dish.Id,
+                    Name = dish.Name,
+                    Price = dish.Price,
+                    IsVegeterian = dish.IsVegeterian,
+                    Photo = dish.Photo,
+                    Amount = dishInCart.Amount
+                });
+            }
+
+            return new OrderDto
+            {
+                Number = order.Id,
+                OrderTime = order.OrderTime,
+                Price = order.Price,
+                Status = order.Status,
+                Address = order.Address,
+                DeliveryTime = order.DeliveryTime,
+                Dishes = dishes
+            };
+        }
+
+        private async Task<Order> GetUserOrder(Guid userId, int orderId)
+        {
+            var order = await _backendContext.Orders
+                .Include(o => o.Dishes)
+                    .ThenInclude(dc => dc.Dish)
+                .SingleOrDefaultAsync(o => o.Id == orderId)
+                ?? throw new BadHttpRequestException("No such order, moron");
+
+            if (order.CustomerId != userId)
+            {
+                throw new BadHttpRequestException("Access denied", StatusCodes.Status403Forbidden);
+            }
+
+            return order;
         }
     }
 }

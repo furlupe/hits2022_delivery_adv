@@ -2,7 +2,7 @@
 
 namespace DeliveryDeck_Backend_Final.Common.DTO.Backend
 {
-    public class OrderShortDto
+    public class OrderDto
     {
         public int Number { get; set; }
         public DateTime OrderTime { get; set; }
@@ -10,5 +10,6 @@ namespace DeliveryDeck_Backend_Final.Common.DTO.Backend
         public int Price { get; set; }
         public OrderStatus Status { get; set; }
         public string Address { get; set; }
+        public ICollection<DishCartDto> Dishes { get; set; }
     }
 }

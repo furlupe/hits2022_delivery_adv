@@ -4,8 +4,7 @@ namespace DeliveryDeck_Backend_Final.Backend.DAL.Entities
 {
     public class Order
     {
-        public Guid Id { get; set; }
-        public int Number { get; set; } = 0;
+        public int Id { get; set; } = 0;
         public DateTime OrderTime { get; set; }
         public DateTime DeliveryTime { get; set; }
         public int Price { get; set; }

@@ -3,7 +3,6 @@ using DeliveryDeck_Backend_Final.Backend.DAL.Entities;
 using DeliveryDeck_Backend_Final.Common.DTO.Backend;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
 using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -44,7 +43,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             return response;
         }
 
-        public async Task<PagedDishesDto> GetMenuDishes(Guid menuId, int page, Filters filters)
+        public async Task<PagedDishesDto> GetMenuDishes(Guid menuId, int page, DishFilters filters)
         {
             var menu = await _backendContext.Menus
                 .Where(m => m.Id == menuId)
@@ -56,7 +55,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             return await GetRestaurantDishes(menu.Id, page, filters);
         }
 
-        public async Task<PagedDishesDto> GetRestaurantDishes(Guid restaurantId, int page, Filters filters)
+        public async Task<PagedDishesDto> GetRestaurantDishes(Guid restaurantId, int page, DishFilters filters)
         {
             var query = _backendContext.Menus
                 .Include(m => m.Dishes)
@@ -114,8 +113,8 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
         public async Task<PagedMenusDto> GetRestaurantMenus(Guid restaurantId, int page, string? name = null)
         {
             var menus = await _backendContext.Menus
-                .Where(m => 
-                    m.Restaurant.Id == restaurantId 
+                .Where(m =>
+                    m.Restaurant.Id == restaurantId
                     && (name == null || m.Name.StartsWith(name))
                     && m.IsActive == true
                 )

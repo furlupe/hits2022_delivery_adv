@@ -43,7 +43,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
             return NoContent();
         }
 
-        [HttpPatch("{dishId}")]
+        [HttpPatch("{dishId}/remove")]
         [ClaimPermissionRequirement(CartPermissions.Adjust)]
         public async Task<IActionResult> RemoveDish(Guid dishId, [FromQuery, BindRequired] int amount = 1)
         {
