@@ -27,7 +27,9 @@ namespace DeliveryDeck_Backend_Final.Common.Utils
                 RoleType.Manager,
                 new List<Claim>
                 {
-                    new Claim(CustomClaimTypes.Permission, OrderPermissions.ReadRestaurant)
+                    new Claim(CustomClaimTypes.Permission, OrderPermissions.ReadRestaurant),
+                    new Claim(CustomClaimTypes.Permission, MenuPermissions.Create),
+                    new Claim(CustomClaimTypes.Permission, MenuPermissions.Adjust)
                 }
             },
 

@@ -2,6 +2,7 @@
 using DeliveryDeck_Backend_Final.Auth.DAL;
 using DeliveryDeck_Backend_Final.Auth.DAL.Entities;
 using DeliveryDeck_Backend_Final.Auth.DAL.Extensions;
+using DeliveryDeck_Backend_Final.Backend.DAL;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
 using DeliveryDeck_Backend_Final.Common.Interfaces.Auth;
 using DeliveryDeck_Backend_Final.Common.Middlewares;
@@ -39,6 +40,7 @@ namespace DeliveryDeck_Backend_Final.Auth.BLL.Extensions
         {
             app.UseMiddleware<ExceptionHandlingMiddleware>();
             await app.AddAuthRoles();
+            await app.AddStaff();
         }
 
         private static async Task AddAuthRoles(this WebApplication app)
@@ -71,6 +73,34 @@ namespace DeliveryDeck_Backend_Final.Auth.BLL.Extensions
                     await roleManager.AddClaimAsync(existingRole, claim);
                 }
             }
+        }
+
+        private static async Task AddStaff(this WebApplication app)
+        {
+            using var scope = app.Services.CreateScope();
+            var userMgr = scope.ServiceProvider.GetService<UserManager<AppUser>>();
+            var context = scope.ServiceProvider.GetService<BackendContext>();
+
+            if (await userMgr.FindByEmailAsync("mgr@example.com") is not null)
+            {
+                return;
+            }
+
+            var mgr = new AppUser
+            {
+                FullName = "furlupe_manager",
+                BirthDate = DateTime.UtcNow,
+                Gender = Gender.Male,
+                Email = "mgr@example.com"
+            };
+
+            var result = await userMgr.CreateAsync(mgr, "_String1");
+            if(!result.Succeeded) { return; }
+            await userMgr.AddToRoleAsync(mgr, RoleType.Manager.ToString());
+
+            var r = await context.Restaurants.FirstAsync(x => true);
+            r.Managers = new List<Guid> { mgr.Id };
+            await context.SaveChangesAsync();
         }
     }
 }

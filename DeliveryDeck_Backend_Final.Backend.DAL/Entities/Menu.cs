@@ -4,7 +4,7 @@
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
-        public ICollection<Dish> Dishes { get; set; }
+        public List<Dish> Dishes { get; set; }
         public Restaurant Restaurant { get; set; }
         public bool IsActive { get; set; } = false;
     }

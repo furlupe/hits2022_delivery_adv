@@ -1,4 +1,6 @@
-﻿using DeliveryDeck_Backend_Final.Common.DTO.Backend;
+﻿using DeliveryDeck_Backend_Final.ClaimAuthorize;
+using DeliveryDeck_Backend_Final.Common.CustomPermissions;
+using DeliveryDeck_Backend_Final.Common.DTO.Backend;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
 using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
 using Microsoft.AspNetCore.Mvc;
@@ -6,12 +8,12 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace DeliveryDeck_Backend_Final.Controllers
 {
-    [Route("api/restaurant")]
+    [Route("api/restaurants")]
     [ApiController]
-    public class RestaurantController : ControllerBase
+    public class RestaurantCustomerController : AuthorizeController
     {
         private readonly IRestaurantService _restaurantService;
-        public RestaurantController(IRestaurantService restaurantService)
+        public RestaurantCustomerController(IRestaurantService restaurantService)
         {
             _restaurantService = restaurantService;
         }
@@ -29,10 +31,10 @@ namespace DeliveryDeck_Backend_Final.Controllers
             [FromQuery, BindRequired] int page = 1
             )
         {
-            return Ok(await _restaurantService.GetRestaurantMenus(restaurantId, page, name));
+            return Ok(await _restaurantService.GetActiveRestaurantMenus(restaurantId, page, name));
         }
 
-        [HttpGet("{restaurantId}")]
+        [HttpGet("{restaurantId}/dishes")]
         public async Task<ActionResult<PagedDishesDto>> GetRestaurantDishes(
             Guid restaurantId,
             [FromQuery] ICollection<FoodCategory> categories,
@@ -41,7 +43,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
             [FromQuery] string? menu,
             int page = 1)
         {
-            return Ok(await _restaurantService.GetRestaurantDishes(restaurantId, page, new DishFilters
+            return Ok(await _restaurantService.GetActiveRestaurantDishes(restaurantId, page, new DishFilters
             {
                 Categories = categories,
                 Menu = menu,
@@ -58,12 +60,14 @@ namespace DeliveryDeck_Backend_Final.Controllers
             [FromQuery] SortingType? sortBy,
             int page = 1)
         {
-            return Ok(await _restaurantService.GetMenuDishes(menuId, page, new DishFilters
+            return Ok(await _restaurantService.GetActiveMenuDishes(menuId, page, new DishFilters
             {
                 Categories = categories,
                 IsVegetarian = isVegetarian,
                 SortBy = sortBy
             }));
         }
+
+        
     }
 }

@@ -6,6 +6,7 @@
         public string Name { get; set; }
         public List<Guid> Managers { get; set; } = new();
         public List<Guid> Cooks { get; set; } = new();
-        public ICollection<Menu> Menus { get; set; }
+        public List<Menu> Menus { get; set; }
+        public List<Dish> Dishes { get; set; }
     }
 }

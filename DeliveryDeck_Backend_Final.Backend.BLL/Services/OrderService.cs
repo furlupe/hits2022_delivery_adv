@@ -59,7 +59,6 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
                     .ThenInclude(d => d.Dish)
                 .FirstAsync(c => c.CustomerId == userId);
 
-            // находим все уникальные меню, в которых лежат те или иные блюда
             var menus = await _backendContext.Menus
                 .Include(m => m.Dishes)
                 .Where(m => m.Dishes
