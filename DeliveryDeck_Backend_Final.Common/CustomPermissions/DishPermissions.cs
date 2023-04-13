@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace DeliveryDeck_Backend_Final.Common.CustomPermissions
 {
-    public static class MenuPermissions
+    public static class DishPermissions
     {
-        public const string Read = "menu.read";
-        public const string Create = "menu.create";
-        public const string Adjust = "menu.adjust";
+        public const string Read = "dish.read";
+        public const string CUD = "dish.cud";
     }
 }

@@ -49,11 +49,6 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
             restaurant.Menus.Add(new Menu { Name = data.Name });
 
-            if (!data.Dishes.IsNullOrEmpty())
-            {
-                await AddDishesToMenu(manager, menu.Id, data.Dishes);
-            }
-
             await _backendContext.SaveChangesAsync();
         }
 

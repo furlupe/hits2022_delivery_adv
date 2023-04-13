@@ -28,8 +28,11 @@ namespace DeliveryDeck_Backend_Final.Common.Utils
                 new List<Claim>
                 {
                     new Claim(CustomClaimTypes.Permission, OrderPermissions.ReadRestaurant),
+                    new Claim(CustomClaimTypes.Permission, MenuPermissions.Read),
                     new Claim(CustomClaimTypes.Permission, MenuPermissions.Create),
-                    new Claim(CustomClaimTypes.Permission, MenuPermissions.Adjust)
+                    new Claim(CustomClaimTypes.Permission, MenuPermissions.Adjust),
+                    new Claim(CustomClaimTypes.Permission, DishPermissions.Read),
+                    new Claim(CustomClaimTypes.Permission, DishPermissions.CUD)
                 }
             },
 
