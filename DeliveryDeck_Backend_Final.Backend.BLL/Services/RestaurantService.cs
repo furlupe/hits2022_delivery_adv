@@ -3,6 +3,7 @@ using DeliveryDeck_Backend_Final.Backend.DAL.Entities;
 using DeliveryDeck_Backend_Final.Common.DTO.Backend;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
 using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -48,7 +49,8 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             var menu = await _backendContext.Menus
                 .Where(m => m.Id == menuId)
                 .Select(m => new { m.Restaurant.Id, m.Name })
-                .SingleAsync();
+                .FirstOrDefaultAsync()
+                ?? throw new BadHttpRequestException("No such menu", StatusCodes.Status404NotFound);
 
             filters.Menu = menu.Name;
 

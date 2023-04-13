@@ -12,7 +12,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
     [Route("api/backend/cart")]
     [Authorize]
     [ApiController]
-    public class CartController : ControllerBase
+    public class CartController : AuthorizeController
     {
         private readonly ICartService _cartService;
         public CartController(ICartService cartService)
@@ -24,22 +24,14 @@ namespace DeliveryDeck_Backend_Final.Controllers
         [ClaimPermissionRequirement(CartPermissions.Read)]
         public async Task<ActionResult<CartDto>> GetCart()
         {
-            if (!ClaimsHelper.HasPermission(User.Claims, CartPermissions.Read))
-            {
-                return Forbid();
-            }
-            return Ok(await _cartService.GetCart(ClaimsHelper.GetUserId(User.Claims)));
+            return Ok(await _cartService.GetCart(UserId));
         }
 
         [HttpPost("{dishId}")]
         [ClaimPermissionRequirement(CartPermissions.Adjust)]
         public async Task<IActionResult> AddDish(Guid dishId, [FromQuery, BindRequired] int amount = 1)
         {
-            if (!ClaimsHelper.HasPermission(User.Claims, CartPermissions.Adjust))
-            {
-                return Forbid();
-            }
-            await _cartService.AddDish(ClaimsHelper.GetUserId(User.Claims), dishId, amount);
+            await _cartService.AddDish(UserId, dishId, amount);
             return NoContent();
         }
 
@@ -47,12 +39,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
         [ClaimPermissionRequirement(CartPermissions.Adjust)]
         public async Task<IActionResult> RemoveDish(Guid dishId, [FromQuery, BindRequired] int amount = 1)
         {
-            if (!ClaimsHelper.HasPermission(User.Claims, CartPermissions.Adjust))
-            {
-                return Forbid();
-            }
-
-            await _cartService.RemoveDish(ClaimsHelper.GetUserId(User.Claims), dishId, amount);
+            await _cartService.RemoveDish(UserId, dishId, amount);
             return NoContent();
         }
 
@@ -60,12 +47,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
         [ClaimPermissionRequirement(CartPermissions.Adjust)]
         public async Task<IActionResult> RemoveDishCompletely(Guid dishId)
         {
-            if (!ClaimsHelper.HasPermission(User.Claims, CartPermissions.Adjust))
-            {
-                return Forbid();
-            }
-
-            await _cartService.RemoveDishCompletely(ClaimsHelper.GetUserId(User.Claims), dishId);
+            await _cartService.RemoveDishCompletely(UserId, dishId);
             return NoContent();
         }
     }

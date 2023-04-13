@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using DeliveryDeck_Backend_Final.Backend.DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DeliveryDeck_Backend_Final.Backend.DAL.Migrations
 {
     [DbContext(typeof(BackendContext))]
-    partial class BackendContextModelSnapshot : ModelSnapshot
+    [Migration("20230413055216_AddOrderedDish")]
+    partial class AddOrderedDish
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -73,7 +76,7 @@ namespace DeliveryDeck_Backend_Final.Backend.DAL.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("dc171fe8-98bf-4f1a-b597-15c619e4294b"),
+                            Id = new Guid("fae59a25-7873-421f-b6d9-4e4b35e4aa84"),
                             Category = 3,
                             Description = "aaaaa",
                             IsVegeterian = false,
@@ -97,19 +100,11 @@ namespace DeliveryDeck_Backend_Final.Backend.DAL.Migrations
                     b.Property<Guid>("DishId")
                         .HasColumnType("uuid");
 
-                    b.Property<int?>("OrderId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("PriceWhenOrdered")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CartId");
 
                     b.HasIndex("DishId");
-
-                    b.HasIndex("OrderId");
 
                     b.ToTable("DishesInCarts");
                 });
@@ -175,6 +170,33 @@ namespace DeliveryDeck_Backend_Final.Backend.DAL.Migrations
                     b.ToTable("Orders");
                 });
 
+            modelBuilder.Entity("DeliveryDeck_Backend_Final.Backend.DAL.Entities.OrderedDish", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Amount")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("DishId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int?>("OrderId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PriceWhenOrdered")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DishId");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("OrderedDishes");
+                });
+
             modelBuilder.Entity("DeliveryDeck_Backend_Final.Backend.DAL.Entities.Rating", b =>
                 {
                     b.Property<Guid>("Id")
@@ -222,21 +244,21 @@ namespace DeliveryDeck_Backend_Final.Backend.DAL.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("2dc11394-c05e-4e7c-86ed-b8a80e90f3fe"),
+                            Id = new Guid("80124889-a836-461b-a0c7-f61873ade0b2"),
                             Cooks = new List<Guid>(),
                             Managers = new List<Guid>(),
                             Name = "New Amogus"
                         },
                         new
                         {
-                            Id = new Guid("075674f4-5b32-4a5c-89a6-d1d1fe3fc23b"),
+                            Id = new Guid("33b778dd-413a-444c-a655-1aee5b829a30"),
                             Cooks = new List<Guid>(),
                             Managers = new List<Guid>(),
                             Name = "Old Amogus"
                         },
                         new
                         {
-                            Id = new Guid("5cee7be9-b2bb-4556-8d60-ca01318208ab"),
+                            Id = new Guid("84dae774-31e1-4bb4-9031-7b3966b99e22"),
                             Cooks = new List<Guid>(),
                             Managers = new List<Guid>(),
                             Name = "FeastingHub"
@@ -272,10 +294,6 @@ namespace DeliveryDeck_Backend_Final.Backend.DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DeliveryDeck_Backend_Final.Backend.DAL.Entities.Order", null)
-                        .WithMany("Dishes")
-                        .HasForeignKey("OrderId");
-
                     b.Navigation("Cart");
 
                     b.Navigation("Dish");
@@ -290,6 +308,21 @@ namespace DeliveryDeck_Backend_Final.Backend.DAL.Migrations
                         .IsRequired();
 
                     b.Navigation("Restaurant");
+                });
+
+            modelBuilder.Entity("DeliveryDeck_Backend_Final.Backend.DAL.Entities.OrderedDish", b =>
+                {
+                    b.HasOne("DeliveryDeck_Backend_Final.Backend.DAL.Entities.Dish", "Dish")
+                        .WithMany()
+                        .HasForeignKey("DishId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DeliveryDeck_Backend_Final.Backend.DAL.Entities.Order", null)
+                        .WithMany("Dishes")
+                        .HasForeignKey("OrderId");
+
+                    b.Navigation("Dish");
                 });
 
             modelBuilder.Entity("DeliveryDeck_Backend_Final.Backend.DAL.Entities.Rating", b =>

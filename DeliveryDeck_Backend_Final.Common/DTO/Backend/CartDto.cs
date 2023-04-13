@@ -4,5 +4,6 @@
     {
         public ICollection<DishCartDto> Dishes { get; set; }
         public int Price { get; set; }
+        public List<Guid> RemovedDishes { get; set; }
     }
 }

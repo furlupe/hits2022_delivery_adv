@@ -11,6 +11,8 @@ namespace DeliveryDeck_Backend_Final.Auth.DAL.Extensions
         {
             builder.Services.AddDbContext<AuthContext>(options =>
                 options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+
         }
     }
 }

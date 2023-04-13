@@ -19,7 +19,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             var cart = await GetCartByUserId(userId);
 
             var existingDish = cart.Dishes
-                .SingleOrDefault(d => d.Dish.Id == dishId);
+                .FirstOrDefault(d => d.Dish.Id == dishId);
 
             if (existingDish != null)
             {
@@ -27,9 +27,12 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             }
             else
             {
+                var dish = await _backendContext.Dishes.FirstAsync(d => d.Id == dishId)
+                    ?? throw new BadHttpRequestException("No such dish", StatusCodes.Status404NotFound);
+
                 cart.Dishes.Add(new DishInCart
                 {
-                    Dish = await _backendContext.Dishes.SingleAsync(d => d.Id == dishId),
+                    Dish = dish,
                     Amount = amount
                 });
             }
@@ -42,10 +45,21 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             var cart = await GetCartByUserId(userId);
 
             var dishes = new List<DishCartDto>();
+            var removed = new List<Guid>();
             var totalPrice = 0;
             foreach (var dishInCart in cart.Dishes)
             {
-                var dish = await _backendContext.Dishes.SingleAsync(d => d == dishInCart.Dish);
+                var dish = await _backendContext.Dishes
+                    .FirstAsync(d => d == dishInCart.Dish);
+
+                if (await _backendContext.Menus
+                    .Where(m => m.Dishes.Contains(dish))
+                    .AllAsync(m => m.IsActive == false)
+                    )
+                {
+                    removed.Add(dish.Id);
+                    continue;
+                }
 
                 dishes.Add(new DishCartDto
                 {
@@ -64,7 +78,8 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             return new CartDto
             {
                 Dishes = dishes,
-                Price = totalPrice
+                Price = totalPrice,
+                RemovedDishes = removed
             };
         }
 
@@ -72,8 +87,8 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
         {
             var cart = await GetCartByUserId(userId);
 
-            var dishInCart = cart.Dishes.SingleOrDefault(d => d.Dish.Id == dishId)
-                ?? throw new BadHttpRequestException("Dish is not in the cart already, moron");
+            var dishInCart = cart.Dishes.FirstOrDefault(d => d.Dish.Id == dishId)
+                ?? throw new BadHttpRequestException("Dish is not in the cart already, moron", StatusCodes.Status404NotFound);
 
             dishInCart.Amount -= amount;
 
@@ -89,8 +104,8 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
         {
             var cart = await GetCartByUserId(userId);
 
-            var dishInCart = cart.Dishes.SingleOrDefault(d => d.Dish.Id == dishId)
-                ?? throw new BadHttpRequestException("Dish is not in the cart already, moron");
+            var dishInCart = cart.Dishes.FirstOrDefault(d => d.Dish.Id == dishId)
+                ?? throw new BadHttpRequestException("Dish is not in the cart already, moron", StatusCodes.Status404NotFound);
 
             cart.Dishes.Remove(dishInCart);
 
@@ -102,7 +117,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             return await _backendContext.Carts
                 .Include(c => c.Dishes)
                     .ThenInclude(d => d.Dish)
-                .SingleOrDefaultAsync(c => c.CustomerId == customerId && c.WasOrdered == false)
+                .FirstOrDefaultAsync(c => c.CustomerId == customerId && c.WasOrdered == false)
                 ?? await CreateCart(customerId);
         }
 

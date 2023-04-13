@@ -12,7 +12,6 @@ namespace DeliveryDeck_Backend_Final.Backend.DAL
         public DbSet<Rating> Ratings { get; set; }
         public DbSet<Restaurant> Restaurants { get; set; }
         public DbSet<Menu> Menus { get; set; }
-
         public BackendContext(DbContextOptions<BackendContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder builder)

@@ -2,7 +2,6 @@
 using DeliveryDeck_Backend_Final.Common.CustomPermissions;
 using DeliveryDeck_Backend_Final.Common.DTO.Backend;
 using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
-using DeliveryDeck_Backend_Final.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -12,7 +11,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
     [Route("api/orders")]
     [ApiController]
     [Authorize]
-    public class OrderController : ControllerBase
+    public class OrderController : AuthorizeController
     {
         private readonly IOrderService _orderService;
         public OrderController(IOrderService orderService)
@@ -22,17 +21,16 @@ namespace DeliveryDeck_Backend_Final.Controllers
 
         [HttpPost]
         [ClaimPermissionRequirement(OrderPermissions.Add)]
-        public async Task<IActionResult> CreateOrders(CreateOrderDto data)
+        public async Task<ActionResult<List<Guid>>> CreateOrders(CreateOrderDto data)
         {
-            await _orderService.CreateOrder(ClaimsHelper.GetUserId(User.Claims), data);
-            return NoContent();
+            return Ok(await _orderService.CreateOrder(UserId, data));
         }
 
         [HttpPatch("{orderId}/cancel")]
         [ClaimPermissionRequirement(OrderPermissions.Cancel)]
         public async Task<IActionResult> CancelOrder(int orderId)
         {
-            await _orderService.CancelOrder(ClaimsHelper.GetUserId(User.Claims), orderId);
+            await _orderService.CancelOrder(UserId, orderId);
             return NoContent();
         }
 
@@ -44,14 +42,14 @@ namespace DeliveryDeck_Backend_Final.Controllers
             [FromQuery] int? orderNumber = default,
             [FromQuery] DateTime fromDate = default)
         {
-            return Ok(await _orderService.GetHistory(ClaimsHelper.GetUserId(User.Claims), orderNumber, fromDate, page, activeOnly));
+            return Ok(await _orderService.GetHistory(UserId, orderNumber, fromDate, page, activeOnly));
         }
 
         [HttpGet("{orderNumber}")]
         [ClaimPermissionRequirement(OrderPermissions.ReadOwnOrderHistory)]
         public async Task<ActionResult<OrderDto>> GetOrderDetails(int orderNumber)
         {
-            return Ok(await _orderService.GetOrderDetails(ClaimsHelper.GetUserId(User.Claims), orderNumber));
+            return Ok(await _orderService.GetOrderDetails(UserId, orderNumber));
         }
 
     }

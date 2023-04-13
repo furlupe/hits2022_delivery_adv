@@ -18,7 +18,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
         {
             var dish = await _backendContext.Dishes
                 .Include(d => d.Ratings)
-                .SingleOrDefaultAsync(d => d.Id == dishId)
+                .FirstOrDefaultAsync(d => d.Id == dishId)
                 ?? throw new BadHttpRequestException("As a matter of fact, there is no such dish with an identifyer you've chosen to pass");
 
             return new DishDto
