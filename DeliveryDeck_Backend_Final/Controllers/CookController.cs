@@ -1,11 +1,9 @@
 ﻿using DeliveryDeck_Backend_Final.Common.CustomPermissions;
-using DeliveryDeck_Backend_Final.Common.DTO.Backend;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
 using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
 using DeliveryDeck_Backend_Final.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace DeliveryDeck_Backend_Final.Controllers
 {
@@ -22,7 +20,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
             _resAuthorizationService = resAuthorizationService;
         }
 
-        [HttpGet("restaurant/orders/available")]
+        /*[HttpGet("restaurant/orders/available")]
         [ClaimPermissionRequirement(OrderPermissions.GetAvailableForCooking)]
         public async Task<ActionResult<OrderKitchenPagedDto>> GetAvailableOrders(
             [FromQuery] OrderSortingType sortBy, 
@@ -30,9 +28,9 @@ namespace DeliveryDeck_Backend_Final.Controllers
             )
         {
             return Ok(await _orderService.GetAvailableForKitchen(UserId, sortBy, page));
-        }
+        }*/
 
-        [HttpPatch("restaurant/orders/{orderId}/take-to-kitchen")]
+        /*[HttpPatch("restaurant/orders/{orderId}/take-to-kitchen")]
         [ClaimPermissionRequirement(OrderPermissions.ChangeStatusUntilDelivery)]
         public async Task<IActionResult> TakeOrderToKitchen(int orderId)
         {
@@ -80,18 +78,19 @@ namespace DeliveryDeck_Backend_Final.Controllers
             await _orderService.SetOrderToDeliveryAvailable(orderId);
             return NoContent();
 
-        }
+        }*/
 
-        /*[HttpPatch("restaurant/orders/{orderId}/{action}")]
+        [HttpPatch("restaurant/orders/{orderId}/{act}")]
         [ClaimPermissionRequirement(OrderPermissions.ChangeStatusUntilDelivery)]        
-        public async Task<IActionResult> PerformActionOnOrder([FromRoute] int orderId, [FromRoute] string action)
+        public async Task<IActionResult> PerformActionOnOrder(int orderId, string act)
         {
+
             if (!await _resAuthorizationService.RestaurantOrderExists(UserId, orderId))
             {
                 return NotFound();
             }
 
-            switch(action)
+            switch(act)
             {
                 case CookOrderAction.SEND_TO_KITCHEN: await _orderService.TakeOrderToKitchen(UserId, orderId); break;
                 case CookOrderAction.SEND_TO_PACKAGE:
@@ -101,11 +100,11 @@ namespace DeliveryDeck_Backend_Final.Controllers
                         return Forbid();
                     }
 
-                    if (action == CookOrderAction.SEND_TO_PACKAGE)
+                    if (act == CookOrderAction.SEND_TO_PACKAGE)
                     {
                         await _orderService.TakeOrderToPackaging(orderId);
                     }
-                    else if (action == CookOrderAction.SET_DELIVERY_AVAILABLE)
+                    else if (act == CookOrderAction.SET_DELIVERY_AVAILABLE)
                     {
                         await _orderService.SetOrderToDeliveryAvailable(orderId);
                     }
@@ -116,6 +115,6 @@ namespace DeliveryDeck_Backend_Final.Controllers
             }
 
             return NoContent();
-        }*/
+        }
     }
 }
