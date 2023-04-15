@@ -1,12 +1,13 @@
 ﻿using DeliveryDeck_Backend_Final.Common.DTO.Backend;
 using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DeliveryDeck_Backend_Final.Controllers
 {
     [Route("api/dishes")]
     [ApiController]
-    public class DishController : ControllerBase
+    public class DishController : AuthorizeController
     {
         private readonly IDishService _dishService;
         private readonly IResourceAuthorizationService _resourceAuthorizationService;
@@ -25,6 +26,19 @@ namespace DeliveryDeck_Backend_Final.Controllers
             }
 
             return Ok(await _dishService.GetDishById(dishId));
+        }
+
+        [HttpPost("{dishId}/rate")]
+        [Authorize]
+        public async Task<ActionResult<DishDto>> RateDish(Guid dishId, RatingDto data)
+        {
+            if (!await _resourceAuthorizationService.DishResourceExists(dishId))
+            {
+                return NotFound();
+            }
+
+            await _dishService.RateDish(UserId, dishId, data.Value);
+            return NoContent();
         }
     }
 }
