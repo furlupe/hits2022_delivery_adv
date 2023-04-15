@@ -111,6 +111,43 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
             return new RemovedDishesDto { RemovedDishes = removed };
         }
+
+        public async Task<OrderKitchenPagedDto> GetAvailableForKitchen(Guid userId, OrderSortingType? sortBy, int page = 1)
+        {
+            var orders = await _backendContext.Restaurants
+                .Where(r => r.Cooks.Contains(userId))
+                .Select(r => r.Orders)
+                .FirstAsync();
+
+            var sortedOrders = orders.Where(o => o.Status == OrderStatus.Created);
+            sortedOrders = sortBy switch
+            {
+                OrderSortingType.CREATION_DATE_ASCENDING => sortedOrders.OrderBy(x => x.OrderTime),
+                OrderSortingType.CREATION_DATE_DESCENDING => sortedOrders.OrderByDescending(x => x.OrderTime),
+                OrderSortingType.DELIVERY_DATE_ASCENDING => sortedOrders.OrderBy(x => x.DeliveryTime),
+                OrderSortingType.DELIVERY_DATE_DESCENDING => sortedOrders.OrderByDescending(x => x.DeliveryTime),
+                _ => sortedOrders
+            };
+
+            var response = new OrderKitchenPagedDto() { PageInfo = new PageInfo(sortedOrders.Count(), _OrdersPageSize, page)};
+
+            sortedOrders = sortedOrders
+                .Skip(_OrdersPageSize * (page - 1))
+                .Take(_OrdersPageSize);
+
+            foreach(var order in sortedOrders)
+            {
+                response.Orders.Add(new OrderShortestDto
+                {
+                    Id = order.Id,
+                    OrderTime = order.OrderTime,
+                    DeliveryTime = order.DeliveryTime
+                });
+            }
+
+            return response;
+        }
+
         public async Task<OrderPagedDto> GetCustomerHistory(
             Guid userId,
             int? number = default,
@@ -138,8 +175,12 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
                 query = query.Where(o => o.Id == number);
             }
 
-            orders = await query.ToListAsync();
             response = new OrderPagedDto { PageInfo = new PageInfo(orders.Count, _OrdersPageSize, page) };
+
+            orders = await query
+                .Skip(_OrdersPageSize * (page - 1))
+                .Take(_OrdersPageSize)
+                .ToListAsync();
 
             foreach (var order in orders)
             {

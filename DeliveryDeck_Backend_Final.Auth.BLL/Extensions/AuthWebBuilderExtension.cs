@@ -79,28 +79,23 @@ namespace DeliveryDeck_Backend_Final.Auth.BLL.Extensions
         {
             using var scope = app.Services.CreateScope();
             var userMgr = scope.ServiceProvider.GetService<UserManager<AppUser>>();
-            var context = scope.ServiceProvider.GetService<BackendContext>();
 
-            if (await userMgr.FindByEmailAsync("mgr@example.com") is not null)
+            if (await userMgr.FindByEmailAsync("cook@example.com") is not null)
             {
                 return;
             }
 
-            var mgr = new AppUser
+            var cook = new AppUser
             {
-                FullName = "furlupe_manager",
+                FullName = "furlupe_cook",
                 BirthDate = DateTime.UtcNow,
-                Gender = Gender.Male,
-                Email = "mgr@example.com"
+                Gender = Gender.Female,
+                Email = "cook@example.com"
             };
 
-            var result = await userMgr.CreateAsync(mgr, "_String1");
-            if(!result.Succeeded) { return; }
-            await userMgr.AddToRoleAsync(mgr, RoleType.Manager.ToString());
-
-            var r = await context.Restaurants.FirstAsync(x => true);
-            r.Managers = new List<Guid> { mgr.Id };
-            await context.SaveChangesAsync();
+            var result = await userMgr.CreateAsync(cook, "_String1");
+            if (!result.Succeeded) { return; }
+            await userMgr.AddToRoleAsync(cook, RoleType.Cook.ToString());
         }
     }
 }

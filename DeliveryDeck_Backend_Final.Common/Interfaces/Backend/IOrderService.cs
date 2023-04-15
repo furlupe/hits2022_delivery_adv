@@ -10,5 +10,6 @@ namespace DeliveryDeck_Backend_Final.Common.Interfaces.Backend
         Task<OrderDto> GetOrderDetails( int orderId);
         Task<OrderPagedDto> GetCustomerHistory(Guid userId, int? number, DateTime fromDate = default, int page = 1, bool activeOnly = false);
         Task<RemovedDishesDto> RepeatPreviousOrder(int orderId);
+        Task<OrderKitchenPagedDto> GetAvailableForKitchen(Guid userId, OrderSortingType? sortBy, int page = 1);
     }
 }
