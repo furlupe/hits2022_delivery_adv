@@ -6,8 +6,9 @@ namespace DeliveryDeck_Backend_Final.Common.Interfaces.Backend
     public interface IOrderService
     {
         Task<RemovedDishesDto> CreateOrder(Guid userId, CreateOrderDto data);
-        Task CancelOrder(Guid userId, int orderId);
-        Task<OrderDto> GetOrderDetails(Guid userId, int orderId);
+        Task CancelOrder(int orderId);
+        Task<OrderDto> GetOrderDetails( int orderId);
         Task<OrderPagedDto> GetCustomerHistory(Guid userId, int? number, DateTime fromDate = default, int page = 1, bool activeOnly = false);
+        Task<RemovedDishesDto> RepeatPreviousOrder(int orderId);
     }
 }

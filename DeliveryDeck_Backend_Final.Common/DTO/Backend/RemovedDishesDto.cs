@@ -2,6 +2,6 @@
 {
     public class RemovedDishesDto
     {
-        public List<Guid> RemovedDishes { get; set; } = new();
+        public IEnumerable<Guid> RemovedDishes { get; set; }
     }
 }

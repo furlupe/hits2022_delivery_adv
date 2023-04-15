@@ -37,7 +37,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
             {
                 return NotFound();
             }
-            await _orderService.CancelOrder(UserId, orderNumber);
+            await _orderService.CancelOrder(orderNumber);
             return NoContent();
         }
 
@@ -61,7 +61,20 @@ namespace DeliveryDeck_Backend_Final.Controllers
                 return NotFound();
             }
 
-            return Ok(await _orderService.GetOrderDetails(UserId, orderNumber));
+            return Ok(await _orderService.GetOrderDetails(orderNumber));
+        }
+
+        [HttpPost("{orderNumber}/repeat")]
+        [ClaimPermissionRequirement(OrderPermissions.Add)]
+        public async Task<IActionResult> RepeatOrder(int orderNumber)
+        {
+            if (!await _resourceAuthorizationService.OrderResourceExists(UserId, orderNumber))
+            {
+                return NotFound();
+            }
+
+            await _orderService.RepeatPreviousOrder(orderNumber);
+            return NoContent();
         }
 
     }

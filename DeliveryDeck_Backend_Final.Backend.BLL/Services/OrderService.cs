@@ -19,9 +19,9 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             _backendContext = backendContext;
         }
 
-        public async Task CancelOrder(Guid userId, int orderId)
+        public async Task CancelOrder(int orderId)
         {
-            var order = await GetUserOrder(userId, orderId);
+            var order = await GetOrder(orderId);
 
             if (order.Status != OrderStatus.Created)
             {
@@ -157,9 +157,9 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             return response;
         }
 
-        public async Task<OrderDto> GetOrderDetails(Guid userId, int orderId)
+        public async Task<OrderDto> GetOrderDetails(int orderId)
         {
-            var order = await GetUserOrder(userId, orderId);
+            var order = await GetOrder(orderId);
             var dishes = new List<DishCartDto>();
 
             foreach (var dishInCart in order.Dishes)
@@ -188,10 +188,65 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             };
         }
 
-        private async Task<Order> GetUserOrder(Guid userId, int orderId) 
+        public async Task<RemovedDishesDto> RepeatPreviousOrder(int orderId)
+        {
+            var order = await GetOrder(orderId);
+            var restaurantDishes = await _backendContext.Restaurants
+                .Where(r => r.Id == order.Restaurant.Id)
+                .Select(r => r.Dishes)
+                .FirstOrDefaultAsync()
+                ?? throw new BadHttpRequestException("The restaurant does not exist");
+
+            var dishes = order.Dishes
+                .IntersectBy(restaurantDishes, x => x.Dish);
+
+            var removedDishes = order.Dishes
+                .ExceptBy(restaurantDishes, x => x.Dish);
+
+            var totalPrice = 0;
+
+            var addedDishes = new List<DishInCart>();
+            foreach(var dishInCart in dishes)
+            {
+                totalPrice += dishInCart.Dish.Price * dishInCart.Amount;
+                addedDishes.Add(new DishInCart
+                {
+                    Dish = dishInCart.Dish,
+                    Amount = dishInCart.Amount,
+                    PriceWhenOrdered = dishInCart.Dish.Price
+                });
+            }
+
+            await _backendContext.Carts.AddAsync(new Cart 
+            { 
+                CustomerId = order.CustomerId, 
+                WasOrdered = true,
+                Dishes = addedDishes
+            });
+
+            await _backendContext.Orders.AddAsync(new Order
+            {
+                OrderTime = DateTime.UtcNow,
+                DeliveryTime = DateTime.UtcNow.AddMinutes(_MinimalCookingTime + new Random().Next(10, 100)),
+                Price = totalPrice,
+                Status = OrderStatus.Created,
+                Address = order.Address,
+                CustomerId = order.CustomerId,
+                Dishes = addedDishes,
+                Restaurant = order.Restaurant
+            });
+
+            await _backendContext.SaveChangesAsync();
+
+            return new RemovedDishesDto { RemovedDishes = removedDishes.Select(d => d.Dish.Id) };
+           
+        }
+
+        private async Task<Order> GetOrder(int orderId) 
             => await _backendContext.Orders
                 .Include(o => o.Dishes)
                     .ThenInclude(dc => dc.Dish)
-                .FirstAsync(o => o.Id == orderId && o.CustomerId == userId);
+                .Include(r => r.Restaurant)
+                .FirstAsync(o => o.Id == orderId);
     }
 }
