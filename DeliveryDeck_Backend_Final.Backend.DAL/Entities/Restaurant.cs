@@ -8,5 +8,6 @@
         public List<Guid> Cooks { get; set; } = new();
         public List<Menu> Menus { get; set; }
         public List<Dish> Dishes { get; set; }
+        public List<Order> Orders { get; set; } = new();
     }
 }

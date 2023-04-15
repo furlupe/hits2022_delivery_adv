@@ -27,8 +27,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             }
             else
             {
-                var dish = await _backendContext.Dishes.FirstAsync(d => d.Id == dishId)
-                    ?? throw new BadHttpRequestException("No such dish", StatusCodes.Status404NotFound);
+                var dish = await _backendContext.Dishes.FirstAsync(d => d.Id == dishId);
 
                 cart.Dishes.Add(new DishInCart
                 {
@@ -39,7 +38,6 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
             await _backendContext.SaveChangesAsync();
         }
-
         public async Task<CartDto> GetCart(Guid userId)
         {
             var cart = await GetCartByUserId(userId);
@@ -82,13 +80,11 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
                 RemovedDishes = removed
             };
         }
-
         public async Task RemoveDish(Guid userId, Guid dishId, int amount = 1)
         {
             var cart = await GetCartByUserId(userId);
 
-            var dishInCart = cart.Dishes.FirstOrDefault(d => d.Dish.Id == dishId)
-                ?? throw new BadHttpRequestException("Dish is not in the cart already, moron", StatusCodes.Status404NotFound);
+            var dishInCart = cart.Dishes.First(d => d.Dish.Id == dishId);
 
             dishInCart.Amount -= amount;
 
@@ -99,13 +95,11 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
             await _backendContext.SaveChangesAsync();
         }
-
         public async Task RemoveDishCompletely(Guid userId, Guid dishId)
         {
             var cart = await GetCartByUserId(userId);
 
-            var dishInCart = cart.Dishes.FirstOrDefault(d => d.Dish.Id == dishId)
-                ?? throw new BadHttpRequestException("Dish is not in the cart already, moron", StatusCodes.Status404NotFound);
+            var dishInCart = cart.Dishes.First(d => d.Dish.Id == dishId);
 
             cart.Dishes.Remove(dishInCart);
 
@@ -120,7 +114,6 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
                 .FirstOrDefaultAsync(c => c.CustomerId == customerId && c.WasOrdered == false)
                 ?? await CreateCart(customerId);
         }
-
         private async Task<Cart> CreateCart(Guid customerId)
         {
             var cart = new Cart

@@ -25,16 +25,9 @@ namespace DeliveryDeck_Backend_Final.Backend.DAL
             builder.Entity<Order>()
                 .HasKey(m => m.Id);
 
-            builder.Entity<Dish>()
-                .HasData(new Dish
-                {
-                    Id = Guid.NewGuid(),
-                    Name = "Fish w/ Qiwi",
-                    Price = 50,
-                    Description = "aaaaa",
-                    IsVegeterian = false,
-                    Category = Common.Enumerations.FoodCategory.Dessert
-                });
+            builder.Entity<Order>()
+                .HasOne(o => o.Restaurant)
+                .WithMany(r => r.Orders);
 
             builder.Entity<Restaurant>()
                 .HasData(

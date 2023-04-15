@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Security.Claims;
 
-namespace DeliveryDeck_Backend_Final.ClaimAuthorize
+namespace DeliveryDeck_Backend_Final.Filters
 {
     public class ClaimPermissionRequirementAttribute : TypeFilterAttribute
     {

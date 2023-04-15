@@ -13,6 +13,7 @@ namespace DeliveryDeck_Backend_Final.Common.Interfaces.Backend
         Task<PagedMenusDto> GetMenus(Guid manager, int page);
         Task<MenuInfo> GetMenuDetails(Guid manager, Guid menuId, int dishPage);
         Task UpdateMenu(Guid manager, Guid menuId, UpdateMenuDto data);
+        Task DeleteMenu(Guid manager, Guid menuId);
 
 
         Task AddDishesToMenu(Guid manager, Guid menuId, List<Guid> dishesIds);

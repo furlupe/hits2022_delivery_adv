@@ -1,7 +1,8 @@
-﻿using DeliveryDeck_Backend_Final.ClaimAuthorize;
+﻿using DeliveryDeck_Backend_Final.Backend.DAL.Entities;
 using DeliveryDeck_Backend_Final.Common.CustomPermissions;
 using DeliveryDeck_Backend_Final.Common.DTO.Backend;
 using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
+using DeliveryDeck_Backend_Final.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -14,23 +15,29 @@ namespace DeliveryDeck_Backend_Final.Controllers
     public class OrderController : AuthorizeController
     {
         private readonly IOrderService _orderService;
-        public OrderController(IOrderService orderService)
+        private readonly IResourceAuthorizationService _resourceAuthorizationService;
+        public OrderController(IOrderService orderService, IResourceAuthorizationService resourceAuthorizationService)
         {
             _orderService = orderService;
+            _resourceAuthorizationService = resourceAuthorizationService;
         }
 
         [HttpPost]
         [ClaimPermissionRequirement(OrderPermissions.Add)]
-        public async Task<ActionResult<List<Guid>>> CreateOrders(CreateOrderDto data)
+        public async Task<ActionResult<RemovedDishesDto>> CreateOrders(CreateOrderDto data)
         {
             return Ok(await _orderService.CreateOrder(UserId, data));
         }
 
-        [HttpPatch("{orderId}/cancel")]
+        [HttpPatch("{orderNumber}/cancel")]
         [ClaimPermissionRequirement(OrderPermissions.Cancel)]
-        public async Task<IActionResult> CancelOrder(int orderId)
+        public async Task<IActionResult> CancelOrder(int orderNumber)
         {
-            await _orderService.CancelOrder(UserId, orderId);
+            if (! await _resourceAuthorizationService.OrderResourceExists(UserId, orderNumber))
+            {
+                return NotFound();
+            }
+            await _orderService.CancelOrder(UserId, orderNumber);
             return NoContent();
         }
 
@@ -42,13 +49,18 @@ namespace DeliveryDeck_Backend_Final.Controllers
             [FromQuery] int? orderNumber = default,
             [FromQuery] DateTime fromDate = default)
         {
-            return Ok(await _orderService.GetHistory(UserId, orderNumber, fromDate, page, activeOnly));
+            return Ok(await _orderService.GetCustomerHistory(UserId, orderNumber, fromDate, page, activeOnly));
         }
 
         [HttpGet("{orderNumber}")]
         [ClaimPermissionRequirement(OrderPermissions.ReadOwnOrderHistory)]
         public async Task<ActionResult<OrderDto>> GetOrderDetails(int orderNumber)
         {
+            if (!await _resourceAuthorizationService.OrderResourceExists(UserId, orderNumber))
+            {
+                return NotFound();
+            }
+
             return Ok(await _orderService.GetOrderDetails(UserId, orderNumber));
         }
 

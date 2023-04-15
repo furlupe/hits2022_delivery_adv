@@ -6,7 +6,6 @@ using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Xml.Linq;
 
 namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 {
@@ -23,15 +22,22 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
         public async Task AddDishesToMenu(Guid manager, Guid menuId, List<Guid> dishesIds)
         {
-            var restaurant = await GetRestaurantByManager(manager);
-            var menu = restaurant.Menus.FirstOrDefault(m => m.Id == menuId)
-                ?? throw new BadHttpRequestException("", StatusCodes.Status404NotFound);
+            var restaurant = await _backendContext.Restaurants
+                .Include(r => r.Menus)
+                    .ThenInclude(m => m.Dishes)
+                .Where(r => r.Managers.Contains(manager))
+                .Select(r => new {r.Menus, r.Dishes})
+                .FirstAsync();
+
+            var menu = restaurant.Menus
+                .First(m => m.Id == menuId);
 
             var dishes = restaurant.Dishes
                 .IntersectBy(dishesIds, d => d.Id)
-                .Except(menu.Dishes);
+                .Except(menu.Dishes)
+                .Distinct();
 
-            var uncatched = dishesIds.Where(d => !dishes.Select(x => x.Id).Contains(d)).ToList();
+            var uncatched = dishesIds.Where(d => !dishes.Select(x => x.Id).Contains(d));
             if (!uncatched.IsNullOrEmpty())
             {
                 throw new BadHttpRequestException("Some dishes do not exist");
@@ -44,8 +50,9 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
         public async Task CreateMenu(Guid manager, CreateMenuDto data)
         {
-            var restaurant = await GetRestaurantByManager(manager);
-            var menu = new Menu { Name = data.Name };
+            var restaurant = await _backendContext.Restaurants
+                .Include(r => r.Menus)
+                .FirstAsync(r => r.Managers.Contains(manager));
 
             restaurant.Menus.Add(new Menu { Name = data.Name });
 
@@ -59,7 +66,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
                 PageInfo = new PageInfo(_backendContext.Restaurants.Count(), _RestaurantPageSize, page)
             };
 
-            var restaurants = await _backendContext.Restaurants
+            var restaurants = await _backendContext.Restaurants.Include(r => r.Menus).ThenInclude(m => m.Dishes)
                 .Where(r => name == null || r.Name.StartsWith(name))
                 .Skip((page - 1) * _RestaurantPageSize)
                 .Take(_RestaurantPageSize)
@@ -82,8 +89,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             var menu = await _backendContext.Menus
                 .Where(m => m.Id == menuId)
                 .Select(m => new { m.Restaurant.Id, m.Name })
-                .FirstOrDefaultAsync()
-                ?? throw new BadHttpRequestException("No such menu", StatusCodes.Status404NotFound);
+                .FirstAsync();
 
             filters.Menu = menu.Name;
 
@@ -180,9 +186,15 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
         public async Task RemoveDishesFromMenu(Guid manager, Guid menuId, List<Guid> dishesIds)
         {
-            var restaurant = await GetRestaurantByManager(manager);
-            var menu = restaurant.Menus.FirstOrDefault(m => m.Id == menuId)
-                ?? throw new BadHttpRequestException("", StatusCodes.Status404NotFound);
+            var restaurant = await _backendContext.Restaurants
+                .Include(r => r.Menus)
+                    .ThenInclude(m => m.Dishes)
+                .Where(r => r.Managers.Contains(manager))
+                .Select(r => new { r.Menus, r.Dishes })
+                .FirstAsync();
+
+            var menu = restaurant.Menus
+                .First(m => m.Id == menuId);
 
             var dishes = restaurant.Dishes
                 .IntersectBy(dishesIds, d => d.Id);
@@ -228,7 +240,9 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
         public async Task AddDishToRestaurant(Guid manager, CreateDishDto data)
         {
-            var restaurant = await GetRestaurantByManager(manager);
+            var restaurant = await _backendContext.Restaurants
+                .Include(r => r.Dishes)
+                .FirstAsync(r => r.Managers.Contains(manager));
 
             restaurant.Dishes.Add(new Dish
             {
@@ -245,9 +259,11 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
         public async Task<PagedMenusDto> GetMenus(Guid manager, int page)
         {
-            var restaurant = await GetRestaurantByManager(manager);
+            var menus = await _backendContext.Restaurants.Include(r => r.Menus).ThenInclude(m => m.Dishes)
+                .Where(r => r.Managers.Contains(manager))
+                .Select(r => r.Menus)
+                .FirstAsync();
 
-            var menus = restaurant.Menus;
             var response = new PagedMenusDto
             {
                 PageInfo = new PageInfo(menus.Count, _MenusPageSize, page)
@@ -272,20 +288,26 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
         public async Task RemoveDishFromRestaurant(Guid manager, Guid dishId)
         {
-            var restaurant = await GetRestaurantByManager(manager);
+            var restaurant = await _backendContext.Restaurants
+                .Include(r => r.Dishes)
+                .FirstAsync(r => r.Managers.Contains(manager));
 
             restaurant.Dishes.Remove(
-                restaurant.Dishes.FirstOrDefault(d => d.Id == dishId)
-                ?? throw new BadHttpRequestException("No such dish", StatusCodes.Status404NotFound)
+                restaurant.Dishes.First(d => d.Id == dishId)
                 );
+
             await _backendContext.SaveChangesAsync();
         }
 
         public async Task<MenuInfo> GetMenuDetails(Guid manager, Guid menuId, int dishPage)
         {
-            var restaurant = await GetRestaurantByManager(manager);
-            var menu = restaurant.Menus.FirstOrDefault(m => m.Id == menuId)
-                ?? throw new BadHttpRequestException("Menu does not exist", StatusCodes.Status404NotFound);
+            var restaurant = await _backendContext.Restaurants
+                .Include(r => r.Menus)
+                    .ThenInclude(m => m.Dishes)
+                        .ThenInclude(d => d.Ratings)
+                .FirstAsync(r => r.Managers.Contains(manager));
+
+            var menu = restaurant.Menus.First(m => m.Id == menuId);
 
             var dishesInfo = new PagedDishesDto
             {
@@ -307,29 +329,25 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
                 });
             }
 
-            var response = new MenuInfo();
-            response.Name = menu.Name;
-            response.IsActive = menu.IsActive;
-            response.Dishes = dishesInfo;
+            var response = new MenuInfo
+            {
+                Name = menu.Name,
+                IsActive = menu.IsActive,
+                Dishes = dishesInfo
+            };
 
             return response;
         }
 
-        private Task<Restaurant> GetRestaurantByManager(Guid managerId)
-        {
-            return _backendContext.Restaurants
-                .Include(r => r.Menus)
-                    .ThenInclude(m => m.Dishes)
-                .Include(d => d.Dishes)
-                    .ThenInclude(d => d.Ratings)
-                .FirstAsync(r => r.Managers.Contains(managerId));
-        }
-
         public async Task UpdateMenu(Guid manager, Guid menuId, UpdateMenuDto data)
         {
-            var menu = (await GetRestaurantByManager(manager))
-                .Menus.FirstOrDefault(m => m.Id == menuId)
-                ?? throw new BadHttpRequestException("No such menu", StatusCodes.Status404NotFound);
+            var menu = (
+                await _backendContext.Restaurants.Include(r => r.Menus).ThenInclude(m => m.Dishes)
+                    .Where(r => r.Managers.Contains(manager))
+                    .Select(r => r.Menus)
+                    .FirstAsync()
+                )
+                .First(m => m.Id == menuId);
 
             menu.Name = data.Name;
             menu.IsActive = data.IsActive;
@@ -339,9 +357,13 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
         public async Task UpdateDish(Guid manager, Guid dishId, CreateDishDto data)
         {
-            var dish = (await GetRestaurantByManager(manager))
-                .Dishes.FirstOrDefault(d => d.Id == dishId)
-                ?? throw new BadHttpRequestException("No such dish", StatusCodes.Status404NotFound);
+            var dish = (
+                await _backendContext.Restaurants.Include(r => r.Menus).ThenInclude(m => m.Dishes)
+                    .Where(r => r.Managers.Contains(manager))
+                    .Select(r => r.Dishes)
+                    .FirstAsync()
+                )
+                .First(d => d.Id == dishId);
 
             dish.Name = data.Name;
             dish.Description = data.Description;
@@ -352,6 +374,18 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
             await _backendContext.SaveChangesAsync();
 
+        }
+        public async Task DeleteMenu(Guid manager, Guid menuId)
+        {
+            var restaurant = await _backendContext.Restaurants
+                .Include(r => r.Menus)
+                .FirstAsync(r => r.Managers.Contains(manager));
+
+            restaurant.Menus.Remove(
+                restaurant.Menus.First(d => d.Id == menuId)
+                );
+
+            await _backendContext.SaveChangesAsync();
         }
     }
 

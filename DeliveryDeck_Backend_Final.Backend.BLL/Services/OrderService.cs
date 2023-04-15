@@ -31,28 +31,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             order.Status = OrderStatus.Cancelled;
             await _backendContext.SaveChangesAsync();
         }
-
-        public async Task ChangeOrderStatus(Guid userId, int orderId, OrderStatus status)
-        {
-            var order = await GetUserOrder(userId, orderId);
-
-            if (status - order.Status > 1 && status != OrderStatus.Cancelled)
-            {
-                throw new BadHttpRequestException("Huge status step > 1");
-            }
-
-            if (userId == order.Cook && (status == OrderStatus.Created || status > OrderStatus.ReadyForDelivery)
-               || userId == order.CourierId && status < OrderStatus.Delivering
-               || userId == order.CustomerId || (userId != order.CourierId && userId != order.Cook))
-            {
-                throw new BadHttpRequestException("Can't change the status");
-            }
-
-            order.Status = status;
-            await _backendContext.SaveChangesAsync();
-        }
-
-        public async Task<List<Guid>> CreateOrder(Guid userId, CreateOrderDto data)
+        public async Task<RemovedDishesDto> CreateOrder(Guid userId, CreateOrderDto data)
         {
             var cart = await _backendContext.Carts
                 .Include(c => c.Dishes)
@@ -61,6 +40,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
             var menus = await _backendContext.Menus
                 .Include(m => m.Dishes)
+                .Include(m => m.Restaurant)
                 .Where(m => m.Dishes
                     .Any(dish => cart.Dishes
                         .Select(d => d.Dish)
@@ -117,7 +97,8 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
                     Status = OrderStatus.Created,
                     CustomerId = userId,
                     Dishes = menuDishesFromCart.ToList(),
-                    Address = data.Address
+                    Address = data.Address,
+                    Restaurant = restaurant
                 });
             }
 
@@ -128,10 +109,9 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             await _backendContext.Carts.AddAsync(new Cart { CustomerId = userId });
             await _backendContext.SaveChangesAsync();
 
-            return removed;
+            return new RemovedDishesDto { RemovedDishes = removed };
         }
-
-        public async Task<OrderPagedDto> GetHistory(
+        public async Task<OrderPagedDto> GetCustomerHistory(
             Guid userId,
             int? number = default,
             DateTime fromDate = default,
@@ -208,20 +188,10 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             };
         }
 
-        private async Task<Order> GetUserOrder(Guid userId, int orderId)
-        {
-            var order = await _backendContext.Orders
+        private async Task<Order> GetUserOrder(Guid userId, int orderId) 
+            => await _backendContext.Orders
                 .Include(o => o.Dishes)
                     .ThenInclude(dc => dc.Dish)
-                .FirstOrDefaultAsync(o => o.Id == orderId)
-                ?? throw new BadHttpRequestException("No such order, moron");
-
-            if (order.CustomerId != userId)
-            {
-                throw new BadHttpRequestException("Access denied", StatusCodes.Status403Forbidden);
-            }
-
-            return order;
-        }
+                .FirstAsync(o => o.Id == orderId && o.CustomerId == userId);
     }
 }

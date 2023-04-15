@@ -9,15 +9,22 @@ namespace DeliveryDeck_Backend_Final.Controllers
     public class DishController : ControllerBase
     {
         private readonly IDishService _dishService;
-        public DishController(IDishService dishService)
+        private readonly IResourceAuthorizationService _resourceAuthorizationService;
+        public DishController(IDishService dishService, IResourceAuthorizationService resourceAuthorizationService)
         {
             _dishService = dishService;
+            _resourceAuthorizationService = resourceAuthorizationService;
         }
 
         [HttpGet("{dishId}")]
-        public async Task<DishDto> GetDish(Guid dishId)
+        public async Task<ActionResult<DishDto>> GetDish(Guid dishId)
         {
-            return await _dishService.GetDishById(dishId);
+            if (! await _resourceAuthorizationService.DishResourceExists(dishId))
+            {
+                return NotFound();
+            }
+
+            return Ok(await _dishService.GetDishById(dishId));
         }
     }
 }

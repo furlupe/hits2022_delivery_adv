@@ -1,5 +1,4 @@
-﻿using DeliveryDeck_Backend_Final.ClaimAuthorize;
-using DeliveryDeck_Backend_Final.Common.CustomPermissions;
+﻿using DeliveryDeck_Backend_Final.Backend.DAL.Entities;
 using DeliveryDeck_Backend_Final.Common.DTO.Backend;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
 using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
@@ -13,9 +12,12 @@ namespace DeliveryDeck_Backend_Final.Controllers
     public class RestaurantCustomerController : AuthorizeController
     {
         private readonly IRestaurantService _restaurantService;
-        public RestaurantCustomerController(IRestaurantService restaurantService)
+        private readonly IResourceAuthorizationService _resourceAuthorizationService;
+
+        public RestaurantCustomerController(IRestaurantService restaurantService, IResourceAuthorizationService resourceAuthorizationService)
         {
             _restaurantService = restaurantService;
+            _resourceAuthorizationService = resourceAuthorizationService;
         }
 
         [HttpGet]
@@ -31,6 +33,11 @@ namespace DeliveryDeck_Backend_Final.Controllers
             [FromQuery, BindRequired] int page = 1
             )
         {
+            if (! await _resourceAuthorizationService.RestaurantResourceExists(restaurantId))
+            {
+                return NotFound();
+            }
+
             return Ok(await _restaurantService.GetActiveRestaurantMenus(restaurantId, page, name));
         }
 
@@ -43,6 +50,11 @@ namespace DeliveryDeck_Backend_Final.Controllers
             [FromQuery] string? menu,
             int page = 1)
         {
+            if (!await _resourceAuthorizationService.RestaurantResourceExists(restaurantId))
+            {
+                return NotFound();
+            }
+
             return Ok(await _restaurantService.GetActiveRestaurantDishes(restaurantId, page, new DishFilters
             {
                 Categories = categories,
@@ -60,6 +72,11 @@ namespace DeliveryDeck_Backend_Final.Controllers
             [FromQuery] SortingType? sortBy,
             int page = 1)
         {
+            if (!await _resourceAuthorizationService.MenuResourceExists(menuId))
+            {
+                return NotFound();
+            }
+
             return Ok(await _restaurantService.GetActiveMenuDishes(menuId, page, new DishFilters
             {
                 Categories = categories,
