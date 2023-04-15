@@ -175,12 +175,14 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
                 query = query.Where(o => o.Id == number);
             }
 
+            orders = await query.ToListAsync();
+
             response = new OrderPagedDto { PageInfo = new PageInfo(orders.Count, _OrdersPageSize, page) };
 
-            orders = await query
+            orders = orders
                 .Skip(_OrdersPageSize * (page - 1))
                 .Take(_OrdersPageSize)
-                .ToListAsync();
+                .ToList();
 
             foreach (var order in orders)
             {
@@ -281,6 +283,51 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
             return new RemovedDishesDto { RemovedDishes = removedDishes.Select(d => d.Dish.Id) };
            
+        }
+
+        public async Task SetOrderToDeliveryAvailable(int orderId)
+        {
+            var order = await _backendContext.Orders
+                .FirstAsync(x => x.Id == orderId);
+
+            if (order.Status > OrderStatus.Packaging)
+            {
+                throw new BadHttpRequestException("Order is already waiting for being delivered");
+            }
+
+            order.Status = OrderStatus.ReadyForDelivery;
+            await _backendContext.SaveChangesAsync();
+        }
+
+        public async Task TakeOrderToKitchen(Guid userId, int orderId)
+        {
+            var order = await _backendContext.Orders
+                .FirstAsync(x => x.Id == orderId);
+
+            if (order.Cook is not null || order.Status != OrderStatus.Created)
+            {
+                throw new BadHttpRequestException("Order has been taken by someone else");
+            }
+
+            order.Status = OrderStatus.Cooking;
+            order.Cook = userId;
+
+            await _backendContext.SaveChangesAsync();
+        }
+
+        public async Task TakeOrderToPackaging(int orderId)
+        {
+            var order = await _backendContext.Orders
+                .FirstAsync(x => x.Id == orderId);
+
+            if (order.Status > OrderStatus.Cooking)
+            {
+                throw new BadHttpRequestException("Order is being packaged or has been packaged already");
+            }
+
+            order.Status = OrderStatus.Packaging;
+
+            await _backendContext.SaveChangesAsync();
         }
 
         private async Task<Order> GetOrder(int orderId) 

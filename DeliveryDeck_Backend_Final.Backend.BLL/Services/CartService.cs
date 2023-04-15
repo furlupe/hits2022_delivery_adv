@@ -2,7 +2,6 @@
 using DeliveryDeck_Backend_Final.Backend.DAL.Entities;
 using DeliveryDeck_Backend_Final.Common.DTO.Backend;
 using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
@@ -54,7 +53,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
                     .Where(m => m.Dishes.Contains(dish))
                     .AllAsync(m => m.IsActive == false)
                     )
-                {
+                {                    
                     removed.Add(dish.Id);
                     continue;
                 }

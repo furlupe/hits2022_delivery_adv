@@ -37,6 +37,7 @@ builder.Services.AddSwaggerGen(option =>
 });
 
 builder.UseBackendComponent();
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 

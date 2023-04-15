@@ -15,12 +15,14 @@ namespace DeliveryDeck_Backend_Final.Controllers
     public class CookController : AuthorizeController
     {
         private readonly IOrderService _orderService;
-        public CookController(IOrderService orderService)
+        private readonly IResourceAuthorizationService _resAuthorizationService;
+        public CookController(IOrderService orderService, IResourceAuthorizationService resAuthorizationService)
         {
             _orderService = orderService;
+            _resAuthorizationService = resAuthorizationService;
         }
 
-        [HttpGet("restaurant/available_orders")]
+        [HttpGet("restaurant/orders/available")]
         [ClaimPermissionRequirement(OrderPermissions.GetAvailableForCooking)]
         public async Task<ActionResult<OrderKitchenPagedDto>> GetAvailableOrders(
             [FromQuery] OrderSortingType sortBy, 
@@ -29,5 +31,91 @@ namespace DeliveryDeck_Backend_Final.Controllers
         {
             return Ok(await _orderService.GetAvailableForKitchen(UserId, sortBy, page));
         }
+
+        [HttpPatch("restaurant/orders/{orderId}/take-to-kitchen")]
+        [ClaimPermissionRequirement(OrderPermissions.ChangeStatusUntilDelivery)]
+        public async Task<IActionResult> TakeOrderToKitchen(int orderId)
+        {
+            if (! await _resAuthorizationService.RestaurantOrderExists(UserId, orderId))
+            {
+                return NotFound();
+            }
+
+            await _orderService.TakeOrderToKitchen(UserId, orderId);
+            return NoContent();
+        }
+
+        [HttpPatch("restaurant/orders/{orderId}/package")]
+        [ClaimPermissionRequirement(OrderPermissions.ChangeStatusUntilDelivery)]
+        public async Task<IActionResult> PackageOrder(int orderId)
+        {
+            if (! await _resAuthorizationService.RestaurantOrderExists(UserId, orderId))
+            {
+                return NotFound();
+            }
+
+            if (! await _resAuthorizationService.OrderCookRelationExists(UserId, orderId))
+            {
+                return Forbid();
+            }
+
+            await _orderService.TakeOrderToPackaging(orderId);
+            return NoContent();
+        }
+
+        [HttpPatch("restaurant/orders/{orderId}/set-ready-for-delivery")]
+        [ClaimPermissionRequirement(OrderPermissions.ChangeStatusUntilDelivery)]
+        public async Task<IActionResult> SetOrderReadyForDelivery(int orderId)
+        {
+            if (!await _resAuthorizationService.RestaurantOrderExists(UserId, orderId))
+            {
+                return NotFound();
+            }
+
+            if (!await _resAuthorizationService.OrderCookRelationExists(UserId, orderId))
+            {
+                return Forbid();
+            }
+
+            await _orderService.SetOrderToDeliveryAvailable(orderId);
+            return NoContent();
+
+        }
+
+        /*[HttpPatch("restaurant/orders/{orderId}/{action}")]
+        [ClaimPermissionRequirement(OrderPermissions.ChangeStatusUntilDelivery)]        
+        public async Task<IActionResult> PerformActionOnOrder([FromRoute] int orderId, [FromRoute] string action)
+        {
+            if (!await _resAuthorizationService.RestaurantOrderExists(UserId, orderId))
+            {
+                return NotFound();
+            }
+
+            switch(action)
+            {
+                case CookOrderAction.SEND_TO_KITCHEN: await _orderService.TakeOrderToKitchen(UserId, orderId); break;
+                case CookOrderAction.SEND_TO_PACKAGE:
+                case CookOrderAction.SET_DELIVERY_AVAILABLE:
+                    if (!await _resAuthorizationService.OrderCookRelationExists(UserId, orderId))
+                    {
+                        return Forbid();
+                    }
+
+                    if (action == CookOrderAction.SEND_TO_PACKAGE)
+                    {
+                        await _orderService.TakeOrderToPackaging(orderId);
+                    }
+                    else if (action == CookOrderAction.SET_DELIVERY_AVAILABLE)
+                    {
+                        await _orderService.SetOrderToDeliveryAvailable(orderId);
+                    }
+
+                    break;
+                default: return NotFound();
+
+            }
+
+            return NoContent();
+        }*/
     }
 }

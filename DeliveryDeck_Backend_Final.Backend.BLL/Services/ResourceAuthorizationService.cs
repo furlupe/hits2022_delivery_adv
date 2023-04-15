@@ -51,9 +51,22 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
                     && r.Dishes.Any(d => d.Id == dishId)
                 ) is not null;
 
+        public async Task<bool> RestaurantOrderExists(Guid userId, int orderId)
+            => await _backendContext.Restaurants
+                .FirstOrDefaultAsync(
+                    r => (r.Cooks.Contains(userId) || r.Managers.Contains(userId)) 
+                    && r.Orders.Any(o => o.Id == orderId)
+                ) is not null;
+
+        public async Task<bool> OrderCookRelationExists(Guid cookId, int orderId)
+            => await _backendContext.Orders
+                .FirstOrDefaultAsync(
+                    o => o.Cook == cookId 
+                    && o.Id == orderId
+                ) is not null;
+
         private async Task<bool> ResourceIsAvailable<TEntity>(object key)
             where TEntity : class
             => await _backendContext.FindAsync<TEntity>(key) is not null;
-
     }
 }

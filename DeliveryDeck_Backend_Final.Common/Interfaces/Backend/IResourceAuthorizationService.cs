@@ -12,5 +12,8 @@
         Task<bool> RestaurantResourceExists(Guid restaurantId);
         Task<bool> RestaurantMenuResourceExists(Guid manager, Guid menuId);
         Task<bool> RestaurantDishResourceExists(Guid manager, Guid dishId);
+
+        Task<bool> RestaurantOrderExists(Guid userId, int orderId);
+        Task<bool> OrderCookRelationExists(Guid cookId, int orderId);
     }
 }
