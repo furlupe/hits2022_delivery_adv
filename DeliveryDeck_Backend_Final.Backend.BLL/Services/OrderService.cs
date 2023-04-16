@@ -329,41 +329,6 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             return CreateOrderPagedResponse(orders, page);
         }
 
-        private async Task<Order> GetOrder(int orderId) 
-            => await _backendContext.Orders
-                .Include(o => o.Dishes)
-                    .ThenInclude(dc => dc.Dish)
-                .Include(r => r.Restaurant)
-                .FirstAsync(o => o.Id == orderId);
-
-        private IQueryable<Order> GetUserHistoryQuery(
-            RoleType role,
-            Guid userId,
-            int? number = default,
-            DateTime fromDate = default
-            )
-        {
-            // определяем предикат фильтрации в зависимости от роли, т.к. суть поиска одинакова, достаточно поменять поля, по которым сравниваем ID пользователей
-            Expression<Func<Order, bool>> predicate = role switch
-            {
-                RoleType.Courier => (Order o) => o.CourierId == userId,
-                RoleType.Cook => (Order o) => o.Cook == userId,
-                RoleType.Customer => (Order o) => o.CustomerId == userId,
-                _ or RoleType.Manager => throw new BadHttpRequestException("Not allowed", StatusCodes.Status403Forbidden)
-            };
-
-            var query = _backendContext.Orders
-                .Where(predicate)
-                .Where(o => o.OrderTime > fromDate);
-
-            if (number != null)
-            {
-                query = query.Where(o => o.Id == number);
-            }
-
-            return query;
-        }
-
         public async Task SetOrderAsBeingDelivered(Guid courierId, int orderId)
         {
             var order = await _backendContext.Orders
@@ -446,6 +411,39 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             }
 
             return response;
+        }
+        private async Task<Order> GetOrder(int orderId)
+            => await _backendContext.Orders
+                .Include(o => o.Dishes)
+                    .ThenInclude(dc => dc.Dish)
+                .Include(r => r.Restaurant)
+                .FirstAsync(o => o.Id == orderId);
+        private IQueryable<Order> GetUserHistoryQuery(
+            RoleType role,
+            Guid userId,
+            int? number = default,
+            DateTime fromDate = default
+            )
+        {
+            // определяем предикат фильтрации в зависимости от роли, т.к. суть поиска одинакова, достаточно поменять поля, по которым сравниваем ID пользователей
+            Expression<Func<Order, bool>> predicate = role switch
+            {
+                RoleType.Courier => (Order o) => o.CourierId == userId,
+                RoleType.Cook => (Order o) => o.Cook == userId,
+                RoleType.Customer => (Order o) => o.CustomerId == userId,
+                _ or RoleType.Manager => throw new BadHttpRequestException("Not allowed", StatusCodes.Status403Forbidden)
+            };
+
+            var query = _backendContext.Orders
+                .Where(predicate)
+                .Where(o => o.OrderTime > fromDate);
+
+            if (number != null)
+            {
+                query = query.Where(o => o.Id == number);
+            }
+
+            return query.OrderBy(x => x.OrderTime);
         }
     }
 

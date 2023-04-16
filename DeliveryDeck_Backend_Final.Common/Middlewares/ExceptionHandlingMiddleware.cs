@@ -22,18 +22,18 @@ namespace DeliveryDeck_Backend_Final.Common.Middlewares
             {
                 await WriteResponse(context, ex.StatusCode, new
                 {
-                    Message = ex.Message,
-                    Errors = ex.Errors
+                    ex.Message,
+                    ex.Errors
                 });
             }
             catch (BadHttpRequestException ex)
             {
-                await WriteResponse(context, ex.StatusCode, new { Message = ex.Message });
+                await WriteResponse(context, ex.StatusCode, new { ex.Message });
             }
-            /*catch
+            catch
             {
                 await WriteResponse(context, StatusCodes.Status500InternalServerError, new { Message = "go outside" });
-            }*/
+            }
         }
 
         private static async Task WriteResponse(HttpContext context, int statusCode, object? obj = null)
