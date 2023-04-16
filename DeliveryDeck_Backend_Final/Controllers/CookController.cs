@@ -1,9 +1,12 @@
 ﻿using DeliveryDeck_Backend_Final.Common.CustomPermissions;
+using DeliveryDeck_Backend_Final.Common.DTO.Backend;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
 using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
+using DeliveryDeck_Backend_Final.Common.Utils;
 using DeliveryDeck_Backend_Final.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace DeliveryDeck_Backend_Final.Controllers
 {
@@ -20,15 +23,38 @@ namespace DeliveryDeck_Backend_Final.Controllers
             _resAuthorizationService = resAuthorizationService;
         }
 
-        /*[HttpGet("restaurant/orders/available")]
+        [HttpGet("restaurant/orders/available")]
         [ClaimPermissionRequirement(OrderPermissions.GetAvailableForCooking)]
-        public async Task<ActionResult<OrderKitchenPagedDto>> GetAvailableOrders(
+        public async Task<ActionResult<OrderAvailablePagedDto>> GetAvailableOrders(
             [FromQuery] OrderSortingType sortBy, 
             [FromQuery, BindRequired] int page = 1
             )
         {
             return Ok(await _orderService.GetAvailableForKitchen(UserId, sortBy, page));
-        }*/
+        }
+
+        [HttpGet("orders")]
+        [ClaimPermissionRequirement(OrderPermissions.ReadOwnCookingHistory)]
+        public async Task<ActionResult<OrderPagedDto>> GetOrderHistory(
+           [FromQuery] int? number,
+           [FromQuery] DateTime fromDate,
+           [FromQuery, BindRequired] int page = 1
+            )
+        {
+            return await _orderService.GetCookHistory(UserId, number, fromDate, page);
+        }
+
+        [HttpGet("orders/{orderNumber}")]
+        [ClaimPermissionRequirement(OrderPermissions.ReadOwnCookingHistory)]
+        public async Task<ActionResult<OrderDto>> GetOrderDetails(int orderNumber)
+        {
+            if (!await _resAuthorizationService.OrderCookRelationExists(UserId, orderNumber))
+            {
+                return NotFound();
+            }
+
+            return await _orderService.GetOrderDetails(orderNumber);
+        }
 
         /*[HttpPatch("restaurant/orders/{orderId}/take-to-kitchen")]
         [ClaimPermissionRequirement(OrderPermissions.ChangeStatusUntilDelivery)]
@@ -85,26 +111,26 @@ namespace DeliveryDeck_Backend_Final.Controllers
         public async Task<IActionResult> PerformActionOnOrder(int orderId, string act)
         {
 
-            if (!await _resAuthorizationService.RestaurantOrderExists(UserId, orderId))
+            if (!await _resAuthorizationService.StaffRestaurantOrderResourceExists(UserId, orderId))
             {
                 return NotFound();
             }
 
             switch(act)
             {
-                case CookOrderAction.SEND_TO_KITCHEN: await _orderService.TakeOrderToKitchen(UserId, orderId); break;
-                case CookOrderAction.SEND_TO_PACKAGE:
-                case CookOrderAction.SET_DELIVERY_AVAILABLE:
+                case OrderAction.SEND_TO_KITCHEN: await _orderService.TakeOrderToKitchen(UserId, orderId); break;
+                case OrderAction.SEND_TO_PACKAGE:
+                case OrderAction.SET_DELIVERY_AVAILABLE:
                     if (!await _resAuthorizationService.OrderCookRelationExists(UserId, orderId))
                     {
                         return Forbid();
                     }
 
-                    if (act == CookOrderAction.SEND_TO_PACKAGE)
+                    if (act == OrderAction.SEND_TO_PACKAGE)
                     {
                         await _orderService.TakeOrderToPackaging(orderId);
                     }
-                    else if (act == CookOrderAction.SET_DELIVERY_AVAILABLE)
+                    else if (act == OrderAction.SET_DELIVERY_AVAILABLE)
                     {
                         await _orderService.SetOrderToDeliveryAvailable(orderId);
                     }

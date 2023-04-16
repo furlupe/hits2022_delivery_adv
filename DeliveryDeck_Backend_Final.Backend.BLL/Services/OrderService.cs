@@ -6,6 +6,8 @@ using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System;
+using System.Linq.Expressions;
 
 namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 {
@@ -112,7 +114,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             return new RemovedDishesDto { RemovedDishes = removed };
         }
 
-        public async Task<OrderKitchenPagedDto> GetAvailableForKitchen(Guid userId, OrderSortingType? sortBy, int page = 1)
+        public async Task<OrderAvailablePagedDto> GetAvailableForKitchen(Guid userId, OrderSortingType? sortBy, int page = 1)
         {
             var orders = await _backendContext.Restaurants
                 .Where(r => r.Cooks.Contains(userId))
@@ -120,84 +122,9 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
                 .FirstAsync();
 
             var sortedOrders = orders.Where(o => o.Status == OrderStatus.Created);
-            sortedOrders = sortBy switch
-            {
-                OrderSortingType.CREATION_DATE_ASCENDING => sortedOrders.OrderBy(x => x.OrderTime),
-                OrderSortingType.CREATION_DATE_DESCENDING => sortedOrders.OrderByDescending(x => x.OrderTime),
-                OrderSortingType.DELIVERY_DATE_ASCENDING => sortedOrders.OrderBy(x => x.DeliveryTime),
-                OrderSortingType.DELIVERY_DATE_DESCENDING => sortedOrders.OrderByDescending(x => x.DeliveryTime),
-                _ => sortedOrders
-            };
+            sortedOrders = sortedOrders.SortByMethod(sortBy);
 
-            var response = new OrderKitchenPagedDto() { PageInfo = new PageInfo(sortedOrders.Count(), _OrdersPageSize, page)};
-
-            sortedOrders = sortedOrders
-                .Skip(_OrdersPageSize * (page - 1))
-                .Take(_OrdersPageSize);
-
-            foreach(var order in sortedOrders)
-            {
-                response.Orders.Add(new OrderShortestDto
-                {
-                    Id = order.Id,
-                    OrderTime = order.OrderTime,
-                    DeliveryTime = order.DeliveryTime
-                });
-            }
-
-            return response;
-        }
-
-        public async Task<OrderPagedDto> GetCustomerHistory(
-            Guid userId,
-            int? number = default,
-            DateTime fromDate = default,
-            int page = 1,
-            bool activeOnly = false
-            )
-        {
-            var query = _backendContext.Orders
-                .Where(o => o.CustomerId == userId && o.OrderTime >= fromDate);
-
-            var orders = new List<Order>();
-            var response = new OrderPagedDto();
-
-            if (number == null && activeOnly)
-            {
-                query = query
-                    .Where(o =>
-                        o.Status != OrderStatus.Cancelled
-                        && o.Status != OrderStatus.Delivered
-                    );
-            }
-            else if (number != null)
-            {
-                query = query.Where(o => o.Id == number);
-            }
-
-            orders = await query.ToListAsync();
-
-            response = new OrderPagedDto { PageInfo = new PageInfo(orders.Count, _OrdersPageSize, page) };
-
-            orders = orders
-                .Skip(_OrdersPageSize * (page - 1))
-                .Take(_OrdersPageSize)
-                .ToList();
-
-            foreach (var order in orders)
-            {
-                response.Orders.Add(new OrderShortDto
-                {
-                    Number = order.Id,
-                    DeliveryTime = order.DeliveryTime,
-                    OrderTime = order.OrderTime,
-                    Price = order.Price,
-                    Status = order.Status,
-                    Address = order.Address
-                });
-            }
-
-            return response;
+            return CreateOrderAvailablePagedResponse(sortedOrders, page);
         }
 
         public async Task<OrderDto> GetOrderDetails(int orderId)
@@ -320,7 +247,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             var order = await _backendContext.Orders
                 .FirstAsync(x => x.Id == orderId);
 
-            if (order.Status > OrderStatus.Cooking)
+            if (order.Status != OrderStatus.Cooking)
             {
                 throw new BadHttpRequestException("Order is being packaged or has been packaged already");
             }
@@ -330,11 +257,210 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             await _backendContext.SaveChangesAsync();
         }
 
+        public async Task<OrderPagedDto> GetCookHistory(
+            Guid userId, 
+            int? number, 
+            DateTime fromDate = default, 
+            int page = 1
+            )
+        {
+            var orders = await GetUserHistoryQuery(RoleType.Cook, userId, number, fromDate)
+                .ToListAsync();
+
+            return CreateOrderPagedResponse(orders, page);
+        }
+
+        public async Task<OrderPagedDto> GetCustomerHistory(
+            Guid userId, 
+            int? number, 
+            DateTime fromDate = default, 
+            int page = 1, 
+            bool activeOnly = false
+            )
+        {
+            var orders = await GetUserHistoryQuery(RoleType.Customer, userId, number, fromDate)
+                .Where(x => !activeOnly || (x.Status != OrderStatus.Cancelled && x.Status != OrderStatus.Delivered))
+                .ToListAsync();
+
+            return CreateOrderPagedResponse(orders, page);
+        }
+
+        public async Task<OrderPagedDto> GetCourierHistory(
+            Guid userId, 
+            int? number, 
+            DateTime fromDate = default, 
+            int page = 1            
+            )
+        {
+            var orders = await GetUserHistoryQuery(RoleType.Courier, userId, number, fromDate)
+                .ToListAsync();
+
+            orders = orders
+                .Where(x => new List<OrderStatus>() { OrderStatus.Delivering, OrderStatus.Delivered, OrderStatus.Cancelled }.Contains(x.Status))
+                .ToList();
+
+            return CreateOrderPagedResponse(orders, page);
+        }
+
+        public async Task<OrderPagedDto> GetRestaurantHistory(
+            Guid managerId, 
+            OrderStatus? status,
+            OrderSortingType? sortBy,
+            int? number, 
+            int page = 1
+            )
+        {
+            var orders = (IEnumerable<Order>) await _backendContext.Restaurants
+                .Where(r => r.Managers.Contains(managerId))
+                .Select(r => r.Orders)
+                .FirstAsync();
+
+            if (number is not null)
+            {
+                orders = orders.Where(x => x.Id == number);
+            }
+            else
+            {
+                orders = orders
+                    .Where(x => x.Status == (status ?? x.Status))
+                    .SortByMethod(sortBy);
+            }
+
+            return CreateOrderPagedResponse(orders, page);
+        }
+
         private async Task<Order> GetOrder(int orderId) 
             => await _backendContext.Orders
                 .Include(o => o.Dishes)
                     .ThenInclude(dc => dc.Dish)
                 .Include(r => r.Restaurant)
                 .FirstAsync(o => o.Id == orderId);
+
+        private IQueryable<Order> GetUserHistoryQuery(
+            RoleType role,
+            Guid userId,
+            int? number = default,
+            DateTime fromDate = default
+            )
+        {
+            // определяем предикат фильтрации в зависимости от роли, т.к. суть поиска одинакова, достаточно поменять поля, по которым сравниваем ID пользователей
+            Expression<Func<Order, bool>> predicate = role switch
+            {
+                RoleType.Courier => (Order o) => o.CourierId == userId,
+                RoleType.Cook => (Order o) => o.Cook == userId,
+                RoleType.Customer => (Order o) => o.CustomerId == userId,
+                _ or RoleType.Manager => throw new BadHttpRequestException("Not allowed", StatusCodes.Status403Forbidden)
+            };
+
+            var query = _backendContext.Orders
+                .Where(predicate)
+                .Where(o => o.OrderTime > fromDate);
+
+            if (number != null)
+            {
+                query = query.Where(o => o.Id == number);
+            }
+
+            return query;
+        }
+
+        public async Task SetOrderAsBeingDelivered(Guid courierId, int orderId)
+        {
+            var order = await _backendContext.Orders
+                .FirstAsync(x => x.Id == orderId);
+
+            if (order.CourierId is not null || order.Status != OrderStatus.ReadyForDelivery)
+            {
+                throw new BadHttpRequestException($"Can't change status from {order.Status} to ReadyForDelivery");
+            }
+
+            order.CourierId = courierId;
+            order.Status = OrderStatus.Delivering;
+
+            await _backendContext.SaveChangesAsync();
+        }
+
+        public async Task<OrderAvailablePagedDto> GetAvailableForDelivery(Guid userId, OrderSortingType? sortBy, int page = 1)
+        {
+            var orders = await _backendContext.Orders
+                .Where(x => x.Status == OrderStatus.ReadyForDelivery)
+                .ToListAsync();
+
+            return CreateOrderAvailablePagedResponse(orders, page);
+        }
+
+        public async Task SetOrderAsDelivered(int orderId)
+        {
+            var order = await _backendContext.Orders
+                .FirstAsync(o => o.Id == orderId);
+
+            if (order.Status != OrderStatus.Delivering)
+            {
+                throw new BadHttpRequestException($"Can't change status from {order.Status} to Delivering");
+            }
+
+            order.Status = OrderStatus.Delivered; 
+            await _backendContext.SaveChangesAsync();
+        }
+
+        private static OrderPagedDto CreateOrderPagedResponse(IEnumerable<Order> collection, int page)
+        {
+            var response = new OrderPagedDto { PageInfo = new PageInfo(collection.Count(), _OrdersPageSize, page) };
+
+            collection = collection
+                .Skip(_OrdersPageSize * (page - 1))
+                .Take(_OrdersPageSize)
+                .ToList();
+
+            foreach (var order in collection)
+            {
+                response.Orders.Add(new OrderShortDto
+                {
+                    Number = order.Id,
+                    DeliveryTime = order.DeliveryTime,
+                    OrderTime = order.OrderTime,
+                    Price = order.Price,
+                    Status = order.Status,
+                    Address = order.Address
+                });
+            }
+
+            return response;
+        }
+        private static OrderAvailablePagedDto CreateOrderAvailablePagedResponse(IEnumerable<Order> collection, int page)
+        {
+            var response = new OrderAvailablePagedDto() { PageInfo = new PageInfo(collection.Count(), _OrdersPageSize, page) };
+
+            collection = collection
+                .Skip(_OrdersPageSize * (page - 1))
+                .Take(_OrdersPageSize);
+
+            foreach (var order in collection)
+            {
+                response.Orders.Add(new OrderShortestDto
+                {
+                    Id = order.Id,
+                    OrderTime = order.OrderTime,
+                    DeliveryTime = order.DeliveryTime
+                });
+            }
+
+            return response;
+        }
+    }
+
+    static class IEnumerableExtension
+    {
+        public static IEnumerable<Order> SortByMethod(this IEnumerable<Order> orders, OrderSortingType? sortBy)
+        {
+            return sortBy switch
+            {
+                OrderSortingType.CREATION_DATE_ASCENDING => orders.OrderBy(x => x.OrderTime),
+                OrderSortingType.CREATION_DATE_DESCENDING => orders.OrderByDescending(x => x.OrderTime),
+                OrderSortingType.DELIVERY_DATE_ASCENDING => orders.OrderBy(x => x.DeliveryTime),
+                OrderSortingType.DELIVERY_DATE_DESCENDING => orders.OrderByDescending(x => x.DeliveryTime),
+                _ => orders
+            };
+        }
     }
 }

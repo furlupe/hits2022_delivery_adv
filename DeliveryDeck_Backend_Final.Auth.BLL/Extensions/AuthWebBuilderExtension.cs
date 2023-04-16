@@ -80,22 +80,22 @@ namespace DeliveryDeck_Backend_Final.Auth.BLL.Extensions
             using var scope = app.Services.CreateScope();
             var userMgr = scope.ServiceProvider.GetService<UserManager<AppUser>>();
 
-            if (await userMgr.FindByEmailAsync("cook@example.com") is not null)
+            if (await userMgr.FindByEmailAsync("del@example.com") is not null)
             {
                 return;
             }
 
             var cook = new AppUser
             {
-                FullName = "furlupe_cook",
+                FullName = "furlupe_delivery",
                 BirthDate = DateTime.UtcNow,
                 Gender = Gender.Female,
-                Email = "cook@example.com"
+                Email = "del@example.com"
             };
 
             var result = await userMgr.CreateAsync(cook, "_String1");
             if (!result.Succeeded) { return; }
-            await userMgr.AddToRoleAsync(cook, RoleType.Cook.ToString());
+            await userMgr.AddToRoleAsync(cook, RoleType.Courier.ToString());
         }
     }
 }

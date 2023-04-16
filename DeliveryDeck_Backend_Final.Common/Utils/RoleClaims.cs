@@ -27,7 +27,7 @@ namespace DeliveryDeck_Backend_Final.Common.Utils
                 RoleType.Manager,
                 new List<Claim>
                 {
-                    new Claim(CustomClaimTypes.Permission, OrderPermissions.ReadRestaurant),
+                    new Claim(CustomClaimTypes.Permission, OrderPermissions.ReadRestaurantHistory),
                     new Claim(CustomClaimTypes.Permission, MenuPermissions.Read),
                     new Claim(CustomClaimTypes.Permission, MenuPermissions.Create),
                     new Claim(CustomClaimTypes.Permission, MenuPermissions.Adjust),
@@ -43,7 +43,7 @@ namespace DeliveryDeck_Backend_Final.Common.Utils
                     new Claim(CustomClaimTypes.Permission, OrderPermissions.Add),
                     new Claim(CustomClaimTypes.Permission, OrderPermissions.ReadOwnDeliveryHistory),
                     new Claim(CustomClaimTypes.Permission, OrderPermissions.GetAvailableForDelivery),
-                    new Claim(CustomClaimTypes.Permission, OrderPermissions.ChangeStatusToDelivered)
+                    new Claim(CustomClaimTypes.Permission, OrderPermissions.ChangeStatusUntilDelivered)
                 }
             },
 

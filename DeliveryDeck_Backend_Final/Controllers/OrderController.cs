@@ -1,5 +1,4 @@
-﻿using DeliveryDeck_Backend_Final.Backend.DAL.Entities;
-using DeliveryDeck_Backend_Final.Common.CustomPermissions;
+﻿using DeliveryDeck_Backend_Final.Common.CustomPermissions;
 using DeliveryDeck_Backend_Final.Common.DTO.Backend;
 using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
 using DeliveryDeck_Backend_Final.Filters;
@@ -33,7 +32,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
         [ClaimPermissionRequirement(OrderPermissions.Cancel)]
         public async Task<IActionResult> CancelOrder(int orderNumber)
         {
-            if (! await _resourceAuthorizationService.OrderResourceExists(UserId, orderNumber))
+            if (! await _resourceAuthorizationService.OrderCustomerRelationExists(UserId, orderNumber))
             {
                 return NotFound();
             }
@@ -43,7 +42,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
 
         [HttpGet]
         [ClaimPermissionRequirement(OrderPermissions.ReadOwnOrderHistory)]
-        public async Task<ActionResult<OrderPagedDto>> GetListOfActiveOrders(
+        public async Task<ActionResult<OrderPagedDto>> GetOrderHistory(
             [FromQuery] bool activeOnly,
             [FromQuery, BindRequired] int page = 1,
             [FromQuery] int? orderNumber = default,
@@ -56,7 +55,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
         [ClaimPermissionRequirement(OrderPermissions.ReadOwnOrderHistory)]
         public async Task<ActionResult<OrderDto>> GetOrderDetails(int orderNumber)
         {
-            if (!await _resourceAuthorizationService.OrderResourceExists(UserId, orderNumber))
+            if (!await _resourceAuthorizationService.OrderCustomerRelationExists(UserId, orderNumber))
             {
                 return NotFound();
             }
@@ -68,7 +67,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
         [ClaimPermissionRequirement(OrderPermissions.Add)]
         public async Task<IActionResult> RepeatOrder(int orderNumber)
         {
-            if (!await _resourceAuthorizationService.OrderResourceExists(UserId, orderNumber))
+            if (!await _resourceAuthorizationService.OrderCustomerRelationExists(UserId, orderNumber))
             {
                 return NotFound();
             }

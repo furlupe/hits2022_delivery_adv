@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace DeliveryDeck_Backend_Final.Controllers
 {
-    [Route("api/backend/cart")]
+    [Route("api/cart")]
     [Authorize]
     [ApiController]
     public class CartController : AuthorizeController
