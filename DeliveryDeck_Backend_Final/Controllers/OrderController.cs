@@ -1,15 +1,16 @@
-﻿using DeliveryDeck_Backend_Final.Common.CustomPermissions;
-using DeliveryDeck_Backend_Final.Common.DTO.Backend;
+﻿using DeliveryDeck_Backend_Final.Common.DTO.Backend;
+using DeliveryDeck_Backend_Final.Common.Enumerations;
 using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
-using DeliveryDeck_Backend_Final.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using static DeliveryDeck_Backend_Final.Common.Filters.RoleRequirementAuthorization;
 
 namespace DeliveryDeck_Backend_Final.Controllers
 {
     [Route("api/orders")]
     [ApiController]
+    [RoleRequirementAuthorization(RoleType.Customer)]
     [Authorize]
     public class OrderController : AuthorizeController
     {
@@ -22,17 +23,15 @@ namespace DeliveryDeck_Backend_Final.Controllers
         }
 
         [HttpPost]
-        [ClaimPermissionRequirement(OrderPermissions.Add)]
         public async Task<ActionResult<RemovedDishesDto>> CreateOrders(CreateOrderDto data)
         {
             return Ok(await _orderService.CreateOrder(UserId, data));
         }
 
         [HttpPatch("{orderNumber}/cancel")]
-        [ClaimPermissionRequirement(OrderPermissions.Cancel)]
         public async Task<IActionResult> CancelOrder(int orderNumber)
         {
-            if (! await _resourceAuthorizationService.OrderCustomerRelationExists(UserId, orderNumber))
+            if (!await _resourceAuthorizationService.OrderCustomerRelationExists(UserId, orderNumber))
             {
                 return NotFound();
             }
@@ -41,7 +40,6 @@ namespace DeliveryDeck_Backend_Final.Controllers
         }
 
         [HttpGet]
-        [ClaimPermissionRequirement(OrderPermissions.ReadOwnOrderHistory)]
         public async Task<ActionResult<OrderPagedDto>> GetOrderHistory(
             [FromQuery] bool activeOnly,
             [FromQuery, BindRequired] int page = 1,
@@ -52,7 +50,6 @@ namespace DeliveryDeck_Backend_Final.Controllers
         }
 
         [HttpGet("{orderNumber}")]
-        [ClaimPermissionRequirement(OrderPermissions.ReadOwnOrderHistory)]
         public async Task<ActionResult<OrderDto>> GetOrderDetails(int orderNumber)
         {
             if (!await _resourceAuthorizationService.OrderCustomerRelationExists(UserId, orderNumber))
@@ -63,8 +60,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
             return Ok(await _orderService.GetOrderDetails(orderNumber));
         }
 
-        [HttpPost("{orderNumber}/repeat")]
-        [ClaimPermissionRequirement(OrderPermissions.Add)]
+        [HttpPost("{orderNumber}")]
         public async Task<IActionResult> RepeatOrder(int orderNumber)
         {
             if (!await _resourceAuthorizationService.OrderCustomerRelationExists(UserId, orderNumber))

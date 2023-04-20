@@ -12,12 +12,12 @@ namespace DeliveryDeck_Backend_Final.Common.DTO.Backend
         {
             var pagesAmount = (int)Math.Ceiling((double)collectionSize / pageSize);
 
-            if ((pagesAmount < currPage || currPage < 1) && collectionSize != 0)
+            if (pagesAmount < currPage && collectionSize != 0 || currPage < 1)
             {
                 throw new BadHttpRequestException("Page out of range");
             }
 
-            var diff = collectionSize - (currPage - 1) * pageSize;
+            var diff = (collectionSize != 0) ? collectionSize - (currPage - 1) * pageSize : 0;
 
             CurrentPage = currPage;
             Pages = pagesAmount;

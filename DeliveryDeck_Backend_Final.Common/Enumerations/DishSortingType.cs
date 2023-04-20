@@ -1,6 +1,6 @@
 ﻿namespace DeliveryDeck_Backend_Final.Common.Enumerations
 {
-    public enum SortingType
+    public enum DishSortingType
     {
         NAME_DESCENDING,
         NAME_ASCENDING,

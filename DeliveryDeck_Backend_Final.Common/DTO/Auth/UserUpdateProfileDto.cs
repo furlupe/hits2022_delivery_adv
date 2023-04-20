@@ -1,4 +1,5 @@
 ﻿using DeliveryDeck_Backend_Final.Common.Enumerations;
+using DeliveryDeck_Backend_Final.Common.Utils;
 using System.ComponentModel.DataAnnotations;
 
 namespace DeliveryDeck_Backend_Final.Common.DTO.Auth
@@ -11,6 +12,7 @@ namespace DeliveryDeck_Backend_Final.Common.DTO.Auth
         [Required]
         public DateTime BirthDate { get; set; }
         [Required]
+        [EnumValueDefined]
         public Gender Gender { get; set; }
         [Required]
         [RegularExpression(@"\d{11}")]

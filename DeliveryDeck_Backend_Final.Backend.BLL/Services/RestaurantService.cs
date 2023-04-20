@@ -26,7 +26,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
                 .Include(r => r.Menus)
                     .ThenInclude(m => m.Dishes)
                 .Where(r => r.Managers.Contains(manager))
-                .Select(r => new {r.Menus, r.Dishes})
+                .Select(r => new { r.Menus, r.Dishes })
                 .FirstAsync();
 
             var menu = restaurant.Menus
@@ -34,13 +34,19 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
             var dishes = restaurant.Dishes
                 .IntersectBy(dishesIds, d => d.Id)
-                .Except(menu.Dishes)
                 .Distinct();
 
             var uncatched = dishesIds.Where(d => !dishes.Select(x => x.Id).Contains(d));
             if (!uncatched.IsNullOrEmpty())
             {
                 throw new BadHttpRequestException("Some dishes do not exist");
+            }
+
+            dishes = dishes.Except(menu.Dishes);
+
+            if (dishes.IsNullOrEmpty())
+            {
+                throw new BadHttpRequestException("Such dishes are already in the menu");
             }
 
             menu.Dishes.AddRange(dishes);
@@ -61,13 +67,17 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
         public async Task<PagedRestaurantsDto> GetAllRestaurants(int page, string? name = null)
         {
+            var query = _backendContext.Restaurants
+                .Include(r => r.Menus)
+                    .ThenInclude(m => m.Dishes)
+                .Where(r => name == null || r.Name.Contains(name));
+
             var response = new PagedRestaurantsDto
             {
-                PageInfo = new PageInfo(_backendContext.Restaurants.Count(), _RestaurantPageSize, page)
+                PageInfo = new PageInfo(query.Count(), _RestaurantPageSize, page)
             };
 
-            var restaurants = await _backendContext.Restaurants.Include(r => r.Menus).ThenInclude(m => m.Dishes)
-                .Where(r => name == null || r.Name.StartsWith(name))
+            var restaurants = await query
                 .Skip((page - 1) * _RestaurantPageSize)
                 .Take(_RestaurantPageSize)
                 .ToListAsync();
@@ -86,14 +96,14 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
         public async Task<PagedDishesDto> GetActiveMenuDishes(Guid menuId, int page, DishFilters filters)
         {
-            var menu = await _backendContext.Menus
+            var restaurant = await _backendContext.Menus
                 .Where(m => m.Id == menuId)
-                .Select(m => new { m.Restaurant.Id, m.Name })
+                .Select(m => m.Restaurant.Id)
                 .FirstAsync();
 
-            filters.Menu = menu.Name;
+            filters.Menu = menuId;
 
-            return await GetActiveRestaurantDishes(menu.Id, page, filters);
+            return await GetActiveRestaurantDishes(restaurant, page, filters);
         }
 
         public async Task<PagedDishesDto> GetActiveRestaurantDishes(Guid restaurantId, int page, DishFilters filters)
@@ -105,19 +115,12 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
             if (filters.Menu != null)
             {
-                query = query.Where(m => m.Name == filters.Menu);
+                query = query.Where(m => m.Id == filters.Menu);
             }
 
-            var menuDishes = await query
-                .Select(m => m.Dishes)
+            var filteredDishes = await query
+                .SelectMany(m => m.Dishes)
                 .ToListAsync();
-
-            var filteredDishes = new List<Dish>();
-
-            foreach (var menu in menuDishes)
-            {
-                filteredDishes.AddRange(menu);
-            }
 
             filteredDishes = filteredDishes
                 .FilterByCategories(filters.Categories)
@@ -128,16 +131,15 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             var response = new PagedDishesDto();
             foreach (var dish in filteredDishes)
             {
-                response.Dishes.Add(new DishDto
+                response.Dishes.Add(new DishShortDto
                 {
                     Id = dish.Id,
                     Name = dish.Name,
                     Price = dish.Price,
                     Rating = dish.Rating,
-                    Description = dish.Description,
                     IsVegeterian = dish.IsVegeterian,
                     Photo = dish.Photo,
-                    Category = dish.Category
+                    Category = dish.Category,
                 });
             }
 
@@ -156,7 +158,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             var menus = await _backendContext.Menus
                 .Where(m =>
                     m.Restaurant.Id == restaurantId
-                    && (name == null || m.Name.StartsWith(name))
+                    && (name == null || m.Name.Contains(name))
                     && m.IsActive == true
                 )
                 .Select(m => new { m.Id, m.Name })
@@ -216,13 +218,12 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             var response = new PagedDishesDto();
             foreach (var dish in dishes)
             {
-                response.Dishes.Add(new DishDto
+                response.Dishes.Add(new DishShortDto
                 {
                     Id = dish.Id,
                     Name = dish.Name,
                     Price = dish.Price,
                     Rating = dish.Rating,
-                    Description = dish.Description,
                     IsVegeterian = dish.IsVegeterian,
                     Photo = dish.Photo,
                     Category = dish.Category
@@ -250,7 +251,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
                 Description = data.Description,
                 IsVegeterian = data.IsVegetarian,
                 Photo = data.Photo,
-                Category = data.FoodCategory,   
+                Category = data.FoodCategory,
                 Price = data.Price
             });
 
@@ -270,8 +271,8 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             };
 
             menus = menus
-                .Skip((page - 1) * _RestaurantPageSize)
-                .Take(_RestaurantPageSize)
+                .Skip((page - 1) * _MenusPageSize)
+                .Take(_MenusPageSize)
                 .ToList();
 
             foreach (var menu in menus)
@@ -314,15 +315,14 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
                 PageInfo = new PageInfo(menu.Dishes.Count, _DishPageSize, dishPage)
             };
 
-            foreach(var dish in menu.Dishes)
+            foreach (var dish in menu.Dishes)
             {
-                dishesInfo.Dishes.Add(new DishDto
+                dishesInfo.Dishes.Add(new DishShortDto
                 {
                     Id = dish.Id,
                     Name = dish.Name,
                     Price = dish.Price,
                     Rating = dish.Rating,
-                    Description = dish.Description,
                     IsVegeterian = dish.IsVegeterian,
                     Photo = dish.Photo,
                     Category = dish.Category
@@ -352,6 +352,19 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             menu.Name = data.Name;
             menu.IsActive = data.IsActive;
 
+            await _backendContext.SaveChangesAsync();
+        }
+        public async Task ChangeMenuVisibility(Guid manager, Guid menuId, bool isActive = true)
+        {
+            var menu = (
+                await _backendContext.Restaurants.Include(r => r.Menus).ThenInclude(m => m.Dishes)
+                    .Where(r => r.Managers.Contains(manager))
+                    .Select(r => r.Menus)
+                    .FirstAsync()
+                )
+                .First(m => m.Id == menuId);
+
+            menu.IsActive = isActive;
             await _backendContext.SaveChangesAsync();
         }
 
@@ -414,17 +427,17 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             return collection;
         }
 
-        public static ICollection<Dish> SortByType(this ICollection<Dish> collection, SortingType? sortBy)
+        public static ICollection<Dish> SortByType(this ICollection<Dish> collection, DishSortingType? sortBy)
         {
             return (sortBy switch
             {
-                SortingType.RATING_DESCENDING => collection.OrderByDescending(d => d.Rating),
-                SortingType.NAME_DESCENDING => collection.OrderByDescending(d => d.Name),
-                SortingType.NAME_ASCENDING => collection.OrderBy(d => d.Name),
-                SortingType.PRICE_DESCENDING => collection.OrderByDescending(d => d.Price),
-                SortingType.PRICE_ASCENDING => collection.OrderBy(d => d.Price),
-                SortingType.RATING_ASCENDING => collection.OrderBy(d => d.Rating),
-                _ => collection.OrderBy(_ => _),
+                DishSortingType.RATING_DESCENDING => collection.OrderByDescending(d => d.Rating),
+                DishSortingType.NAME_DESCENDING => collection.OrderByDescending(d => d.Name),
+                DishSortingType.NAME_ASCENDING => collection.OrderBy(d => d.Name),
+                DishSortingType.PRICE_DESCENDING => collection.OrderByDescending(d => d.Price),
+                DishSortingType.PRICE_ASCENDING => collection.OrderBy(d => d.Price),
+                DishSortingType.RATING_ASCENDING => collection.OrderBy(d => d.Rating),
+                _ => collection.OrderBy(d => d.Name),
             }).ToList();
         }
     }

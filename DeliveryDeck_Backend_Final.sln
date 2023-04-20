@@ -24,9 +24,18 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeliveryDeck_Backend_Final.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeliveryDeck_Backend_Final.JWT", "DeliveryDeck_Backend_Final.JWT\DeliveryDeck_Backend_Final.JWT.csproj", "{51B4C46A-8367-4C56-A8FF-D72A1E923495}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeliveryDeck_Backend_Final.Backend.DAL", "DeliveryDeck_Backend_Final.Backend.DAL\DeliveryDeck_Backend_Final.Backend.DAL.csproj", "{F8F42E00-F79E-4E44-8F7B-D1281457D2E3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeliveryDeck_Backend_Final.Backend.DAL", "DeliveryDeck_Backend_Final.Backend.DAL\DeliveryDeck_Backend_Final.Backend.DAL.csproj", "{F8F42E00-F79E-4E44-8F7B-D1281457D2E3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeliveryDeck_Backend_Final.Backend.BLL", "DeliveryDeck_Backend_Final.Backend.BLL\DeliveryDeck_Backend_Final.Backend.BLL.csproj", "{D1E90EEE-918E-43A5-9FF2-130B9F64D750}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeliveryDeck_Backend_Final.Backend.BLL", "DeliveryDeck_Backend_Final.Backend.BLL\DeliveryDeck_Backend_Final.Backend.BLL.csproj", "{D1E90EEE-918E-43A5-9FF2-130B9F64D750}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deployment", "Deployment", "{4572F6EF-BB53-4D28-B7B8-059572D297BD}"
+	ProjectSection(SolutionItems) = preProject
+		backend.Dockerfile = backend.Dockerfile
+		auth.Dockerfile = auth.Dockerfile
+		db_auth.env = db_auth.env
+		db_backend.env = db_backend.env
+		docker-compose.yaml = docker-compose.yaml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

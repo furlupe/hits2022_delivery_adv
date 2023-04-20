@@ -1,7 +1,9 @@
 ﻿using DeliveryDeck_Backend_Final.Common.DTO.Backend;
+using DeliveryDeck_Backend_Final.Common.Enumerations;
 using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static DeliveryDeck_Backend_Final.Common.Filters.RoleRequirementAuthorization;
 
 namespace DeliveryDeck_Backend_Final.Controllers
 {
@@ -20,7 +22,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
         [HttpGet("{dishId}")]
         public async Task<ActionResult<DishDto>> GetDish(Guid dishId)
         {
-            if (! await _resourceAuthorizationService.DishResourceExists(dishId))
+            if (!await _resourceAuthorizationService.DishIsActive(dishId))
             {
                 return NotFound();
             }
@@ -29,6 +31,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
         }
 
         [HttpPost("{dishId}/rate")]
+        [RoleRequirementAuthorization(RoleType.Customer)]
         [Authorize]
         public async Task<ActionResult<DishDto>> RateDish(Guid dishId, RatingDto data)
         {

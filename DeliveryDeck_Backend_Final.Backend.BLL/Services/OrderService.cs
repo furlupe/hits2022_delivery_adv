@@ -6,7 +6,6 @@ using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System;
 using System.Linq.Expressions;
 
 namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
@@ -27,7 +26,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
             if (order.Status != OrderStatus.Created)
             {
-                throw new BadHttpRequestException("Too late, m8, the order has been proceeded");
+                throw new BadHttpRequestException($"Can't change status from {order.Status} to Cancelled");
             }
 
             order.Status = OrderStatus.Cancelled;
@@ -38,7 +37,12 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             var cart = await _backendContext.Carts
                 .Include(c => c.Dishes)
                     .ThenInclude(d => d.Dish)
-                .FirstAsync(c => c.CustomerId == userId);
+                .FirstAsync(c => c.CustomerId == userId && c.WasOrdered == false);
+
+            if (cart.Dishes.IsNullOrEmpty())
+            {
+                throw new BadHttpRequestException("Your cart is empty");
+            }
 
             var menus = await _backendContext.Menus
                 .Include(m => m.Dishes)
@@ -59,7 +63,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             var orders = new List<Order>();
             var removed = new List<Guid>();
 
-            foreach(var restaurant in restaurants)
+            foreach (var restaurant in restaurants)
             {
                 var totalPrice = 0;
 
@@ -68,7 +72,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
                     .IntersectBy(
                         restaurant.Menus
                             .Where(m => m.IsActive == true)
-                            .SelectMany(m => m.Dishes), 
+                            .SelectMany(m => m.Dishes),
                         x => x.Dish);
 
                 // блюда из неактивных меню
@@ -176,7 +180,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             var totalPrice = 0;
 
             var addedDishes = new List<DishInCart>();
-            foreach(var dishInCart in dishes)
+            foreach (var dishInCart in dishes)
             {
                 totalPrice += dishInCart.Dish.Price * dishInCart.Amount;
                 addedDishes.Add(new DishInCart
@@ -187,9 +191,9 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
                 });
             }
 
-            await _backendContext.Carts.AddAsync(new Cart 
-            { 
-                CustomerId = order.CustomerId, 
+            await _backendContext.Carts.AddAsync(new Cart
+            {
+                CustomerId = order.CustomerId,
                 WasOrdered = true,
                 Dishes = addedDishes
             });
@@ -209,7 +213,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             await _backendContext.SaveChangesAsync();
 
             return new RemovedDishesDto { RemovedDishes = removedDishes.Select(d => d.Dish.Id) };
-           
+
         }
 
         public async Task SetOrderToDeliveryAvailable(int orderId)
@@ -258,9 +262,9 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
         }
 
         public async Task<OrderPagedDto> GetCookHistory(
-            Guid userId, 
-            int? number, 
-            DateTime fromDate = default, 
+            Guid userId,
+            int? number,
+            DateTime fromDate = default,
             int page = 1
             )
         {
@@ -271,10 +275,10 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
         }
 
         public async Task<OrderPagedDto> GetCustomerHistory(
-            Guid userId, 
-            int? number, 
-            DateTime fromDate = default, 
-            int page = 1, 
+            Guid userId,
+            int? number,
+            DateTime fromDate = default,
+            int page = 1,
             bool activeOnly = false
             )
         {
@@ -286,10 +290,10 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
         }
 
         public async Task<OrderPagedDto> GetCourierHistory(
-            Guid userId, 
-            int? number, 
-            DateTime fromDate = default, 
-            int page = 1            
+            Guid userId,
+            int? number,
+            DateTime fromDate = default,
+            int page = 1
             )
         {
             var orders = await GetUserHistoryQuery(RoleType.Courier, userId, number, fromDate)
@@ -303,14 +307,14 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
         }
 
         public async Task<OrderPagedDto> GetRestaurantHistory(
-            Guid managerId, 
+            Guid managerId,
             OrderStatus? status,
             OrderSortingType? sortBy,
-            int? number, 
+            int? number,
             int page = 1
             )
         {
-            var orders = (IEnumerable<Order>) await _backendContext.Restaurants
+            var orders = (IEnumerable<Order>)await _backendContext.Restaurants
                 .Where(r => r.Managers.Contains(managerId))
                 .Select(r => r.Orders)
                 .FirstAsync();
@@ -364,7 +368,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
                 throw new BadHttpRequestException($"Can't change status from {order.Status} to Delivering");
             }
 
-            order.Status = OrderStatus.Delivered; 
+            order.Status = OrderStatus.Delivered;
             await _backendContext.SaveChangesAsync();
         }
 

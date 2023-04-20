@@ -1,9 +1,11 @@
 ﻿using DeliveryDeck_Backend_Final.Backend.BLL.Services;
+using DeliveryDeck_Backend_Final.Backend.DAL;
 using DeliveryDeck_Backend_Final.Backend.DAL.Extensions;
 using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
 using DeliveryDeck_Backend_Final.Common.Middlewares;
 using DeliveryDeck_Backend_Final.JWT.Extenions;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DeliveryDeck_Backend_Final.Backend.BLL.Extensions
@@ -21,6 +23,21 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Extensions
 
             builder.AddJwtAuthentification();
             return builder;
+        }
+
+        public async static Task<WebApplication> UseBackendComponent(this WebApplication app)
+        {
+            using (var scope = app.Services.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetService<BackendContext>();
+
+                if ((await context.Database.GetPendingMigrationsAsync()).Any())
+                {
+                    await context.Database.MigrateAsync();
+                }
+
+                return app.UseExceptionMiddleware();
+            }
         }
 
         public static WebApplication UseExceptionMiddleware(this WebApplication app)

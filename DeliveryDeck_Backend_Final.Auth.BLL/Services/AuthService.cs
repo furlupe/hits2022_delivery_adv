@@ -75,6 +75,14 @@ namespace DeliveryDeck_Backend_Final.Auth.BLL.Services
             }
 
             await _userMgr.AddToRoleAsync(user, RoleType.Customer.ToString());
+
+            await _authContext.Customers.AddAsync(new Customer
+            {
+                User = user,
+                Address = data.Address
+            });
+
+            await _authContext.SaveChangesAsync();
         }
 
         private async Task<TokenPairDto> CreateTokenPair(AppUser user)
@@ -112,15 +120,6 @@ namespace DeliveryDeck_Backend_Final.Auth.BLL.Services
             foreach (var role in await _userMgr.GetRolesAsync(user))
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
-
-                var actualRole = await _roleMgr.Roles
-                    .Include(r => r.RoleClaims)
-                    .FirstAsync(x => x.Name == role);
-
-                foreach (var claim in actualRole.RoleClaims)
-                {
-                    claims.Add(claim.ToClaim());
-                }
             }
 
             return new ClaimsIdentity(claims, "Token");

@@ -51,7 +51,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
                     x =>
                         x.CustomerId == userId
                         && x.Dishes.Select(y => y.Dish).Contains(dish)
-                        && x.Status == OrderStatus.Delivered) is null) 
+                        && x.Status == OrderStatus.Delivered) is null)
             {
                 throw new BadHttpRequestException("Uh-oh, you haven't ordered that dish yet...");
             }

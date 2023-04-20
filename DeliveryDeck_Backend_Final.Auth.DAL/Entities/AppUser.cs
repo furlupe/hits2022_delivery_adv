@@ -10,7 +10,11 @@ namespace DeliveryDeck_Backend_Final.Auth.DAL.Entities
         public Gender Gender { get; set; }
         public ICollection<UserRole> Roles { get; set; }
         public override string? UserName => Email;
-        public string? Address { get; set; }
+
+        public Cook? Cook { get; set; }
+        public Customer? Customer { get; set; }
+        public Manager? Manager { get; set; }
+        public Courier? Courier { get; set; }
     }
 
 }

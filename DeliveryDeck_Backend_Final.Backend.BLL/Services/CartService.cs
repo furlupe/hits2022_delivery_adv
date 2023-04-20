@@ -53,7 +53,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
                     .Where(m => m.Dishes.Contains(dish))
                     .AllAsync(m => m.IsActive == false)
                     )
-                {                    
+                {
                     removed.Add(dish.Id);
                     continue;
                 }

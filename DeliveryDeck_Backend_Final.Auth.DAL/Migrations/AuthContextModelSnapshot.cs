@@ -31,9 +31,6 @@ namespace DeliveryDeck_Backend_Final.Auth.DAL.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Address")
-                        .HasColumnType("text");
-
                     b.Property<DateTime>("BirthDate")
                         .HasColumnType("timestamp with time zone");
 
@@ -100,6 +97,50 @@ namespace DeliveryDeck_Backend_Final.Auth.DAL.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("DeliveryDeck_Backend_Final.Auth.DAL.Entities.Cook", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Cooks");
+                });
+
+            modelBuilder.Entity("DeliveryDeck_Backend_Final.Auth.DAL.Entities.Courier", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Couriers");
+                });
+
+            modelBuilder.Entity("DeliveryDeck_Backend_Final.Auth.DAL.Entities.Customer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Customers");
+                });
+
+            modelBuilder.Entity("DeliveryDeck_Backend_Final.Auth.DAL.Entities.Manager", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Managers");
+                });
+
             modelBuilder.Entity("DeliveryDeck_Backend_Final.Auth.DAL.Entities.RefreshUserToken", b =>
                 {
                     b.Property<string>("Value")
@@ -112,7 +153,7 @@ namespace DeliveryDeck_Backend_Final.Auth.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshTokens", (string)null);
+                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("DeliveryDeck_Backend_Final.Auth.DAL.Entities.Role", b =>
@@ -145,7 +186,22 @@ namespace DeliveryDeck_Backend_Final.Auth.DAL.Migrations
                     b.ToTable("AspNetRoles", (string)null);
                 });
 
-            modelBuilder.Entity("DeliveryDeck_Backend_Final.Auth.DAL.Entities.RoleClaim", b =>
+            modelBuilder.Entity("DeliveryDeck_Backend_Final.Auth.DAL.Entities.UserRole", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -167,21 +223,6 @@ namespace DeliveryDeck_Backend_Final.Auth.DAL.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetRoleClaims", (string)null);
-                });
-
-            modelBuilder.Entity("DeliveryDeck_Backend_Final.Auth.DAL.Entities.UserRole", b =>
-                {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("UserId", "RoleId");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AspNetUserRoles", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
@@ -248,6 +289,50 @@ namespace DeliveryDeck_Backend_Final.Auth.DAL.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("DeliveryDeck_Backend_Final.Auth.DAL.Entities.Cook", b =>
+                {
+                    b.HasOne("DeliveryDeck_Backend_Final.Auth.DAL.Entities.AppUser", "User")
+                        .WithOne("Cook")
+                        .HasForeignKey("DeliveryDeck_Backend_Final.Auth.DAL.Entities.Cook", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("DeliveryDeck_Backend_Final.Auth.DAL.Entities.Courier", b =>
+                {
+                    b.HasOne("DeliveryDeck_Backend_Final.Auth.DAL.Entities.AppUser", "User")
+                        .WithOne("Courier")
+                        .HasForeignKey("DeliveryDeck_Backend_Final.Auth.DAL.Entities.Courier", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("DeliveryDeck_Backend_Final.Auth.DAL.Entities.Customer", b =>
+                {
+                    b.HasOne("DeliveryDeck_Backend_Final.Auth.DAL.Entities.AppUser", "User")
+                        .WithOne("Customer")
+                        .HasForeignKey("DeliveryDeck_Backend_Final.Auth.DAL.Entities.Customer", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("DeliveryDeck_Backend_Final.Auth.DAL.Entities.Manager", b =>
+                {
+                    b.HasOne("DeliveryDeck_Backend_Final.Auth.DAL.Entities.AppUser", "User")
+                        .WithOne("Manager")
+                        .HasForeignKey("DeliveryDeck_Backend_Final.Auth.DAL.Entities.Manager", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("DeliveryDeck_Backend_Final.Auth.DAL.Entities.RefreshUserToken", b =>
                 {
                     b.HasOne("DeliveryDeck_Backend_Final.Auth.DAL.Entities.AppUser", "User")
@@ -257,17 +342,6 @@ namespace DeliveryDeck_Backend_Final.Auth.DAL.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("DeliveryDeck_Backend_Final.Auth.DAL.Entities.RoleClaim", b =>
-                {
-                    b.HasOne("DeliveryDeck_Backend_Final.Auth.DAL.Entities.Role", "Role")
-                        .WithMany("RoleClaims")
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("DeliveryDeck_Backend_Final.Auth.DAL.Entities.UserRole", b =>
@@ -287,6 +361,15 @@ namespace DeliveryDeck_Backend_Final.Auth.DAL.Migrations
                     b.Navigation("Role");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
+                {
+                    b.HasOne("DeliveryDeck_Backend_Final.Auth.DAL.Entities.Role", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
@@ -318,13 +401,20 @@ namespace DeliveryDeck_Backend_Final.Auth.DAL.Migrations
 
             modelBuilder.Entity("DeliveryDeck_Backend_Final.Auth.DAL.Entities.AppUser", b =>
                 {
+                    b.Navigation("Cook");
+
+                    b.Navigation("Courier")
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Manager");
+
                     b.Navigation("Roles");
                 });
 
             modelBuilder.Entity("DeliveryDeck_Backend_Final.Auth.DAL.Entities.Role", b =>
                 {
-                    b.Navigation("RoleClaims");
-
                     b.Navigation("Users");
                 });
 #pragma warning restore 612, 618

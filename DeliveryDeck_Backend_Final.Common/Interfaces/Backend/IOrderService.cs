@@ -7,7 +7,7 @@ namespace DeliveryDeck_Backend_Final.Common.Interfaces.Backend
     {
         Task<RemovedDishesDto> CreateOrder(Guid userId, CreateOrderDto data);
         Task CancelOrder(int orderId);
-        Task<OrderDto> GetOrderDetails( int orderId);
+        Task<OrderDto> GetOrderDetails(int orderId);
         Task<RemovedDishesDto> RepeatPreviousOrder(int orderId);
 
         Task<OrderPagedDto> GetCookHistory(Guid userId, int? number, DateTime fromDate = default, int page = 1);

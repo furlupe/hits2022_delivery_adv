@@ -1,5 +1,4 @@
-﻿using DeliveryDeck_Backend_Final.Backend.DAL.Entities;
-using DeliveryDeck_Backend_Final.Common.DTO.Backend;
+﻿using DeliveryDeck_Backend_Final.Common.DTO.Backend;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
 using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
 using Microsoft.AspNetCore.Mvc;
@@ -33,7 +32,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
             [FromQuery, BindRequired] int page = 1
             )
         {
-            if (! await _resourceAuthorizationService.RestaurantResourceExists(restaurantId))
+            if (!await _resourceAuthorizationService.RestaurantResourceExists(restaurantId))
             {
                 return NotFound();
             }
@@ -46,14 +45,17 @@ namespace DeliveryDeck_Backend_Final.Controllers
             Guid restaurantId,
             [FromQuery] ICollection<FoodCategory> categories,
             [FromQuery] bool? isVegetarian,
-            [FromQuery] SortingType? sortBy,
-            [FromQuery] string? menu,
-            int page = 1)
+            [FromQuery] DishSortingItem? sort,
+            [FromQuery] DishSortingItem? desc,
+            [FromQuery] Guid? menu,
+            [FromQuery, BindRequired] int page = 1)
         {
             if (!await _resourceAuthorizationService.RestaurantResourceExists(restaurantId))
             {
                 return NotFound();
             }
+
+            DishSortingType? sortBy = (desc is not null) ? desc.ToSortingType(true) : sort.ToSortingType();
 
             return Ok(await _restaurantService.GetActiveRestaurantDishes(restaurantId, page, new DishFilters
             {
@@ -64,18 +66,21 @@ namespace DeliveryDeck_Backend_Final.Controllers
             }));
         }
 
-        [HttpGet("menus/{menuId}")]
+        [HttpGet("menus/{menuId}/dishes")]
         public async Task<ActionResult<PagedDishesDto>> GetMenuDishes(
             Guid menuId,
             [FromQuery] ICollection<FoodCategory> categories,
             [FromQuery] bool? isVegetarian,
-            [FromQuery] SortingType? sortBy,
-            int page = 1)
+            [FromQuery] DishSortingItem? sort,
+            [FromQuery] DishSortingItem? desc,
+            [FromQuery, BindRequired] int page = 1)
         {
             if (!await _resourceAuthorizationService.MenuResourceExists(menuId))
             {
                 return NotFound();
             }
+
+            DishSortingType? sortBy = (desc is not null) ? desc.ToSortingType(true) : sort.ToSortingType();
 
             return Ok(await _restaurantService.GetActiveMenuDishes(menuId, page, new DishFilters
             {
@@ -85,6 +90,6 @@ namespace DeliveryDeck_Backend_Final.Controllers
             }));
         }
 
-        
+
     }
 }

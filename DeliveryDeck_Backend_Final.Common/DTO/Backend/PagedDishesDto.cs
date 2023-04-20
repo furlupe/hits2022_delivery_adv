@@ -2,7 +2,7 @@
 {
     public class PagedDishesDto
     {
-        public ICollection<DishDto> Dishes { get; set; } = new List<DishDto>();
+        public ICollection<DishShortDto> Dishes { get; set; } = new List<DishShortDto>();
         public PageInfo PageInfo { get; set; }
     }
 }

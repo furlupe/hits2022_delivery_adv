@@ -4,6 +4,7 @@
     {
         Task<bool> DishResourceExists(Guid dishId);
         Task<bool> DishInCartResourceExists(Guid userId, Guid dishId);
+        Task<bool> DishIsActive(Guid dishId);
 
         Task<bool> OrderCustomerRelationExists(Guid userId, int orderId);
 
@@ -18,6 +19,6 @@
 
         Task<bool> OrderIsAccessibleForCourier(Guid courierId, int orderId);
         Task<bool> OrderCourierRelationExists(Guid courierId, int orderId);
-        
+
     }
 }

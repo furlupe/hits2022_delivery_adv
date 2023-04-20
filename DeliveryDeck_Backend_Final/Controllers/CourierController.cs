@@ -1,17 +1,14 @@
-﻿using DeliveryDeck_Backend_Final.Backend.DAL.Entities;
-using DeliveryDeck_Backend_Final.Common.CustomPermissions;
-using DeliveryDeck_Backend_Final.Common.DTO.Backend;
+﻿using DeliveryDeck_Backend_Final.Common.DTO.Backend;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
 using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
-using DeliveryDeck_Backend_Final.Common.Utils;
-using DeliveryDeck_Backend_Final.Filters;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using static DeliveryDeck_Backend_Final.Common.Filters.RoleRequirementAuthorization;
 
 namespace DeliveryDeck_Backend_Final.Controllers
 {
     [Route("api/courier")]
+    [RoleRequirementAuthorization(RoleType.Courier)]
     [ApiController]
     public class CourierController : AuthorizeController
     {
@@ -24,7 +21,6 @@ namespace DeliveryDeck_Backend_Final.Controllers
         }
 
         [HttpGet("orders")]
-        [ClaimPermissionRequirement(OrderPermissions.ReadOwnDeliveryHistory)]
         public async Task<ActionResult<OrderPagedDto>> GetOrderHistory(
            [FromQuery] int? number,
            [FromQuery] DateTime fromDate,
@@ -35,17 +31,18 @@ namespace DeliveryDeck_Backend_Final.Controllers
         }
 
         [HttpGet("orders/available")]
-        [ClaimPermissionRequirement(OrderPermissions.GetAvailableForDelivery)]
         public async Task<ActionResult<OrderAvailablePagedDto>> GetAvailableOrders(
-            [FromQuery] OrderSortingType sortBy,
+            [FromQuery] OrderSortingItem? sort,
+            [FromQuery] OrderSortingItem? desc,
             [FromQuery, BindRequired] int page = 1
             )
         {
+            var sortBy = (desc is not null) ? desc.ToSortingType(true) : sort.ToSortingType();
+
             return Ok(await _orderService.GetAvailableForDelivery(UserId, sortBy, page));
         }
 
         [HttpGet("orders/{orderNumber}")]
-        [ClaimPermissionRequirement(OrderPermissions.ReadOwnDeliveryHistory)]
         public async Task<ActionResult<OrderDto>> GetOrderDetails(int orderNumber)
         {
             if (!await _resourceAuthorizationService.OrderIsAccessibleForCourier(UserId, orderNumber))
@@ -57,8 +54,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
         }
 
         [HttpPatch("orders/{orderNumber}/{act}")]
-        [ClaimPermissionRequirement(OrderPermissions.ChangeStatusUntilDelivered)]
-        public async Task<IActionResult> PerformActionOnOrder(int orderNumber, string act)
+        public async Task<IActionResult> PerformActionOnOrder(int orderNumber, OrderAction act)
         {
             if (!await _resourceAuthorizationService.OrderIsAccessibleForCourier(UserId, orderNumber))
             {
@@ -67,19 +63,19 @@ namespace DeliveryDeck_Backend_Final.Controllers
 
             switch (act)
             {
-                case OrderAction.TAKE_TO_DELIVERY: await _orderService.SetOrderAsBeingDelivered(UserId, orderNumber); break;
-                case OrderAction.SET_AS_DELIVERED:
-                case OrderAction.CANCEL:
-                    if (! await _resourceAuthorizationService.OrderCourierRelationExists(UserId, orderNumber))
+                case OrderAction.delivering: await _orderService.SetOrderAsBeingDelivered(UserId, orderNumber); break;
+                case OrderAction.delivered:
+                case OrderAction.cancel:
+                    if (!await _resourceAuthorizationService.OrderCourierRelationExists(UserId, orderNumber))
                     {
                         return Forbid();
                     }
 
-                    if (act == OrderAction.SET_AS_DELIVERED)
+                    if (act == OrderAction.delivered)
                     {
                         await _orderService.SetOrderAsDelivered(orderNumber);
-                    } 
-                    else if (act == OrderAction.CANCEL)
+                    }
+                    else if (act == OrderAction.cancel)
                     {
                         await _orderService.CancelOrder(orderNumber);
                     }

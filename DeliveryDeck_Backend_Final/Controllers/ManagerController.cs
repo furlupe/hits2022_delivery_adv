@@ -1,39 +1,43 @@
-﻿using DeliveryDeck_Backend_Final.Common.CustomPermissions;
-using DeliveryDeck_Backend_Final.Common.DTO.Backend;
+﻿using DeliveryDeck_Backend_Final.Common.DTO.Backend;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
 using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
-using DeliveryDeck_Backend_Final.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using static DeliveryDeck_Backend_Final.Common.Filters.RoleRequirementAuthorization;
 
 namespace DeliveryDeck_Backend_Final.Controllers
 {
     [Route("api/manager/restaurant")]
     [ApiController]
+    [RoleRequirementAuthorization(RoleType.Manager)]
     [Authorize]
     public class ManagerController : AuthorizeController
     {
         private readonly IRestaurantService _restaurantService;
+        private readonly IDishService _dishService;
         private readonly IOrderService _orderService;
         private readonly IResourceAuthorizationService _resourceAuthorizationService;
 
-        public ManagerController(IRestaurantService restaurantService, IResourceAuthorizationService resourceAuthorizationService, IOrderService orderService)
+        public ManagerController(
+            IRestaurantService restaurantService,
+            IResourceAuthorizationService resourceAuthorizationService,
+            IOrderService orderService,
+            IDishService dishSerivce)
         {
             _restaurantService = restaurantService;
             _resourceAuthorizationService = resourceAuthorizationService;
             _orderService = orderService;
+            _dishService = dishSerivce;
         }
 
         [HttpGet("menus")]
-        [ClaimPermissionRequirement(MenuPermissions.Read)]
         public async Task<ActionResult<PagedMenusDto>> GetMenus([FromQuery, BindRequired] int page = 1)
         {
             return Ok(await _restaurantService.GetMenus(UserId, page));
         }
 
         [HttpPost("menus")]
-        [ClaimPermissionRequirement(MenuPermissions.Create)]
         public async Task<IActionResult> CreateMenu(CreateMenuDto data)
         {
             await _restaurantService.CreateMenu(UserId, data);
@@ -41,7 +45,6 @@ namespace DeliveryDeck_Backend_Final.Controllers
         }
 
         [HttpGet("menus/{menuId}")]
-        [ClaimPermissionRequirement(MenuPermissions.Read)]
         public async Task<ActionResult<MenuInfo>> GetMenu(Guid menuId, [FromQuery, BindRequired] int page = 1)
         {
             if (!await _resourceAuthorizationService.ManagerRestaurantMenuResourceExists(UserId, menuId))
@@ -52,8 +55,31 @@ namespace DeliveryDeck_Backend_Final.Controllers
             return Ok(await _restaurantService.GetMenuDetails(UserId, menuId, page));
         }
 
+        [HttpPatch("menus/{menuId}/active")]
+        public async Task<IActionResult> SetMenuActive(Guid menuId)
+        {
+            if (!await _resourceAuthorizationService.ManagerRestaurantMenuResourceExists(UserId, menuId))
+            {
+                return NotFound();
+            }
+
+            await _restaurantService.ChangeMenuVisibility(UserId, menuId);
+            return NoContent();
+        }
+
+        [HttpPatch("menus/{menuId}/non-active")]
+        public async Task<IActionResult> SetMenuNonActive(Guid menuId)
+        {
+            if (!await _resourceAuthorizationService.ManagerRestaurantMenuResourceExists(UserId, menuId))
+            {
+                return NotFound();
+            }
+
+            await _restaurantService.ChangeMenuVisibility(UserId, menuId, false);
+            return NoContent();
+        }
+
         [HttpPatch("menus/{menuId}")]
-        [ClaimPermissionRequirement(MenuPermissions.Adjust)]
         public async Task<IActionResult> UpdateMenu(Guid menuId, UpdateMenuDto data)
         {
             if (!await _resourceAuthorizationService.ManagerRestaurantMenuResourceExists(UserId, menuId))
@@ -66,7 +92,6 @@ namespace DeliveryDeck_Backend_Final.Controllers
         }
 
         [HttpDelete("menus/{menuId}")]
-        [ClaimPermissionRequirement(MenuPermissions.Adjust)]
         public async Task<IActionResult> DeleteMenu(Guid menuId)
         {
             if (!await _resourceAuthorizationService.ManagerRestaurantMenuResourceExists(UserId, menuId))
@@ -79,7 +104,6 @@ namespace DeliveryDeck_Backend_Final.Controllers
         }
 
         [HttpPost("menus/{menuId}/dishes")]
-        [ClaimPermissionRequirement(MenuPermissions.Adjust)]
         public async Task<IActionResult> AddDishesToMenu(Guid menuId, SomeDishesForMenuDto data)
         {
             if (!await _resourceAuthorizationService.ManagerRestaurantMenuResourceExists(UserId, menuId))
@@ -92,7 +116,6 @@ namespace DeliveryDeck_Backend_Final.Controllers
         }
 
         [HttpDelete("menus/{menuId}/dishes")]
-        [ClaimPermissionRequirement(MenuPermissions.Adjust)]
         public async Task<IActionResult> RemoveDishesFromMenu(Guid menuId, SomeDishesForMenuDto data)
         {
             if (!await _resourceAuthorizationService.ManagerRestaurantMenuResourceExists(UserId, menuId))
@@ -105,14 +128,22 @@ namespace DeliveryDeck_Backend_Final.Controllers
         }
 
         [HttpGet("dishes")]
-        [ClaimPermissionRequirement(DishPermissions.Read)]
         public async Task<ActionResult<PagedDishesDto>> GetDishes([FromQuery, BindRequired] int page = 1)
         {
             return Ok(await _restaurantService.GetAllRestaurantDishes(UserId, page));
         }
 
+        [HttpGet("dishes/{dishId}")]
+        public async Task<ActionResult<DishDto>> GetDishDetails(Guid dishId)
+        {
+            if (!await _resourceAuthorizationService.ManagerRestaurantDishResourceExists(UserId, dishId))
+            {
+                return NotFound();
+            }
+            return Ok(await _dishService.GetDishById(dishId));
+        }
+
         [HttpPost("dishes")]
-        [ClaimPermissionRequirement(DishPermissions.CUD)]
         public async Task<IActionResult> AddDish(CreateDishDto data)
         {
             await _restaurantService.AddDishToRestaurant(UserId, data);
@@ -120,7 +151,6 @@ namespace DeliveryDeck_Backend_Final.Controllers
         }
 
         [HttpPatch("dishes/{dishId}")]
-        [ClaimPermissionRequirement(DishPermissions.CUD)]
         public async Task<IActionResult> UpdateDish(Guid dishId, CreateDishDto data)
         {
             if (!await _resourceAuthorizationService.ManagerRestaurantDishResourceExists(UserId, dishId))
@@ -133,7 +163,6 @@ namespace DeliveryDeck_Backend_Final.Controllers
         }
 
         [HttpDelete("dishes/{dishId}")]
-        [ClaimPermissionRequirement(DishPermissions.CUD)]
         public async Task<IActionResult> RemoveDish(Guid dishId)
         {
             if (!await _resourceAuthorizationService.ManagerRestaurantDishResourceExists(UserId, dishId))
@@ -146,7 +175,6 @@ namespace DeliveryDeck_Backend_Final.Controllers
         }
 
         [HttpGet("orders")]
-        [ClaimPermissionRequirement(OrderPermissions.ReadRestaurantHistory)]
         public async Task<ActionResult<PagedDishesDto>> GetRestaurantOrderHistory(
             [FromQuery] OrderStatus? status,
             [FromQuery] OrderSortingType? sortBy,
@@ -158,10 +186,9 @@ namespace DeliveryDeck_Backend_Final.Controllers
         }
 
         [HttpGet("orders/{orderNumber}")]
-        [ClaimPermissionRequirement(OrderPermissions.ReadRestaurantHistory)]
         public async Task<ActionResult<PagedDishesDto>> GetRestaurantOrderHistory(int orderNumber)
         {
-            if (! await _resourceAuthorizationService.StaffRestaurantOrderResourceExists(UserId, orderNumber))
+            if (!await _resourceAuthorizationService.StaffRestaurantOrderResourceExists(UserId, orderNumber))
             {
                 return NotFound();
             }

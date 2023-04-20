@@ -4,6 +4,6 @@
     {
         public string Name { get; set; }
         public bool IsActive { get; set; }
-        public PagedDishesDto Dishes { get; set; } = new ();
+        public PagedDishesDto Dishes { get; set; } = new();
     }
 }

@@ -1,15 +1,16 @@
-﻿using DeliveryDeck_Backend_Final.Common.CustomPermissions;
-using DeliveryDeck_Backend_Final.Common.DTO.Backend;
+﻿using DeliveryDeck_Backend_Final.Common.DTO.Backend;
+using DeliveryDeck_Backend_Final.Common.Enumerations;
 using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
-using DeliveryDeck_Backend_Final.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using static DeliveryDeck_Backend_Final.Common.Filters.RoleRequirementAuthorization;
 
 namespace DeliveryDeck_Backend_Final.Controllers
 {
     [Route("api/cart")]
     [Authorize]
+    [RoleRequirementAuthorization(RoleType.Customer)]
     [ApiController]
     public class CartController : AuthorizeController
     {
@@ -22,17 +23,15 @@ namespace DeliveryDeck_Backend_Final.Controllers
         }
 
         [HttpGet]
-        [ClaimPermissionRequirement(CartPermissions.Read)]
         public async Task<ActionResult<CartDto>> GetCart()
         {
             return Ok(await _cartService.GetCart(UserId));
         }
 
         [HttpPost("{dishId}")]
-        [ClaimPermissionRequirement(CartPermissions.Adjust)]
         public async Task<IActionResult> AddDish(Guid dishId, [FromQuery, BindRequired] int amount = 1)
         {
-            if (! await _resourceAuthorizationService.DishResourceExists(dishId))
+            if (!await _resourceAuthorizationService.DishIsActive(dishId))
             {
                 return NotFound();
             }
@@ -42,7 +41,6 @@ namespace DeliveryDeck_Backend_Final.Controllers
         }
 
         [HttpPatch("{dishId}/remove")]
-        [ClaimPermissionRequirement(CartPermissions.Adjust)]
         public async Task<IActionResult> RemoveDish(Guid dishId, [FromQuery, BindRequired] int amount = 1)
         {
             if (
@@ -58,7 +56,6 @@ namespace DeliveryDeck_Backend_Final.Controllers
         }
 
         [HttpDelete("{dishId}")]
-        [ClaimPermissionRequirement(CartPermissions.Adjust)]
         public async Task<IActionResult> RemoveDishCompletely(Guid dishId)
         {
             if (

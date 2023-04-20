@@ -1,6 +1,5 @@
 ﻿using DeliveryDeck_Backend_Final.Common.DTO.Auth;
 using DeliveryDeck_Backend_Final.Common.Interfaces.Auth;
-using DeliveryDeck_Backend_Final.Common.Utils;
 using DeliveryDeck_Backend_Final.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -46,7 +45,7 @@ namespace DeliveryDeck_Backend_Final.Auth.Controllers
         public async Task<IActionResult> Logout()
         {
             await _authService.Logout(UserId);
-            return Ok();
+            return NoContent();
         }
 
     }
