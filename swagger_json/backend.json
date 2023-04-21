@@ -797,6 +797,54 @@
         }
       }
     },
+    "/api/manager/restaurant/menus/{menuId}/active": {
+      "patch": {
+        "tags": [
+          "Manager"
+        ],
+        "parameters": [
+          {
+            "name": "menuId",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/manager/restaurant/menus/{menuId}/non-active": {
+      "patch": {
+        "tags": [
+          "Manager"
+        ],
+        "parameters": [
+          {
+            "name": "menuId",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/api/manager/restaurant/menus/{menuId}/dishes": {
       "post": {
         "tags": [

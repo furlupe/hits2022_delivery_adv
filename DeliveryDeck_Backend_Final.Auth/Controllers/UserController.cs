@@ -8,7 +8,7 @@ using static DeliveryDeck_Backend_Final.Common.Filters.RoleRequirementAuthorizat
 
 namespace DeliveryDeck_Backend_Final.Auth.Controllers
 {
-    [Route("api/user")]
+    [Route("api/profile")]
     [ApiController]
     public class UserController : AuthorizeController
     {
