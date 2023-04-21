@@ -177,11 +177,14 @@ namespace DeliveryDeck_Backend_Final.Controllers
         [HttpGet("orders")]
         public async Task<ActionResult<PagedDishesDto>> GetRestaurantOrderHistory(
             [FromQuery] OrderStatus? status,
-            [FromQuery] OrderSortingType? sortBy,
+            [FromQuery] OrderSortingItem? sort,
+            [FromQuery] OrderSortingItem? desc,
             [FromQuery] int? number,
-            [FromQuery, BindRequired] int page
+            [FromQuery, BindRequired] int page = 1
             )
         {
+            OrderSortingType? sortBy = (desc is not null) ? desc.ToSortingType(true) : sort.ToSortingType();
+
             return Ok(await _orderService.GetRestaurantHistory(UserId, status, sortBy, number, page));
         }
 

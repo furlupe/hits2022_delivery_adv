@@ -378,8 +378,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
             collection = collection
                 .Skip(_OrdersPageSize * (page - 1))
-                .Take(_OrdersPageSize)
-                .ToList();
+                .Take(_OrdersPageSize);
 
             foreach (var order in collection)
             {
