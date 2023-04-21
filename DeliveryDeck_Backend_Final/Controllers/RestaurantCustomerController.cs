@@ -22,7 +22,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
         [HttpGet]
         public async Task<ActionResult<PagedRestaurantsDto>> GetAllRestaurants([FromQuery] string? name, [FromQuery, BindRequired] int page = 1)
         {
-            return Ok(await _restaurantService.GetAllRestaurants(page, name));
+            return Ok(await _restaurantService.GetAllRestaurants(page, name?.ToUpper().Normalize()));
         }
 
         [HttpGet("{restaurantId}/menus")]
@@ -37,7 +37,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
                 return NotFound();
             }
 
-            return Ok(await _restaurantService.GetActiveRestaurantMenus(restaurantId, page, name));
+            return Ok(await _restaurantService.GetActiveRestaurantMenus(restaurantId, page, name?.ToUpper().Normalize()));
         }
 
         [HttpGet("{restaurantId}/dishes")]

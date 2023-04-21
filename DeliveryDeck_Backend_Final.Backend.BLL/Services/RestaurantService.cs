@@ -70,7 +70,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             var query = _backendContext.Restaurants
                 .Include(r => r.Menus)
                     .ThenInclude(m => m.Dishes)
-                .Where(r => name == null || r.Name.Contains(name));
+                .Where(r => name == null || r.NormalizedName.Contains(name));
 
             var response = new PagedRestaurantsDto
             {
@@ -158,7 +158,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             var menus = await _backendContext.Menus
                 .Where(m =>
                     m.Restaurant.Id == restaurantId
-                    && (name == null || m.Name.Contains(name))
+                    && (name == null || m.NormalizedName.Contains(name))
                     && m.IsActive == true
                 )
                 .Select(m => new { m.Id, m.Name })
