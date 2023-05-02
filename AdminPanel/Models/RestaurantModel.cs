@@ -2,7 +2,7 @@
 
 namespace AdminPanel.Models
 {
-    public class CreateRestaurantModel
+    public class RestaurantModel
     {
         [Required]
         [MinLength(1)]

@@ -1,4 +1,5 @@
-﻿@{
+﻿@model DeliveryDeck_Backend_Final.Common.DTO.Backend.PagedRestaurantsDto
+@{
     ViewData["Title"] = "Restaurants";
 }
 
@@ -34,12 +35,12 @@
         </div>
     </div>
     @{
-        for(var i = 0; i < 8; i++)
+        foreach(var restaurant in Model.Restaurants)
         {
             <div class="container card card-body my-2">
                 <div class="row">
                     <div class="col d-flex">
-                        <p class="fs-5 my-auto">i hate niggers - @i</p>
+                        <p class="fs-5 my-auto">@restaurant.Name</p>
                     </div>
                     <div class="col d-flex justify-content-end">
                         <a class="fs-5 btn btn-outline-secondary mx-1">M</a>

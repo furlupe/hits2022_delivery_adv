@@ -1,13 +1,25 @@
 ﻿using AdminPanel.Models;
+using AutoMapper;
+using DeliveryDeck_Backend_Final.Common.DTO.AdminPanel;
+using DeliveryDeck_Backend_Final.Common.Interfaces.AdminPanel;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AdminPanel.Controllers
 {
     public class RestaurantController : Controller
     {
-        public IActionResult Index()
+        private readonly IAdminRestaurantService _restaurantService;
+        private readonly IMapper _mapper;
+
+        public RestaurantController(IAdminRestaurantService restaurantService, IMapper mapper)
         {
-            return View();
+            _restaurantService = restaurantService;
+            _mapper = mapper;
+        }
+
+        public async Task<IActionResult> Index(int page = 1)
+        {
+            return View("Index", await _restaurantService.GetRestaurants(page));
         }
 
         public IActionResult About()
@@ -16,15 +28,15 @@ namespace AdminPanel.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateRestaurant(CreateRestaurantModel model)
+        public async Task<IActionResult> CreateRestaurant(RestaurantModel model)
         {
             if(!ModelState.IsValid)
             {
-                return View("Index");
+                return RedirectToAction("Index");
             }
 
-
-            return View("Index");
+            await _restaurantService.CreateRestaurant(_mapper.Map<RestaurantDto>(model));
+            return RedirectToAction("Index");
         }
     }
 }

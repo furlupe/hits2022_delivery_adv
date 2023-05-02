@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DeliveryDeck_Backend_Final.Auth.DAL\DeliveryDeck_Backend_Final.Auth.DAL.csproj" />
+    <ProjectReference Include="..\DeliveryDeck_Backend_Final.Backend.BLL\DeliveryDeck_Backend_Final.Backend.BLL.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,9 +1,15 @@
+using AdminPanel.Mappers;
+using AdminPanel.BLL.Extensions;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services
     .AddControllersWithViews()
     .AddRazorRuntimeCompilation();
+
+builder.Services.AddAutoMapper(typeof(MapperProfile));
+builder.UseAdminComponent();
 
 var app = builder.Build();
 
