@@ -14,7 +14,7 @@ namespace AdminPanel.BLL.Services
     {
         private readonly AuthContext _authContext;
         private readonly BackendContext _backendContext;
-        private const int _RestaurantPageSize = 1;
+        private const int _RestaurantPageSize = 3;
 
         public AdminRestaurantService(AuthContext authContext, BackendContext backendContext)
         {
@@ -87,7 +87,7 @@ namespace AdminPanel.BLL.Services
             var query = _backendContext.Restaurants
                 .Include(r => r.Menus)
                     .ThenInclude(m => m.Dishes)
-                .Where(r => name == null || r.NormalizedName.Contains(name));
+                .Where(r => name == null || r.NormalizedName.Contains(name.ToUpper().Normalize()));
 
             var response = new PagedRestaurantsDto
             {
@@ -109,6 +109,22 @@ namespace AdminPanel.BLL.Services
             }
 
             return response;
+        }
+
+        public async Task DeleteRestaurant(Guid id)
+        {
+            var restaurant = await _backendContext.Restaurants.FirstOrDefaultAsync(x => x.Id == id)
+                ?? throw new BadHttpRequestException("No such restaurant");
+
+            _backendContext.Restaurants.Remove(restaurant);
+            try
+            {
+                await _backendContext.SaveChangesAsync();
+            }
+            catch
+            {
+                throw new BadHttpRequestException("what the fuck");
+            }
         }
     }
 }

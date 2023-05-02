@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using DeliveryDeck_Backend_Final.Backend.DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DeliveryDeck_Backend_Final.Backend.DAL.Migrations
 {
     [DbContext(typeof(BackendContext))]
-    partial class BackendContextModelSnapshot : ModelSnapshot
+    [Migration("20230502121048_CascadeDishesRestaurant")]
+    partial class CascadeDishesRestaurant
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -229,7 +232,7 @@ namespace DeliveryDeck_Backend_Final.Backend.DAL.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("6ca0fd62-ff84-4ce0-84ab-906eb54d8307"),
+                            Id = new Guid("5b448e49-0d95-47cd-a26c-536404dee101"),
                             Cooks = new List<Guid>(),
                             Managers = new List<Guid>(),
                             Name = "New Amogus",
@@ -237,7 +240,7 @@ namespace DeliveryDeck_Backend_Final.Backend.DAL.Migrations
                         },
                         new
                         {
-                            Id = new Guid("78b6d3bb-4806-4415-a5b7-c8066af91a4c"),
+                            Id = new Guid("c0b3322e-0eef-4087-9b69-6f7defd8085c"),
                             Cooks = new List<Guid>(),
                             Managers = new List<Guid>(),
                             Name = "Old Amogus",
@@ -245,7 +248,7 @@ namespace DeliveryDeck_Backend_Final.Backend.DAL.Migrations
                         },
                         new
                         {
-                            Id = new Guid("cdd104ff-0077-4986-b860-80e08d1ae83e"),
+                            Id = new Guid("dfc01d9a-6b08-493d-ad4b-093fed949f01"),
                             Cooks = new List<Guid>(),
                             Managers = new List<Guid>(),
                             Name = "FeastingHub",
@@ -292,8 +295,7 @@ namespace DeliveryDeck_Backend_Final.Backend.DAL.Migrations
 
                     b.HasOne("DeliveryDeck_Backend_Final.Backend.DAL.Entities.Order", null)
                         .WithMany("Dishes")
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("OrderId");
 
                     b.Navigation("Cart");
 

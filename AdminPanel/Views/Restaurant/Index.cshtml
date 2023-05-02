@@ -17,7 +17,7 @@
         </div>
         <div class="form-group row">
             <div class="col">
-                <input type="text" id="name" name="Name"/>
+                <input type="text" id="name" name="Name" placeholder="Name..."/>
             </div>
         </div>
         <div class="row mt-3">
@@ -30,6 +30,10 @@
 
 <div class="container">
     <div class="row">
+        <div class="col d-flex justify-content-start">
+            <input type="text" class="me-2" placeholder="Search by name..." id="search_name" value="@(ViewBag.Name ?? "")"/>
+            <a class="btn btn-primary me-2" onclick="searchRestaurants(1)">Go</a>
+        </div>
         <div class="col d-flex justify-content-end">
             <a class="btn btn-success" onclick="showRestaurantCreationForm()">+ Add restaurant</a>
         </div>
@@ -37,22 +41,57 @@
     @{
         foreach(var restaurant in Model.Restaurants)
         {
-            <div class="container card card-body my-2">
+            <div class="container card card-body my-2" id="@restaurant.Id">
                 <div class="row">
                     <div class="col d-flex">
                         <p class="fs-5 my-auto">@restaurant.Name</p>
                     </div>
                     <div class="col d-flex justify-content-end">
-                        <a class="fs-5 btn btn-outline-secondary mx-1">M</a>
-                        <a class="fs-5 btn btn-outline-warning mx-1">U</a>
-                        <a class="fs-5 btn btn-outline-danger mx-1">D</a>
+                        <a class="btn btn-outline-danger" onclick="deleteRestaurant('@restaurant.Id')">D</a>
                     </div>
                 </div>
             </div>
         }
     }
 </div>
+<nav>
+    <ul class="pagination justify-content-center" >
+        <li class="page-item @(Model.PageInfo.CurrentPage == 1 ? "disabled" : "")">
+            <a class="page-link btn" onclick="searchRestaurants(@(Model.PageInfo.CurrentPage > 1 ? Model.PageInfo.CurrentPage - 1 : 1))">&laquo;</a>
+        </li>
+        @{
+            for(var i = 1; i < Model.PageInfo.Pages + 1; i++)
+            {
+                <li class="page-item @(i == Model.PageInfo.CurrentPage ? "active" : "")"><a class="page-link btn" onclick="searchRestaurants(@i)">@i</a></li>
+            }
+        }
+        <li class="page-item @(Model.PageInfo.CurrentPage == Model.PageInfo.Pages ? "disabled" : "")">
+            <a class="page-link btn" onclick="searchRestaurants(@(Model.PageInfo.CurrentPage < Model.PageInfo.Pages ? Model.PageInfo.CurrentPage + 1 : Model.PageInfo.CurrentPage))">&raquo;</a>
+        </li>
+    </ul>
+</nav>
 <script>
     showRestaurantCreationForm = () => $(".restaurant-form").addClass("active-form");
     closeRestaurantCreationForm = () => $(".restaurant-form").removeClass("active-form");
+
+    function searchRestaurants(page) {
+        var url = '@Html.Raw(Url.Action("Index", "Restaurant", new {page = "__page__", name = "__name__"}))';
+
+        url = url.replace("__name__", $("#search_name").val());
+        url = url.replace("__page__", page);
+
+        window.location.href = url.replace("__name__", $("#search_name").val());
+    };
+
+    function deleteRestaurant(id) {
+        var url = '@Html.Raw(@Url.Action("Delete", "Restaurant", new {id = "__id__"}))'.replace("__id__", id);
+        console.log(url);
+        $.ajax({
+            url: url,
+            type: 'DELETE',
+            success: function (result) {
+                searchRestaurants(1);
+            }
+        });
+    }
 </script>

@@ -35,3 +35,12 @@
     opacity: 1;
     z-index: 1;
 }
+
+page-link {
+    transform: scale(0.9);
+    cursor: pointer;
+}
+
+input {
+    padding-left: 10px;
+}

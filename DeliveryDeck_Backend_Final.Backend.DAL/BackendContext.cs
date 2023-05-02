@@ -29,6 +29,16 @@ namespace DeliveryDeck_Backend_Final.Backend.DAL
                 .HasOne(o => o.Restaurant)
                 .WithMany(r => r.Orders);
 
+            builder.Entity<Order>()
+                .HasMany(o => o.Dishes)
+                .WithOne()
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Restaurant>()
+                .HasMany(r => r.Dishes)
+                .WithOne()
+                .OnDelete(DeleteBehavior.Cascade);
+
             builder.Entity<Restaurant>()
                 .HasData(
                     new Restaurant { Id = Guid.NewGuid(), Name = "New Amogus" },

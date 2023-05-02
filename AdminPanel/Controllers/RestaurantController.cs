@@ -17,9 +17,10 @@ namespace AdminPanel.Controllers
             _mapper = mapper;
         }
 
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(int page = 1, string? name = null)
         {
-            return View("Index", await _restaurantService.GetRestaurants(page));
+            ViewBag.Name = name;
+            return View("Index", await _restaurantService.GetRestaurants(page, name));
         }
 
         public IActionResult About()
@@ -37,6 +38,13 @@ namespace AdminPanel.Controllers
 
             await _restaurantService.CreateRestaurant(_mapper.Map<RestaurantDto>(model));
             return RedirectToAction("Index");
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            await _restaurantService.DeleteRestaurant(id);
+            return NoContent();
         }
     }
 }
