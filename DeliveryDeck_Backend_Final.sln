@@ -30,12 +30,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeliveryDeck_Backend_Final.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deployment", "Deployment", "{4572F6EF-BB53-4D28-B7B8-059572D297BD}"
 	ProjectSection(SolutionItems) = preProject
-		backend.Dockerfile = backend.Dockerfile
 		auth.Dockerfile = auth.Dockerfile
+		backend.Dockerfile = backend.Dockerfile
 		db_auth.env = db_auth.env
 		db_backend.env = db_backend.env
 		docker-compose.yaml = docker-compose.yaml
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdminPanel", "AdminPanel\AdminPanel.csproj", "{96DE6710-7745-421B-B6D1-A395C32FCC7F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,6 +77,10 @@ Global
 		{D1E90EEE-918E-43A5-9FF2-130B9F64D750}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D1E90EEE-918E-43A5-9FF2-130B9F64D750}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D1E90EEE-918E-43A5-9FF2-130B9F64D750}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96DE6710-7745-421B-B6D1-A395C32FCC7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96DE6710-7745-421B-B6D1-A395C32FCC7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96DE6710-7745-421B-B6D1-A395C32FCC7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96DE6710-7745-421B-B6D1-A395C32FCC7F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
