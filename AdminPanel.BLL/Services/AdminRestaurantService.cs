@@ -29,54 +29,9 @@ namespace AdminPanel.BLL.Services
                 throw new BadHttpRequestException("Name is already taken");
             }
 
-            var existingManagers = await _authContext.Managers
-                .Where(m => data.Managers.Contains(m.Id))
-                .Select(m => m.Id)
-                .ToListAsync();
-
-            var existingCooks = await _authContext.Cooks
-                .Where(m => data.Cooks.Contains(m.Id))
-                .Select(m => m.Id)
-                .ToListAsync();
-
-            if (data.Managers.Except(existingManagers).Any())
-            {
-                throw new BadHttpRequestException("No such manager");
-            }
-
-            if (data.Cooks.Except(existingCooks).Any())
-            {
-                throw new BadHttpRequestException("No such cook");
-            }
-
-            var availableManagers = new List<Guid>();
-            var availableCooks = new List<Guid>();
-            foreach(var manager in existingManagers)
-            {
-
-                if (await _backendContext.Restaurants.AllAsync(r => !r.Managers.Contains(manager)))
-                {
-                    availableManagers.Add(manager);
-                }
-
-                throw new BadHttpRequestException("Manager taken");
-            }
-
-            foreach(var cook in existingCooks)
-            {
-                if (await _backendContext.Restaurants.AllAsync(r => !r.Cooks.Contains(cook)))
-                {
-                    availableCooks.Add(cook);
-                }
-
-                throw new BadHttpRequestException("Cook taken");
-            }
-
             await _backendContext.Restaurants.AddAsync(new Restaurant
             {
-                Name = data.Name,
-                Managers = availableManagers,
-                Cooks = availableCooks
+                Name = data.Name
             });
 
             await _backendContext.SaveChangesAsync();

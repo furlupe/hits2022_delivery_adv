@@ -40,11 +40,11 @@ namespace AdminPanel.Controllers
             return RedirectToAction("Index");
         }
 
-        [HttpDelete]
+        [HttpPost]
         public async Task<IActionResult> Delete(Guid id)
         {
             await _restaurantService.DeleteRestaurant(id);
-            return NoContent();
+            return RedirectToAction("Index");
         }
     }
 }
