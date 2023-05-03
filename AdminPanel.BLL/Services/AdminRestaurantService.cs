@@ -1,4 +1,5 @@
-﻿using DeliveryDeck_Backend_Final.Auth.DAL;
+﻿using AutoMapper;
+using DeliveryDeck_Backend_Final.Auth.DAL;
 using DeliveryDeck_Backend_Final.Auth.DAL.Entities;
 using DeliveryDeck_Backend_Final.Backend.DAL;
 using DeliveryDeck_Backend_Final.Backend.DAL.Entities;
@@ -13,16 +14,18 @@ namespace AdminPanel.BLL.Services
     public class AdminRestaurantService : IAdminRestaurantService
     {
         private readonly AuthContext _authContext;
+        private readonly IMapper _mapper;
         private readonly BackendContext _backendContext;
         private const int _RestaurantPageSize = 3;
 
-        public AdminRestaurantService(AuthContext authContext, BackendContext backendContext)
+        public AdminRestaurantService(AuthContext authContext, BackendContext backendContext, IMapper mapper)
         {
             _authContext = authContext;
             _backendContext = backendContext;
+            _mapper = mapper;
         }
 
-        public async Task CreateRestaurant(RestaurantDto data)
+        public async Task CreateRestaurant(RestaurantShortDto data)
         {
             if (await _backendContext.Restaurants.AnyAsync(r => r.Name == data.Name))
             {
@@ -35,6 +38,15 @@ namespace AdminPanel.BLL.Services
             });
 
             await _backendContext.SaveChangesAsync();
+        }
+
+        public async Task<RestaurantDto> GetRestaurantInfo(Guid id)
+        {
+            var restaurant = await _backendContext.Restaurants
+                .FirstOrDefaultAsync(r => r.Id == id)
+                ?? throw new BadHttpRequestException("No such restaurant");
+
+            return _mapper.Map<RestaurantDto>(restaurant);
         }
 
         public async Task<PagedRestaurantsDto> GetRestaurants(int page = 1, string? name = null)
@@ -81,5 +93,6 @@ namespace AdminPanel.BLL.Services
                 throw new BadHttpRequestException("what the fuck");
             }
         }
+
     }
 }

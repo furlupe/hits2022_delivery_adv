@@ -1,4 +1,5 @@
-﻿using AdminPanel.BLL.Services;
+﻿using AdminPanel.BLL.Mappers;
+using AdminPanel.BLL.Services;
 using DeliveryDeck_Backend_Final.Auth.DAL.Extensions;
 using DeliveryDeck_Backend_Final.Backend.DAL.Extensions;
 using DeliveryDeck_Backend_Final.Common.Interfaces.AdminPanel;
@@ -14,6 +15,7 @@ namespace AdminPanel.BLL.Extensions
             builder.UseAuthDAL();
             builder.UseBackendDAL();
 
+            builder.Services.AddAutoMapper(typeof(DtoToEntityMapper));
             builder.Services.AddScoped<IAdminRestaurantService, AdminRestaurantService>();
 
             return builder;
