@@ -80,14 +80,7 @@ namespace AdminPanel.BLL.Services
                 ?? throw new BadHttpRequestException("No such restaurant");
 
             _backendContext.Restaurants.Remove(restaurant);
-            try
-            {
-                await _backendContext.SaveChangesAsync();
-            }
-            catch
-            {
-                throw new BadHttpRequestException("what the fuck");
-            }
+            await _backendContext.SaveChangesAsync();
         }
 
     }

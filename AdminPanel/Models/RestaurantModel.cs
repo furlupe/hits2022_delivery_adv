@@ -2,7 +2,7 @@
 {
     public class RestaurantModel : RestaurantShortModel
     {
-        public List<StaffModel> Managers { get; set; } = new();
-        public List<StaffModel> Cooks { get; set; } = new();
+        public List<Guid> Managers { get; set; } = new();
+        public List<Guid> Cooks { get; set; } = new();
     }
 }

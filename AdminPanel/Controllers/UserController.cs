@@ -19,5 +19,16 @@ namespace AdminPanel.Controllers
         {
             return View("Index", _mapper.Map<UserListModel>(await _userService.GetUsers(page)));
         }
+
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            await _userService.DeleteUser(id);
+            return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> Details(Guid id)
+        {
+            return View("Details", _mapper.Map<UserModel>(await _userService.GetUserInfo(id)));
+        }
     }
 }

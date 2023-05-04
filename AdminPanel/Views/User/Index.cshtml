@@ -5,19 +5,34 @@
 
 <div class="container">
     <div class="row">
-        @await Html.PartialAsync("~/Views/Shared/Partial/SearchByName.cshtml", new SearchFieldModel {Controller = "User"});
+        @await Html.PartialAsync("~/Views/Shared/Partial/SearchByName.cshtml", new SearchFieldModel {Controller = "User"})
     </div>
     @{
         foreach (var user in Model.Users)
         {
             <div class="container card card-body my-2" id="@user.Id">
                 <div class="row">
-                    <div class="col-10 d-flex" id="restaurantName">
-                        <p class="fs-5 my-auto">@user.Name</p>
+                    <div class="col d-flex">
+                        <div class="container">
+                            @{
+                                foreach (var role in user.Roles)
+                                {
+                                    <div class="row">
+                                        <div class="col">
+                                            <p class="fs-5 my-auto">@role.ToString()</p>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
                     </div>
+                    <div class="col d-flex" id="userName">
+                        <p class="fs-5 my-auto">@user.FullName</p>
+                    </div>
+                    @await Html.PartialAsync("~/Views/Shared/Partial/CardCRUDElements.cshtml", new CardCRUDElementsModel {Id = user.Id, Controller="User"})
                 </div>
             </div>
         }
     }
 </div>
-@await Html.PartialAsync("~/Views/Shared/Partial/Pagination.cshtml", new PaginationModel { PageInfo = Model.PageInfo, Controller = "User" });
+@await Html.PartialAsync("~/Views/Shared/Partial/Pagination.cshtml", new PaginationModel { PageInfo = Model.PageInfo, Controller = "User" })

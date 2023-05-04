@@ -1,0 +1,82 @@
+﻿@model UserModel
+@using DeliveryDeck_Backend_Final.Common.Enumerations
+@{
+    ViewData["Title"] = "User details";
+}
+
+<div class="row">
+    <div class="col d-flex justify-content-center">
+        <h3 class="display-4">@Model.FullName</h3> 
+    </div>
+</div>
+<br/>
+<div class="container border bg-white p-4">
+    <div class="row">
+        <div class="col-9">
+            <form>
+                <div class="row">
+                    <div class="col">
+                        <p class="fs-5">Email</p>
+                        <input class="w-100" disabled value="@Model.Email" />
+                    </div>
+                    <div class="col">
+                        <p class="fs-5">Birthdate</p>
+                        <input type="date" class="w-100" disabled value="@string.Format("{0:yyyy-MM-dd}", Model.BirthDate)" />
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col">
+                        <p class="fs-5">Sex</p>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="gender" value="@Gender.Male" id="genderRadioMale" disabled checked="@(Model.Gender == Gender.Male)" />
+                            <label class="form-check-label" for="genderRadioMale">Male</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="gender" value="@Gender.Female" id="genderRadioFemale" disabled checked="@(Model.Gender == Gender.Female)" />
+                            <label class="form-check-label" for="genderRadioFemale">Female</label>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            @{
+                if (Model.RestaurantAsManager is not null)
+                {
+                    <div class="row mt-5">
+                            <div class="col justify-content-center">
+                                <span class="fs-5">Manages</span>
+                                <a class="btn btn-outline-dark ms-4" asp-controller="Restaurant" asp-action="Details" asp-route-id="@Model.RestaurantAsManager.Id">@Model.RestaurantAsManager.Name</a>
+                            </div>
+                    </div>
+                }
+
+                if (Model.RestaurantAsCook is not null)
+                {
+                    <div class="row mt-3">
+                            <div class="col justify-content-center">
+                                <span class="fs-5">Cooks</span>
+                                <a class="btn btn-outline-dark ms-4" asp-controller="Restaurant" asp-action="Details" asp-route-id="@Model.RestaurantAsCook.Id">@Model.RestaurantAsCook.Name</a>
+                            </div>
+                    </div>
+                }
+            }
+        </div>
+
+        <div class="col-2 offset-1">
+            <div class="card">
+                <div class="card-header">Actions</div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <p>Edit profile</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <p>Kill yourself</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

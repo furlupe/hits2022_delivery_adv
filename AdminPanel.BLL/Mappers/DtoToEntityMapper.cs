@@ -17,6 +17,9 @@ namespace AdminPanel.BLL.Mappers
             CreateMap<AppUser, UserShortDto>()
                 .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => src.RoleTypes))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.FullName));
+
+            CreateMap<AppUser, UserExtendedDto>()
+                .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => src.RoleTypes));
         }
     }
 }

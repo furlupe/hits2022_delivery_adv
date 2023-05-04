@@ -43,14 +43,7 @@
                     <div class="col-10 d-flex" id="restaurantName">
                         <p class="fs-5 my-auto">@restaurant.Name</p>
                     </div>
-                    <div class="col d-flex justify-content-end">
-                        <form asp-controller="Restaurant" asp-action="Delete" asp-route-id="@restaurant.Id" method="post">
-                            <button type="submit" class="btn btn-outline-danger mx-2">D</button>
-                        </form>
-                        <form asp-controller="Restaurant" asp-action="Details" asp-route-id="@restaurant.Id" method="get">
-                            <button type="submit" class="btn btn-outline-secondary mx-2">Details</button>
-                        </form>
-                    </div>
+                    @await Html.PartialAsync("~/Views/Shared/Partial/CardCRUDElements.cshtml", new CardCRUDElementsModel {Id = restaurant.Id, Controller="Controller"})
                 </div>
             </div>
         }
