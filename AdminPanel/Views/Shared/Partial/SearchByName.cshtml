@@ -1,0 +1,7 @@
+﻿@model SearchFieldModel
+<div class="col d-flex justify-content-start">
+    <form asp-controller="@Model.Controller">
+        <input type="text" class="me-2" placeholder="Search by name..." id="search_name" value="@(ViewBag.Name)" name="name" />
+        <button class="btn btn-primary me-2" type="submit">Go</button>
+    </form>
+</div>

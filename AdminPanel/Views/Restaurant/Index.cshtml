@@ -30,12 +30,7 @@
 
 <div class="container">
     <div class="row">
-        <div class="col d-flex justify-content-start">
-            <form asp-controller="Restaurant" asp-action="Index" method="get">
-                <input type="text" class="me-2" placeholder="Search by name..." id="search_name" value="@(ViewBag.Name)" name="name"/>
-                <button class="btn btn-primary me-2" type="submit">Go</button>
-            </form>
-        </div>
+        @await Html.PartialAsync("~/Views/Shared/Partial/SearchByName.cshtml", new SearchFieldModel {Controller = "Restaurant"});
         <div class="col d-flex justify-content-end">
             <a class="btn btn-success" onclick="showRestaurantCreationForm()">+ Add restaurant</a>
         </div>

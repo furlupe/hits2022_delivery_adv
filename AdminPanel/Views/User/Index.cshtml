@@ -5,12 +5,7 @@
 
 <div class="container">
     <div class="row">
-        <div class="col d-flex justify-content-start">
-            <form asp-controller="User">
-                <input type="text" class="me-2" placeholder="Search by name..." id="search_name" value="@(ViewBag.Name)" name="name" />
-                <button class="btn btn-primary me-2" type="submit">Go</button>
-            </form>
-        </div>
+        @await Html.PartialAsync("~/Views/Shared/Partial/SearchByName.cshtml", new SearchFieldModel {Controller = "User"});
     </div>
     @{
         foreach (var user in Model.Users)
