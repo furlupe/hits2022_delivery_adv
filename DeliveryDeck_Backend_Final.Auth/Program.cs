@@ -38,7 +38,7 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
-builder.AddAuth(); // наш authService
+builder.AddAuth(); // наш auth BLL
 
 var app = builder.Build();
 
