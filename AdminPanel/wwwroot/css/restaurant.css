@@ -45,3 +45,7 @@
 input {
     padding-left: 10px;
 }
+
+.page-item {
+    z-index: 0 !important;
+}

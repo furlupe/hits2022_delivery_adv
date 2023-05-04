@@ -1,5 +1,6 @@
 ﻿using DeliveryDeck_Backend_Final.Common.Enumerations;
 using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DeliveryDeck_Backend_Final.Auth.DAL.Entities
 {
@@ -15,6 +16,15 @@ namespace DeliveryDeck_Backend_Final.Auth.DAL.Entities
         public Customer? Customer { get; set; }
         public Manager? Manager { get; set; }
         public Courier? Courier { get; set; }
+
+        [NotMapped]
+        public List<RoleType> RoleTypes 
+        {
+            get 
+            { 
+                return Roles.Select(x => x.Role.Type).ToList();
+            }
+        }
     }
 
 }

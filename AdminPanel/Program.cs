@@ -8,7 +8,8 @@ builder.Services
     .AddControllersWithViews()
     .AddRazorRuntimeCompilation();
 
-builder.Services.AddAutoMapper(typeof(MapperProfile));
+builder.Services.AddAutoMapper(typeof(RestaurantMapper));
+builder.Services.AddAutoMapper(typeof(UserMapper));
 builder.UseAdminComponent();
 
 var app = builder.Build();

@@ -1,4 +1,4 @@
-﻿@model DeliveryDeck_Backend_Final.Common.DTO.Backend.PagedRestaurantsDto
+﻿@model RestaurantListModel
 @{
     ViewData["Title"] = "Restaurants";
 }
@@ -31,8 +31,10 @@
 <div class="container">
     <div class="row">
         <div class="col d-flex justify-content-start">
-            <input type="text" class="me-2" placeholder="Search by name..." id="search_name" value="@(ViewBag.Name ?? "")"/>
-            <a class="btn btn-primary me-2" onclick="searchRestaurants(1)">Go</a>
+            <form asp-controller="Restaurant" asp-action="Index" method="get">
+                <input type="text" class="me-2" placeholder="Search by name..." id="search_name" value="@(ViewBag.Name)" name="name"/>
+                <button class="btn btn-primary me-2" type="submit">Go</button>
+            </form>
         </div>
         <div class="col d-flex justify-content-end">
             <a class="btn btn-success" onclick="showRestaurantCreationForm()">+ Add restaurant</a>
@@ -43,12 +45,15 @@
         {
             <div class="container card card-body my-2" id="@restaurant.Id">
                 <div class="row">
-                    <div class="col d-flex">
+                    <div class="col-10 d-flex" id="restaurantName">
                         <p class="fs-5 my-auto">@restaurant.Name</p>
                     </div>
                     <div class="col d-flex justify-content-end">
                         <form asp-controller="Restaurant" asp-action="Delete" asp-route-id="@restaurant.Id" method="post">
-                            <button type="submit" class="btn btn-outline-danger">D</button>
+                            <button type="submit" class="btn btn-outline-danger mx-2">D</button>
+                        </form>
+                        <form asp-controller="Restaurant" asp-action="Details" asp-route-id="@restaurant.Id" method="get">
+                            <button type="submit" class="btn btn-outline-secondary mx-2">Details</button>
                         </form>
                     </div>
                 </div>
@@ -56,32 +61,12 @@
         }
     }
 </div>
-<nav>
-    <ul class="pagination justify-content-center" >
-        <li class="page-item @(Model.PageInfo.CurrentPage == 1 ? "disabled" : "")">
-            <a class="page-link btn" onclick="searchRestaurants(@(Model.PageInfo.CurrentPage > 1 ? Model.PageInfo.CurrentPage - 1 : 1))">&laquo;</a>
-        </li>
-        @{
-            for(var i = 1; i < Model.PageInfo.Pages + 1; i++)
-            {
-                <li class="page-item @(i == Model.PageInfo.CurrentPage ? "active" : "")"><a class="page-link btn" onclick="searchRestaurants(@i)">@i</a></li>
-            }
-        }
-        <li class="page-item @(Model.PageInfo.CurrentPage == Model.PageInfo.Pages ? "disabled" : "")">
-            <a class="page-link btn" onclick="searchRestaurants(@(Model.PageInfo.CurrentPage < Model.PageInfo.Pages ? Model.PageInfo.CurrentPage + 1 : Model.PageInfo.CurrentPage))">&raquo;</a>
-        </li>
-    </ul>
-</nav>
+@await Html.PartialAsync("~/Views/Shared/Partial/Pagination.cshtml", new PaginationModel { PageInfo = Model.PageInfo, Controller = "Restaurant" });
+
 <script>
-    showRestaurantCreationForm = () => $(".restaurant-form").addClass("active-form");
+    showRestaurantCreationForm = () => {
+        $(".restaurant-form").addClass("active-form");
+        $(".restaurant-form #name").focus();
+    }
     closeRestaurantCreationForm = () => $(".restaurant-form").removeClass("active-form");
-
-    function searchRestaurants(page) {
-        var url = '@Html.Raw(Url.Action("Index", "Restaurant", new {page = "__page__", name = "__name__"}))';
-
-        url = url.replace("__name__", $("#search_name").val());
-        url = url.replace("__page__", page);
-
-        window.location.href = url.replace("__name__", $("#search_name").val());
-    };
 </script>

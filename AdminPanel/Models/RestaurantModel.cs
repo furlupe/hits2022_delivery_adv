@@ -1,14 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace AdminPanel.Models
+﻿namespace AdminPanel.Models
 {
-    public class RestaurantModel
+    public class RestaurantModel : RestaurantShortModel
     {
-        [Required]
-        [MinLength(1)]
-        public string Name { get; set; }
-
-        public List<Guid> Managers { get; set; } = new();
-        public List<Guid> Cooks { get; set; } = new();
+        public List<StaffModel> Managers { get; set; } = new();
+        public List<StaffModel> Cooks { get; set; } = new();
     }
 }
