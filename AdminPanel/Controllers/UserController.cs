@@ -20,6 +20,11 @@ namespace AdminPanel.Controllers
             return View("Index", _mapper.Map<UserListModel>(await _userService.GetUsers(page)));
         }
 
+        public async Task<IActionResult> Create()
+        {
+            return View();
+        }
+
         public async Task<IActionResult> Delete(Guid id)
         {
             await _userService.DeleteUser(id);

@@ -1,0 +1,13 @@
+﻿@model PaginationModel
+<nav>
+    <ul class="pagination justify-content-center">
+        @{
+            for (var i = 1; i < Model.PageInfo.Pages + 1; i++)
+            {
+                <li class="page-item numbers">
+                    <button class="page-link btn" type="submit" value="@i">@i</button>
+                </li>
+            }
+        }
+    </ul>
+</nav>

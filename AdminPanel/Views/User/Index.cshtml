@@ -5,14 +5,20 @@
 
 <div class="container">
     <div class="row">
+        
         @await Html.PartialAsync("~/Views/Shared/Partial/SearchByName.cshtml", new SearchFieldModel {Controller = "User"})
+        <div class="col d-flex justify-content-end">
+            <form asp-controller="User" asp-action="Create">
+                <button class="btn btn-outline-success" type="submit">+ Add user</button>
+            </form>
+        </div>
     </div>
     @{
         foreach (var user in Model.Users)
         {
             <div class="container card card-body my-2" id="@user.Id">
                 <div class="row">
-                    <div class="col d-flex">
+                    <div class="col-2 d-flex">
                         <div class="container">
                             @{
                                 foreach (var role in user.Roles)

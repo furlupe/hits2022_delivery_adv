@@ -39,7 +39,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deployment", "Deployment", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdminPanel", "AdminPanel\AdminPanel.csproj", "{96DE6710-7745-421B-B6D1-A395C32FCC7F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdminPanel.BLL", "AdminPanel.BLL\AdminPanel.BLL.csproj", "{CD227112-4CE6-4D3E-A065-6E69214DB32F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdminPanel.BLL", "AdminPanel.BLL\AdminPanel.BLL.csproj", "{CD227112-4CE6-4D3E-A065-6E69214DB32F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

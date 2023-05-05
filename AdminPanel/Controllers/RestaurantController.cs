@@ -23,6 +23,15 @@ namespace AdminPanel.Controllers
             return View("Index", _mapper.Map<RestaurantListModel>(await _restaurantService.GetRestaurants(page, name)));
         }
 
+        public async Task<IActionResult> RestaurantsPage(int page = 1, string? name = null)
+        {
+            ViewBag.Name = name;
+            return PartialView(
+                "~/Views/Shared/Partial/RestaurantListPartial.cshtml", 
+                _mapper.Map<RestaurantListModel>(await _restaurantService.GetRestaurants(page, name))
+            );
+        }
+
         public IActionResult About()
         {
             return Redirect("https://www.youtube.com/watch?v=VZrDxD0Za9I&list=PLu4wnki9NI_8VmJ7Qz_byhKwCquXcy6u9");

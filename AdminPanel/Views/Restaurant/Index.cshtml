@@ -30,31 +30,40 @@
 
 <div class="container">
     <div class="row">
-        @await Html.PartialAsync("~/Views/Shared/Partial/SearchByName.cshtml", new SearchFieldModel {Controller = "Restaurant"});
+        @await Html.PartialAsync("~/Views/Shared/Partial/SearchByName.cshtml", new SearchFieldModel {Controller = "Restaurant"})
         <div class="col d-flex justify-content-end">
             <a class="btn btn-success" onclick="showRestaurantCreationForm()">+ Add restaurant</a>
         </div>
     </div>
-    @{
-        foreach(var restaurant in Model.Restaurants)
-        {
-            <div class="container card card-body my-2" id="@restaurant.Id">
-                <div class="row">
-                    <div class="col-10 d-flex" id="restaurantName">
-                        <p class="fs-5 my-auto">@restaurant.Name</p>
-                    </div>
-                    @await Html.PartialAsync("~/Views/Shared/Partial/CardCRUDElements.cshtml", new CardCRUDElementsModel {Id = restaurant.Id, Controller="Controller"})
-                </div>
-            </div>
-        }
-    }
-</div>
-@await Html.PartialAsync("~/Views/Shared/Partial/Pagination.cshtml", new PaginationModel { PageInfo = Model.PageInfo, Controller = "Restaurant" });
+    <div id="restaurantsList">
 
-<script>
-    showRestaurantCreationForm = () => {
-        $(".restaurant-form").addClass("active-form");
-        $(".restaurant-form #name").focus();
-    }
-    closeRestaurantCreationForm = () => $(".restaurant-form").removeClass("active-form");
-</script>
+    </div>
+</div>
+@await Html.PartialAsync("~/Views/Shared/Partial/PaginationAjax.cshtml", new PaginationModel { PageInfo = Model.PageInfo, Controller = "Restaurant" })
+
+@section Scripts {
+    <script>
+        showRestaurantCreationForm = () => {
+            $(".restaurant-form").addClass("active-form");
+            $(".restaurant-form #name").focus();
+        }
+        closeRestaurantCreationForm = () => $(".restaurant-form").removeClass("active-form");
+
+        $(".page-link").on("click", function() {
+            var url = "";
+            var url = "@Html.Raw(
+                (ViewBag.Name is not null) ?
+                    Url.Action("RestaurantsPage", "Restaurant", new { page = "__page__", name = "__name__"})
+                    : Url.Action("RestaurantsPage", "Restaurant", new { page = "__page__"})
+            )";
+
+            url = url.replace("__page__", $(this).val());
+            url = url.replace("__name__", "@ViewBag.Name");
+            getPage(url)
+                .then(result => $("#restaurantsList").html(result));
+        });
+
+        $(".page-link").first().click();
+
+    </script>
+}

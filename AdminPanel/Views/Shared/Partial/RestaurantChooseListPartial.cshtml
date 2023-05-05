@@ -1,0 +1,18 @@
+﻿@model RestaurantListModel
+<div class="container">
+    <h4 class="col display-5">Choose restaurant</h4>
+    <div class="container">
+        @{
+            foreach (var restaurant in Model.Restaurants)
+            {
+                <div class="container card card-body my-2" id="@restaurant.Id">
+                    <div class="row">
+                        <div class="col-10 d-flex" id="restaurantName">
+                            <p class="fs-5 my-auto">@restaurant.Name</p>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
