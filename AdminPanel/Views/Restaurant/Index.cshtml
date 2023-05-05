@@ -32,14 +32,14 @@
     <div class="row">
         @await Html.PartialAsync("~/Views/Shared/Partial/SearchByName.cshtml", new SearchFieldModel {Controller = "Restaurant"})
         <div class="col d-flex justify-content-end">
-            <a class="btn btn-success" onclick="showRestaurantCreationForm()">+ Add restaurant</a>
+            <a class="btn btn-outline-success" onclick="showRestaurantCreationForm()">+ Add restaurant</a>
         </div>
     </div>
     <div id="restaurantsList">
 
     </div>
 </div>
-@await Html.PartialAsync("~/Views/Shared/Partial/PaginationAjax.cshtml", new PaginationModel { PageInfo = Model.PageInfo, Controller = "Restaurant" })
+@await Html.PartialAsync("~/Views/Shared/Partial/PaginationAjax.cshtml", new PaginationModel { PageInfo = Model.PageInfo })
 
 @section Scripts {
     <script>

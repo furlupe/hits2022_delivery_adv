@@ -17,14 +17,54 @@ namespace AdminPanel.BLL.Services
     {
         private const int _UserPageSize = 2;
         private readonly AuthContext _authContext;
+        private readonly UserManager<AppUser> _userMgr;
         private readonly BackendContext _backendContext;
         private readonly IMapper _mapper;
 
-        public AdminUserService(AuthContext authContext, BackendContext backendContext, IMapper mapper)
+        public AdminUserService(AuthContext authContext, BackendContext backendContext, UserManager<AppUser> userMgr, IMapper mapper)
         {
             _authContext = authContext;
             _mapper = mapper;
             _backendContext = backendContext;
+            _userMgr = userMgr;
+        }
+
+        public async Task CreateUser(UserCreateDto data)
+        {
+            var user = new AppUser
+            {
+                FullName = data.FullName,
+                BirthDate = data.BirthDate,
+                Gender = data.Gender,
+                Email = data.Email
+            };
+
+            if(data.Roles.Contains(RoleType.Customer))
+            {
+                user.Customer = new Customer { Address = data.Address };
+            }
+
+            foreach(var roletype in data.Roles)
+            {
+                switch(roletype)
+                {
+                    case RoleType.Customer:
+                        user.Customer = new Customer { Address = data.Address }; break;
+                    case RoleType.Manager:
+                        user.Manager = new Manager(); break;
+                    case RoleType.Cook:
+                        user.Cook = new Cook(); break;
+                    case RoleType.Courier:
+                        user.Courier = new Courier(); break;
+                }
+            }
+
+            await _userMgr.CreateAsync(user, data.Password);
+
+            foreach(var roletype in data.Roles)
+            {
+                await _userMgr.AddToRoleAsync(user, roletype.ToString());
+            }
         }
 
         public async Task DeleteUser(Guid id)
@@ -90,11 +130,6 @@ namespace AdminPanel.BLL.Services
             }
 
             return response;
-        }
-
-        private async Task<Restaurant?> GetRestaurantUserWorkingIn(Guid staffId)
-        {
-            return await _backendContext.Restaurants.FirstOrDefaultAsync(r => r.Managers.Contains(staffId) || r.Cooks.Contains(staffId));
         }
     }
 }

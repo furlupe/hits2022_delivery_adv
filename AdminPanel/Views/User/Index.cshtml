@@ -5,40 +5,29 @@
 
 <div class="container">
     <div class="row">
-        
-        @await Html.PartialAsync("~/Views/Shared/Partial/SearchByName.cshtml", new SearchFieldModel {Controller = "User"})
         <div class="col d-flex justify-content-end">
-            <form asp-controller="User" asp-action="Create">
+            <form asp-controller="User" asp-action="Create" method="get">
                 <button class="btn btn-outline-success" type="submit">+ Add user</button>
             </form>
         </div>
     </div>
-    @{
-        foreach (var user in Model.Users)
-        {
-            <div class="container card card-body my-2" id="@user.Id">
-                <div class="row">
-                    <div class="col-2 d-flex">
-                        <div class="container">
-                            @{
-                                foreach (var role in user.Roles)
-                                {
-                                    <div class="row">
-                                        <div class="col">
-                                            <p class="fs-5 my-auto">@role.ToString()</p>
-                                        </div>
-                                    </div>
-                                }
-                            }
-                        </div>
-                    </div>
-                    <div class="col d-flex" id="userName">
-                        <p class="fs-5 my-auto">@user.FullName</p>
-                    </div>
-                    @await Html.PartialAsync("~/Views/Shared/Partial/CardCRUDElements.cshtml", new CardCRUDElementsModel {Id = user.Id, Controller="User"})
-                </div>
-            </div>
-        }
-    }
+    <div id="user-list">
+
+    </div>
 </div>
-@await Html.PartialAsync("~/Views/Shared/Partial/Pagination.cshtml", new PaginationModel { PageInfo = Model.PageInfo, Controller = "User" })
+@await Html.PartialAsync("~/Views/Shared/Partial/PaginationAjax.cshtml", new PaginationModel { PageInfo = Model.PageInfo })
+
+@section Scripts {
+    <script>
+        $(".page-link").on("click", function () {
+            var url = "@Html.Raw(Url.Action("UsersPage", "User", new { page = "__page__"}))";
+
+            url = url.replace("__page__", $(this).val());
+
+            getPage(url)
+                .then(result => $("#user-list").html(result));
+        });
+
+        $(".page-link").first().click();
+    </script>
+}

@@ -1,5 +1,6 @@
 ﻿using AdminPanel.Models;
 using AutoMapper;
+using DeliveryDeck_Backend_Final.Common.DTO.AdminPanel;
 using DeliveryDeck_Backend_Final.Common.Interfaces.AdminPanel;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,9 +21,22 @@ namespace AdminPanel.Controllers
             return View("Index", _mapper.Map<UserListModel>(await _userService.GetUsers(page)));
         }
 
-        public async Task<IActionResult> Create()
+        public async Task<IActionResult> UsersPage(int page = 1)
         {
-            return View();
+            return PartialView("~/Views/Shared/Partial/UserListPartial.cshtml", _mapper.Map<UserListModel>(await _userService.GetUsers(page)));
+        }
+
+        [HttpGet]
+        public IActionResult Create()
+        {
+            return View("Create");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(UserCreateModel data)
+        {
+            await _userService.CreateUser(_mapper.Map<UserCreateDto>(data));
+            return RedirectToAction("Index");
         }
 
         public async Task<IActionResult> Delete(Guid id)

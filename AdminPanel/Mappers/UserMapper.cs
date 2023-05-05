@@ -12,6 +12,8 @@ namespace AdminPanel.Mappers
             CreateMap<UserShortDto, UserShortModel>()
                 .ForMember(dest => dest.FullName, ost => ost.MapFrom(src => src.Name));
             CreateMap<UserExtendedDto, UserModel>();
+
+            CreateMap<UserCreateModel, UserCreateDto>();
         }
     }
 }

@@ -4,6 +4,6 @@
     {
         public Guid Id { get; set; }
         public AppUser User { get; set; }
-        public string Address { get; set; }
+        public string? Address { get; set; }
     }
 }
