@@ -54,20 +54,24 @@ namespace AdminPanel.BLL.Services
             {
                 var cooks = await _authContext.Cooks
                     .Where(x => restaurant.Cooks.Contains(x.Id))
+                    .Include(x => x.User.Roles)
+                        .ThenInclude(r => r.Role)
                     .Select(x => x.User)
                     .ToListAsync();
 
-                staff = cooks.Select(_mapper.Map<UserShortDto>).ToList();
+                staff.AddRange(cooks.Select(_mapper.Map<UserShortDto>).ToList());
             }
 
             if (staffRoles.IsNullOrEmpty() || staffRoles.Contains(RoleType.Manager))
             {
                 var managers = await _authContext.Managers
                     .Where(x => restaurant.Managers.Contains(x.Id))
+                    .Include(x => x.User.Roles)
+                        .ThenInclude(r => r.Role)
                     .Select(x => x.User)
                     .ToListAsync();
 
-                staff = managers.Select(_mapper.Map<UserShortDto>).ToList();
+                staff.AddRange(managers.Select(_mapper.Map<UserShortDto>).ToList());
             }
 
             return new RestaurantDto
@@ -120,6 +124,11 @@ namespace AdminPanel.BLL.Services
         {
             var restaurant = await _backendContext.Restaurants.FirstOrDefaultAsync(x => x.Id == restaurantId)
                 ?? throw new BadHttpRequestException("No such restaurant");
+
+            if(await _backendContext.Restaurants.AnyAsync(r => r.Managers.Concat(r.Cooks).Contains(data.Id)))
+            {
+                throw new BadHttpRequestException("User is already taken");
+            }
 
             if (data.Role == RoleType.Manager)
             {

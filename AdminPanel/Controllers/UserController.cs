@@ -29,9 +29,9 @@ namespace AdminPanel.Controllers
             return PartialView("~/Views/Shared/Partial/UserListPartial.cshtml", _mapper.Map<UserListModel>(await _userService.GetUsers(page, roles)));
         }
 
-        public async Task<IActionResult> UsersChoosePage(int page = 1, List<RoleType>? roles = default)
+        public async Task<IActionResult> UsersChoosePage(int page = 1)
         {
-            var response = _mapper.Map<UserListModel>(await _userService.GetUsers(page, roles));
+            var response = _mapper.Map<UserListModel>(await _userService.GetUsers(page, new List<RoleType> { RoleType.Manager, RoleType.Cook }, true));
             ViewBag.PageInfo = response.PageInfo;
             return PartialView("~/Views/Shared/Partial/UserChooseListPartial.cshtml", response);
         }

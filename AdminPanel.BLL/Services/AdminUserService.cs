@@ -110,21 +110,31 @@ namespace AdminPanel.BLL.Services
             return response;
         }
 
-        public async Task<PagedUsersDto> GetUsers(int page = 1, List<RoleType>? roles = default)
+        public async Task<PagedUsersDto> GetUsers(int page = 1, List<RoleType>? roles = default, bool availableOnly = false)
         {
-
-            var response = new PagedUsersDto
-            {
-                PageInfo = new PageInfo(_authContext.Users.Count(), _UserPageSize, page)
-            };
-
-            var users = await _authContext.Users
+            var query = await _authContext.Users
                 .Include(x => x.Roles)
                     .ThenInclude(r => r.Role)
                 .Where(x => roles.IsNullOrEmpty() || x.Roles.Any(r => roles.Contains(r.Role.Type)))
-                .Skip((page - 1) * _UserPageSize)
-                .Take(_UserPageSize)
                 .ToListAsync();
+
+            if (availableOnly)
+            {
+                var restaurants = await _backendContext.Restaurants
+                    .Select(r => new {r.Managers, r.Cooks})
+                    .ToListAsync();
+
+                query = query.Where(x => ! restaurants.Any(r => r.Managers.Concat(r.Cooks).Contains(x.Id))).ToList();
+            }
+
+            var response = new PagedUsersDto
+            {
+                PageInfo = new PageInfo( query.Count, _UserPageSize, page)
+            };
+
+            var users = query.Skip((page - 1) * _UserPageSize)
+                .Take(_UserPageSize)
+                .ToList();
 
             foreach (var user in users)
             {
