@@ -2,8 +2,8 @@
 {
     public class RestaurantDto
     {
+        public Guid Id { get; set; }
         public string Name { get; set; }
-        public List<Guid> Managers { get; set; } = new();
-        public List<Guid> Cooks { get; set; } = new();
+        public PagedUsersDto Staff { get; set; }
     }
 }

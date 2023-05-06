@@ -1,6 +1,8 @@
 ﻿using AdminPanel.Models;
 using AutoMapper;
+using DeliveryDeck_Backend_Final.Common.DTO.AdminPanel;
 using DeliveryDeck_Backend_Final.Common.DTO.Backend;
+using DeliveryDeck_Backend_Final.Common.Enumerations;
 using DeliveryDeck_Backend_Final.Common.Interfaces.AdminPanel;
 using Microsoft.AspNetCore.Mvc;
 
@@ -37,9 +39,9 @@ namespace AdminPanel.Controllers
             return Redirect("https://www.youtube.com/watch?v=VZrDxD0Za9I&list=PLu4wnki9NI_8VmJ7Qz_byhKwCquXcy6u9");
         }
 
-        public async Task<IActionResult >Details(Guid id)
+        public async Task<IActionResult >Details(Guid id, int page = 1, List<RoleType>? roles = default)
         {
-            return View("Details", _mapper.Map<RestaurantModel>(await _restaurantService.GetRestaurantInfo(id)));
+            return View("Details", _mapper.Map<RestaurantModel>(await _restaurantService.GetRestaurantInfo(id, page, roles)));
         }
 
         [HttpPost]
@@ -53,6 +55,14 @@ namespace AdminPanel.Controllers
             await _restaurantService.CreateRestaurant(_mapper.Map<RestaurantShortDto>(model));
             return RedirectToAction("Index");
         }
+
+        [HttpPost]
+        public async Task<IActionResult> AddStaffToRestaurant(Guid restaurantId, StaffModel data)
+        {
+            await _restaurantService.AddStaffToRestaurant(restaurantId, _mapper.Map<StaffDto>(data));
+            return NoContent();
+        }
+        
 
         [HttpPost]
         public async Task<IActionResult> Delete(Guid id)

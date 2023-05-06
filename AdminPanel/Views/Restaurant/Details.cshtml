@@ -1,6 +1,134 @@
-﻿@model RestaurantModel
+﻿@using DeliveryDeck_Backend_Final.Common.Enumerations;
+@model RestaurantModel
 @{
     ViewData["Title"] = "Restaurants";
 }
 
-<h2 class="display-4">@Model.Name</h2>
+<div id="addStaffDialog" class="modal fade">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content p-2" id="dialogContent"></div>
+    </div>
+    <div id="modalPagination"></div>
+</div>
+
+<div class="row">
+    <div class="col d-flex justify-content-center">
+        <h3 class="display-4">@Model.Name</h3>
+    </div>
+</div>
+
+<div class="container bg-white" id="main">
+    <div class="row">
+        <form class="col" asp-controller="Restaurant" asp-action="Details" asp-route-id="@Model.Id" method="get">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="roleManager" value="@RoleType.Manager" name="roles" />
+                <label class="form-check-label fs-5" for="roleManager">Manager</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="roleCook" value="@RoleType.Cook" name="roles" />
+                <label class="form-check-label fs-5" for="roleCook">Cook</label>
+            </div>
+            <button class="btn btn-outline-primary" type="submit">Go</button>
+        </form>
+        <div class="col d-flex justify-content-end">
+            <button class="btn btn-outline-success" id="addStaffButton">+ Add staff</button>
+        </div>
+    </div>
+    <div id="user-list">
+
+    </div>
+    @{
+        if (Model.Staff is not null)
+        {
+            await Html.PartialAsync("~/Views/Shared/Partial/PaginationAjax.cshtml", new PaginationModel { PageInfo = Model.Staff.PageInfo });
+        }
+    }
+</div>
+@section Scripts {
+    <script src="~/js/pagination.js"></script>
+    <script>
+        $("#main").find(".page-link").on("click", function (e) {
+            e.preventDefault();
+
+            var url = "@Html.Raw(Url.Action("Details", "Restaurant", new { page = "__page__"}))";
+
+            url += $("#roleManager").checked ? "&roles=Manager" : "";
+            url += $("#roleCook").checked ? "&roles=Cook" : "";
+
+            url = url.replace("__page__", $(this).val());
+
+            getPage(url)
+                .then(result => $("#user-list").html(result));
+        });
+
+        $("#main").find(".page-link").first().click();
+
+        $("#addStaffButton").click(function(e) {
+            e.preventDefault();
+
+            var url = "@Html.Raw(Url.Action("UsersChoosePage", "User"))";
+
+            getPage(url)
+                .then(function (result) {
+                    $("#dialogContent").html(result);
+
+                    var url = "@Html.Raw(Url.Action("Pagination", "Utils", new { currpage = "__curr__", pages = "__pages__", pagesize = "__size__"}))";
+                    url = url.replace("__curr__", $("#viewbagcurrpage").val());
+                    url = url.replace("__pages__", $("#viewbagpages").val());
+                    url = url.replace("__size__", $("#viewbagsize").val());
+
+                    console.log(url);
+
+                    $.ajax({
+                        url: url,
+                        type: "Get",
+                        async: true
+                    })
+                        .then(function(result) {
+                            $("#modalPagination").html(result);
+                            $("#addStaffDialog").find(".page-link").click(function () {
+                                console.log($(this));
+
+                                var url = "@Html.Raw(Url.Action("UsersChoosePage", "User", new { page = "__page__"}))";
+
+                                url = url.replace("__page__", $(this).val());
+
+                                getPage(url)
+                                    .then(function (result) {
+                                        $("#dialogContent").html(result)
+
+                                        $("#asCookButton").click(function () {
+                                            addStaff({
+                                                Id: $(this).val(),
+                                                Role: "@RoleType.Cook"
+                                            });
+                                        })
+
+                                        $("#asManagerButton").click(function () {
+                                            addStaff({
+                                                Id: $(this).val(),
+                                                Role: "@RoleType.Manager"
+                                            });
+                                        })
+                                    });
+                            });
+                        })
+
+                    $("#addStaffDialog").modal('show');
+                });
+        })
+
+        function addStaff(data) {
+            var url = "@Html.Raw(Url.Action("AddStaffToRestaurant", "Restaurant", new {restaurantId = "__id__"}))";
+            url = url.replace("__id__", "@Model.Id")
+
+            $.ajax({
+                url: url,
+                type: "POST",
+                async: true,
+                data: data
+             })
+                .then(result => location.reload());
+        }
+    </script>
+}

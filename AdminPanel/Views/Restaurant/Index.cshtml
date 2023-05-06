@@ -42,6 +42,7 @@
 @await Html.PartialAsync("~/Views/Shared/Partial/PaginationAjax.cshtml", new PaginationModel { PageInfo = Model.PageInfo })
 
 @section Scripts {
+    <script src="~/js/pagination.js"></script>
     <script>
         showRestaurantCreationForm = () => {
             $(".restaurant-form").addClass("active-form");

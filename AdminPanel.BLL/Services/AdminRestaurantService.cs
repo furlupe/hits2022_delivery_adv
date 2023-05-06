@@ -5,9 +5,11 @@ using DeliveryDeck_Backend_Final.Backend.DAL;
 using DeliveryDeck_Backend_Final.Backend.DAL.Entities;
 using DeliveryDeck_Backend_Final.Common.DTO.AdminPanel;
 using DeliveryDeck_Backend_Final.Common.DTO.Backend;
+using DeliveryDeck_Backend_Final.Common.Enumerations;
 using DeliveryDeck_Backend_Final.Common.Interfaces.AdminPanel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
 
 namespace AdminPanel.BLL.Services
 {
@@ -40,13 +42,43 @@ namespace AdminPanel.BLL.Services
             await _backendContext.SaveChangesAsync();
         }
 
-        public async Task<RestaurantDto> GetRestaurantInfo(Guid id)
+        public async Task<RestaurantDto> GetRestaurantInfo(Guid id, int page = 1, List<RoleType>? staffRoles = default)
         {
             var restaurant = await _backendContext.Restaurants
                 .FirstOrDefaultAsync(r => r.Id == id)
                 ?? throw new BadHttpRequestException("No such restaurant");
 
-            return _mapper.Map<RestaurantDto>(restaurant);
+            var staff = new List<UserShortDto>();
+            if (staffRoles is null || staffRoles.Contains(RoleType.Cook))
+            {
+                var cooks = await _authContext.Cooks
+                    .Where(x => restaurant.Cooks.Contains(x.Id))
+                    .Select(x => x.User)
+                    .ToListAsync();
+
+                staff = cooks.Select(_mapper.Map<UserShortDto>).ToList();
+            }
+
+            if (staffRoles is null || staffRoles.Contains(RoleType.Manager))
+            {
+                var managers = await _authContext.Managers
+                    .Where(x => restaurant.Managers.Contains(x.Id))
+                    .Select(x => x.User)
+                    .ToListAsync();
+
+                staff = managers.Select(_mapper.Map<UserShortDto>).ToList();
+            }
+
+            return new RestaurantDto
+            {
+                Id = id,
+                Name = restaurant.Name,
+                Staff = new PagedUsersDto
+                {
+                    Users = staff.Skip((page - 1) * _RestaurantPageSize).Take(_RestaurantPageSize).ToList(),
+                    PageInfo = new PageInfo(staff.Count, _RestaurantPageSize, page)
+                }
+            };
         }
 
         public async Task<PagedRestaurantsDto> GetRestaurants(int page = 1, string? name = null)
@@ -83,5 +115,25 @@ namespace AdminPanel.BLL.Services
             await _backendContext.SaveChangesAsync();
         }
 
+        public async Task AddStaffToRestaurant(Guid restaurantId, StaffDto data)
+        {
+            var restaurant = await _backendContext.Restaurants.FirstOrDefaultAsync(x => x.Id == restaurantId)
+                ?? throw new BadHttpRequestException("No such restaurant");
+
+            if (data.Role == RoleType.Manager)
+            {
+                restaurant.Managers.Add(data.Id);
+            }
+            else if (data.Role == RoleType.Cook)
+            {
+                restaurant.Cooks.Add(data.Id);
+            }
+            else
+            {
+                throw new BadHttpRequestException("Unsupported restaurant staff type");
+            }
+
+            await _backendContext.SaveChangesAsync();
+        }
     }
 }

@@ -18,6 +18,7 @@
 @await Html.PartialAsync("~/Views/Shared/Partial/PaginationAjax.cshtml", new PaginationModel { PageInfo = Model.PageInfo })
 
 @section Scripts {
+    <script src="~/js/pagination.js"></script>
     <script>
         $(".page-link").on("click", function () {
             var url = "@Html.Raw(Url.Action("UsersPage", "User", new { page = "__page__"}))";
@@ -25,7 +26,10 @@
             url = url.replace("__page__", $(this).val());
 
             getPage(url)
-                .then(result => $("#user-list").html(result));
+                .then(result => {
+                    console.log(result);
+                    $("#user-list").html(result)
+                });
         });
 
         $(".page-link").first().click();

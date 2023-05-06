@@ -8,6 +8,8 @@ namespace DeliveryDeck_Backend_Final.Common.DTO.Backend
         public int Pages { get; set; }
         public int PageSize { get; set; }
 
+        public PageInfo() { }
+
         public PageInfo(int collectionSize, int pageSize, int currPage = 1)
         {
             var pagesAmount = (int)Math.Ceiling((double)collectionSize / pageSize);

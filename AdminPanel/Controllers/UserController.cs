@@ -1,6 +1,7 @@
 ﻿using AdminPanel.Models;
 using AutoMapper;
 using DeliveryDeck_Backend_Final.Common.DTO.AdminPanel;
+using DeliveryDeck_Backend_Final.Common.Enumerations;
 using DeliveryDeck_Backend_Final.Common.Interfaces.AdminPanel;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,12 +19,21 @@ namespace AdminPanel.Controllers
         }
         public async Task<IActionResult> Index(int page = 1)
         {
-            return View("Index", _mapper.Map<UserListModel>(await _userService.GetUsers(page)));
+            var users = await _userService.GetUsers(page);
+            var response = _mapper.Map<UserListModel>(users);
+            return View("Index",response);
         }
 
-        public async Task<IActionResult> UsersPage(int page = 1)
+        public async Task<IActionResult> UsersPage(int page = 1, List<RoleType>? roles = default)
         {
-            return PartialView("~/Views/Shared/Partial/UserListPartial.cshtml", _mapper.Map<UserListModel>(await _userService.GetUsers(page)));
+            return PartialView("~/Views/Shared/Partial/UserListPartial.cshtml", _mapper.Map<UserListModel>(await _userService.GetUsers(page, roles)));
+        }
+
+        public async Task<IActionResult> UsersChoosePage(int page = 1, List<RoleType>? roles = default)
+        {
+            var response = _mapper.Map<UserListModel>(await _userService.GetUsers(page, roles));
+            ViewBag.PageInfo = response.PageInfo;
+            return PartialView("~/Views/Shared/Partial/UserChooseListPartial.cshtml", response);
         }
 
         [HttpGet]

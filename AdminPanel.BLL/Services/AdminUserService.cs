@@ -10,6 +10,7 @@ using DeliveryDeck_Backend_Final.Common.Interfaces.AdminPanel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace AdminPanel.BLL.Services
 {
@@ -109,7 +110,7 @@ namespace AdminPanel.BLL.Services
             return response;
         }
 
-        public async Task<PagedUsersDto> GetUsers(int page = 1)
+        public async Task<PagedUsersDto> GetUsers(int page = 1, List<RoleType>? roles = default)
         {
 
             var response = new PagedUsersDto
@@ -120,6 +121,7 @@ namespace AdminPanel.BLL.Services
             var users = await _authContext.Users
                 .Include(x => x.Roles)
                     .ThenInclude(r => r.Role)
+                .Where(x => roles.IsNullOrEmpty() || x.Roles.Any(r => roles.Contains(r.Role.Type)))
                 .Skip((page - 1) * _UserPageSize)
                 .Take(_UserPageSize)
                 .ToListAsync();
@@ -131,5 +133,7 @@ namespace AdminPanel.BLL.Services
 
             return response;
         }
+
+
     }
 }

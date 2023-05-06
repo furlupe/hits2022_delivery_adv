@@ -1,0 +1,38 @@
+﻿@model UserListModel
+<link rel="stylesheet" href="~/css/chooselist.css"/>
+<input id="viewbagcurrpage" value="@ViewBag.PageInfo.CurrentPage" style="display: none"/>
+<input id="viewbagpages" value="@ViewBag.PageInfo.Pages" style="display: none"/>
+<input id="viewbagsize" value="@ViewBag.PageInfo.PageSize" style="display: none" />
+
+@{
+    foreach (var user in Model.Users)
+    {
+        <div class="container card card-body my-2">
+            <div class="row">
+                <div class="col-2 d-flex">
+                    <div class="container">
+                        @{
+                            foreach (var role in user.Roles)
+                            {
+                                <div class="row">
+                                    <div class="col">
+                                        <p class="fs-5 my-auto">@role.ToString()</p>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+                <div class="col d-flex" id="userName">
+                    <p class="fs-5 my-auto">@user.FullName</p>
+                </div>
+                <div class="col d-flex">
+                    <button class="btn btn-outline-secondary" id="asManagerButton" value="@user.Id">Add as manager</button>
+                </div>
+                <div class="col d-flex">
+                    <button class="btn btn-outline-secondary" id="asCookButton" value="@user.Id">Add as cook</button>
+                </div>
+            </div>
+        </div>
+    }
+}

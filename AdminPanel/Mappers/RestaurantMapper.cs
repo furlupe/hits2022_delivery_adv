@@ -18,6 +18,8 @@ namespace AdminPanel.Mappers
 
             CreateMap<RestaurantListModel, PagedRestaurantsDto>()
                 .ReverseMap();
+
+            CreateMap<StaffModel, StaffDto>();
         }
     }
 }

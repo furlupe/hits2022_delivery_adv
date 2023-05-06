@@ -1,8 +1,8 @@
 ﻿using DeliveryDeck_Backend_Final.Common.Enumerations;
 
-namespace AdminPanel.Models
+namespace DeliveryDeck_Backend_Final.Common.DTO.AdminPanel
 {
-    public class StaffModel
+    public class StaffDto
     {
         public Guid Id { get; set; }
         public RoleType Role { get; set; }
