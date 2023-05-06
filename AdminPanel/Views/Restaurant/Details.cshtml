@@ -97,14 +97,17 @@
                                     .then(function (result) {
                                         $("#dialogContent").html(result)
 
-                                        $("#asCookButton").click(function () {
+                                        console.log($("#asCookButton"));
+
+                                        $(".asCookButton").click(function () {
+                                            console.log("asd");
                                             addStaff({
                                                 Id: $(this).val(),
                                                 Role: "@RoleType.Cook"
                                             });
                                         })
 
-                                        $("#asManagerButton").click(function () {
+                                        $(".asManagerButton").click(function () {
                                             addStaff({
                                                 Id: $(this).val(),
                                                 Role: "@RoleType.Manager"

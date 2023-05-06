@@ -41,7 +41,9 @@ namespace AdminPanel.Controllers
 
         public async Task<IActionResult >Details(Guid id, int page = 1, List<RoleType>? roles = default)
         {
-            return View("Details", _mapper.Map<RestaurantModel>(await _restaurantService.GetRestaurantInfo(id, page, roles)));
+            var restaurants = await _restaurantService.GetRestaurantInfo(id, page, roles);
+            var response = _mapper.Map<RestaurantModel>(restaurants);
+            return View("Details", response);
         }
 
         [HttpPost]

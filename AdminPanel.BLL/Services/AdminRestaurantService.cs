@@ -9,6 +9,7 @@ using DeliveryDeck_Backend_Final.Common.Enumerations;
 using DeliveryDeck_Backend_Final.Common.Interfaces.AdminPanel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System.Net;
 
 namespace AdminPanel.BLL.Services
@@ -49,7 +50,7 @@ namespace AdminPanel.BLL.Services
                 ?? throw new BadHttpRequestException("No such restaurant");
 
             var staff = new List<UserShortDto>();
-            if (staffRoles is null || staffRoles.Contains(RoleType.Cook))
+            if (staffRoles.IsNullOrEmpty() || staffRoles.Contains(RoleType.Cook))
             {
                 var cooks = await _authContext.Cooks
                     .Where(x => restaurant.Cooks.Contains(x.Id))
@@ -59,7 +60,7 @@ namespace AdminPanel.BLL.Services
                 staff = cooks.Select(_mapper.Map<UserShortDto>).ToList();
             }
 
-            if (staffRoles is null || staffRoles.Contains(RoleType.Manager))
+            if (staffRoles.IsNullOrEmpty() || staffRoles.Contains(RoleType.Manager))
             {
                 var managers = await _authContext.Managers
                     .Where(x => restaurant.Managers.Contains(x.Id))
