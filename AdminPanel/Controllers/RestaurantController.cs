@@ -63,7 +63,7 @@ namespace AdminPanel.Controllers
                 return RedirectToAction("Index");
             }
 
-            await _restaurantService.CreateRestaurant(_mapper.Map<RestaurantShortDto>(model));
+            await _restaurantService.CreateRestaurant(_mapper.Map<RestaurantCreateDto>(model));
             return RedirectToAction("Index");
         }
 
@@ -87,6 +87,13 @@ namespace AdminPanel.Controllers
         {
             await _restaurantService.DeleteRestaurant(id);
             return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Update(Guid id, RestaurantCreateModel data)
+        {
+            await _restaurantService.UpdateRestaurant(id, _mapper.Map<RestaurantCreateDto>(data));
+            return RedirectToAction("Details", new { id });
         }
     }
 }

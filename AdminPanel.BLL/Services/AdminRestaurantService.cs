@@ -28,7 +28,7 @@ namespace AdminPanel.BLL.Services
             _mapper = mapper;
         }
 
-        public async Task CreateRestaurant(RestaurantShortDto data)
+        public async Task CreateRestaurant(RestaurantCreateDto data)
         {
             if (await _backendContext.Restaurants.AnyAsync(r => r.Name == data.Name))
             {
@@ -168,6 +168,21 @@ namespace AdminPanel.BLL.Services
             {
                 restaurant.Managers.Remove(staffId);
             }
+
+            await _backendContext.SaveChangesAsync();
+        }
+
+        public async Task UpdateRestaurant(Guid restaurantId, RestaurantCreateDto data)
+        {
+            var restaurant = await _backendContext.Restaurants.FirstOrDefaultAsync(x => x.Id == restaurantId)
+                ?? throw new BadHttpRequestException("No such restaurant");
+
+            if(await _backendContext.Restaurants.AnyAsync(r => r.Name == data.Name))
+            {
+                throw new BadHttpRequestException("Name is already taken");
+            }
+
+            restaurant.Name = data.Name;
 
             await _backendContext.SaveChangesAsync();
         }

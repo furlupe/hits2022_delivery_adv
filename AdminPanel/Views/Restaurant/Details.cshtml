@@ -21,26 +21,74 @@
     </div>
 </div>
 
+<div id="updateRestaurantDialog" class="modal fade">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content p-2">
+            <div class="modal-header">
+                <h5 class="modal-title display-4">Update restaurant</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form class="p-3" asp-controller="Restaurant" asp-action="Update" asp-route-id="@Model.Id">
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <div class="col">
+                            <label for="Name" class="col fs-5">Name</label>
+                            <input class="w-75 ms-3" type="text" id="name" name="Name" value="@Model.Name" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="row mt-2">
+                        <div class="col justify-content-center">
+                            <button type="submit" class="btn btn-outline-success">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <div class="row">
     <div class="col d-flex justify-content-center mb-4">
         <h3 class="display-4">@Model.Name</h3>
     </div>
 </div>
 
-<div class="container bg-white p-2" id="main">
-    <div class="row p-2">
-        <div class="col d-flex justify-content-end">
-            <button class="btn btn-outline-success" id="addStaffButton">+ Add staff</button>
+<div class="container bg-white p-4" id="main">
+    <div class="row">
+        <div class="col-9">
+            <div id="user-list">
+                @await Html.PartialAsync("~/Views/Shared/Partial/StaffListPartial.cshtml", Model)
+            </div>
+            @await Html.PartialAsync("~/Views/Shared/Partial/PaginationAjax.cshtml", new PaginationModel { PageInfo = Model.Staff.PageInfo })
+        </div>
+        <div class="col-2 offset-1">
+            <div class="card">
+                <div class="card-header">Actions</div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <p id="updateRestaurantButton">Edit restaurant</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <p id="addStaffButton">Add staff</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <div id="user-list">
-        @await Html.PartialAsync("~/Views/Shared/Partial/StaffListPartial.cshtml", Model)
-    </div>
-    @await Html.PartialAsync("~/Views/Shared/Partial/PaginationAjax.cshtml", new PaginationModel { PageInfo = Model.Staff.PageInfo })
 </div>
 @section Scripts {
     <script src="~/js/pagination.js"></script>
     <script>
+        $("#updateRestaurantButton").click(function (e) {
+            $("#updateRestaurantDialog").modal('show');
+        })
+
         $("#main").find(".page-link").on("click", function (e) {
             e.preventDefault();
 

@@ -9,8 +9,6 @@ namespace AdminPanel.Mappers
     {
         public RestaurantMapper() 
         {
-            CreateMap<RestaurantCreateModel, RestaurantShortDto>();
-
             CreateMap<RestaurantShortModel, RestaurantShortDto>()
                 .ReverseMap();
 
@@ -24,6 +22,8 @@ namespace AdminPanel.Mappers
 
             CreateMap<PagedStaffDto, StaffListModel>()
                 .ForMember(dest => dest.Staff, ost => ost.MapFrom(src => src.Staff));
+
+            CreateMap<RestaurantCreateModel, RestaurantCreateDto>();
         }
     }
 }
