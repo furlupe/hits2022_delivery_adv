@@ -39,24 +39,18 @@ namespace AdminPanel.Controllers
             return Redirect("https://www.youtube.com/watch?v=VZrDxD0Za9I&list=PLu4wnki9NI_8VmJ7Qz_byhKwCquXcy6u9");
         }
 
-        public async Task<IActionResult>Details(Guid id, List<RoleType>? roles = default)
+        public async Task<IActionResult>Details(Guid id)
         {
             var restaurants = await _restaurantService.GetRestaurantInfo(id);
             var response = _mapper.Map<RestaurantModel>(restaurants);
 
-            ViewBag.RoleManager = roles is null || roles.Contains(RoleType.Manager);
-            ViewBag.CookManager = roles is null || roles.Contains(RoleType.Cook);
-
             return View("Details", response);
         }
 
-        public async Task<IActionResult>StaffPage(Guid id, int page = 1, List<RoleType>? roles = default)
+        public async Task<IActionResult>StaffPage(Guid id, int page = 1)
         {
-            var restaurants = await _restaurantService.GetRestaurantInfo(id, page, roles);
+            var restaurants = await _restaurantService.GetRestaurantInfo(id, page);
             var response = _mapper.Map<RestaurantModel>(restaurants);
-
-            ViewBag.RoleManager = roles is null || roles.Contains(RoleType.Manager);
-            ViewBag.CookManager = roles is null || roles.Contains(RoleType.Cook);
 
             return PartialView("~/Views/Shared/Partial/UserCommonListPartial.cshtml", response.Staff);
         }

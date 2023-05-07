@@ -24,7 +24,7 @@
         </div>
     </div>
     <div id="user-list">
-
+        @await Html.PartialAsync("~/Views/Shared/Partial/UserCommonListPartial.cshtml", Model.Staff)
     </div>
     @await Html.PartialAsync("~/Views/Shared/Partial/PaginationAjax.cshtml", new PaginationModel { PageInfo = Model.Staff.PageInfo })
 </div>
@@ -42,8 +42,6 @@
             getPage(url)
                 .then(result => $("#user-list").html(result));
         });
-
-        $("#main").find(".page-link").first().click();
 
         $("#addStaffButton").click(function(e) {
             e.preventDefault();
