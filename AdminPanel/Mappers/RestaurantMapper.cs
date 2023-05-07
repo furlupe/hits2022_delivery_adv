@@ -19,7 +19,11 @@ namespace AdminPanel.Mappers
             CreateMap<RestaurantListModel, PagedRestaurantsDto>()
                 .ReverseMap();
 
-            CreateMap<StaffModel, StaffDto>();
+            CreateMap<StaffModel, StaffDto>()
+                .ReverseMap();
+
+            CreateMap<PagedStaffDto, StaffListModel>()
+                .ForMember(dest => dest.Staff, ost => ost.MapFrom(src => src.Staff));
         }
     }
 }

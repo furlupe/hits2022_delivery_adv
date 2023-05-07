@@ -3,6 +3,82 @@
 @{
     ViewData["Title"] = "User details";
 }
+<div class="modal fade">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title display-5">Update user</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form class="border border-1 py-3 px-5 bg-white" asp-controller="User" asp-action="Update" asp-route-id="@Model.Id" method="post">
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <div class="col">
+                            <label for="Name" class="col fs-5">Name</label>
+                            <input class="w-75 ms-3" type="text" id="name" name="FullName" value="@Model.FullName"/>
+                        </div>
+                    </div>
+
+                    <div class="form-group row my-3">
+                        <div class="col">
+                            <label for="birthdate" class="col fs-5">Date of birth</label>
+                            <input class="ms-3" type="date" id="birthdate" name="BirthDate" value="@Model.BirthDate.ToString("yyyy-MM-dd")"/>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col">
+                            <label class="fs-5">Sex</label>
+                            <div class="form-check form-check-inline ms-3">
+                                <input class="form-check-input" type="radio" name="Gender" value="@Gender.Male" id="genderRadioMale" checked="@(Model.Gender == Gender.Male)"/>
+                                <label class="form-check-label" for="genderRadioMale">Male</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="Gender" value="@Gender.Female" id="genderRadioFemale" checked="@(Model.Gender == Gender.Female)"/>
+                                <label class="form-check-label" for="genderRadioFemale">Female</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group row my-3">
+                        <div class="col">
+                            <label class="col fs-5">Roles</label>
+                            <div class="form-check form-check-inline ms-3">
+                                <input class="form-check-input" type="checkbox" name="Roles" value="@RoleType.Customer" id="roleCustomerCheck" checked="@(Model.Roles.Contains(RoleType.Customer))"/>
+                                <label class="form-check-label" for="roleCustomer">Customer</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" name="Roles" value="@RoleType.Courier" id="roleCourierCheck" checked="@(Model.Roles.Contains(RoleType.Courier))"/>
+                                <label class="form-check-label" for="roleCourier">Courier</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" name="Roles" value="@RoleType.Cook" id="roleCookCheck" checked="@(Model.Roles.Contains(RoleType.Cook))"/>
+                                <label class="form-check-label" for="roleCook">Cook</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" name="Roles" value="@RoleType.Manager" id="roleManagerCheck" checked="@(Model.Roles.Contains(RoleType.Manager))"/>
+                                <label class="form-check-label" for="roleManager">Manager</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row my-3" id="addressField">
+                        <div class="col">
+                            <label for="Address" class="col fs-5">Address</label>
+                            <input class="ms-3" type="text" id="Address" name="Address" value="@Model.Address"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="row mt-3">
+                        <div class="col">
+                            <button type="submit" class="btn btn-primary">Update</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 <div class="row">
     <div class="col d-flex justify-content-center">
@@ -13,61 +89,83 @@
 <div class="container border bg-white p-4">
     <div class="row">
         <div class="col-9">
-            <form>
-                <div class="row">
-                    <div class="col">
-                        <p class="fs-5">Email</p>
-                        <input class="w-100" disabled value="@Model.Email" />
-                    </div>
-                    <div class="col">
-                        <p class="fs-5">Birthdate</p>
-                        <input type="date" class="w-100" disabled value="@string.Format("{0:yyyy-MM-dd}", Model.BirthDate)" />
-                    </div>
+            <div class="row">
+                <div class="col-2">
+                    <span class="fs-5">Email</span>
                 </div>
-                <div class="row mt-3">
-                    <div class="col">
-                        <p class="fs-5">Sex</p>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="gender" value="@Gender.Male" id="genderRadioMale" disabled checked="@(Model.Gender == Gender.Male)" />
-                            <label class="form-check-label" for="genderRadioMale">Male</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="gender" value="@Gender.Female" id="genderRadioFemale" disabled checked="@(Model.Gender == Gender.Female)" />
-                            <label class="form-check-label" for="genderRadioFemale">Female</label>
-                        </div>
-                    </div>
+                <div class="col border-bottom p-1">
+                    <span>@Model.Email</span>
                 </div>
-            </form>
+            </div>
+            <div class="row mt-3">
+                <div class="col-2">
+                    <span class="fs-5">Birthdate</span>
+                </div>
+                <div class="col border-bottom p-1">
+                    <span>@string.Format("{0:yyyy-MM-dd}", Model.BirthDate)</span>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-2">
+                    <span class="fs-5">Sex</span>
+                </div>
+                <div class="col border-bottom p-1">
+                    <span class="">@(Model.Gender.ToString())</span>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-2">
+                    <span class="fs-5">Roles</span>
+                </div>
+                <div class="col border-bottom p-1">
+                    <span>@string.Join(", ", Model.Roles)</span>
+                </div>
+            </div>
             @{
+                if (Model.Roles.Contains(RoleType.Customer))
+                {
+                    <div class="row mt-3">
+                        <div class="col-2">
+                            <span class="fs-5">Address</span>
+                        </div>
+                        <div class="col border-bottom p-1">
+                            <span class="">@(Model.Address ?? "")</span>
+                        </div>
+                    </div>
+                }
+
                 if (Model.RestaurantAsManager is not null)
                 {
                     <div class="row mt-5">
-                            <div class="col justify-content-center">
-                                <span class="fs-5">Manages</span>
-                                <a class="btn btn-outline-dark ms-4" asp-controller="Restaurant" asp-action="Details" asp-route-id="@Model.RestaurantAsManager.Id">@Model.RestaurantAsManager.Name</a>
-                            </div>
+                        <div class="col-2">
+                            <span class="fs-5">Manages</span>
+                        </div>
+                        <div class="col ps-1">
+                            <a class="btn btn-outline-dark" asp-controller="Restaurant" asp-action="Details" asp-route-id="@Model.RestaurantAsManager.Id">@Model.RestaurantAsManager.Name</a>
+                        </div>
                     </div>
                 }
 
                 if (Model.RestaurantAsCook is not null)
                 {
                     <div class="row mt-3">
-                            <div class="col justify-content-center">
-                                <span class="fs-5">Cooks</span>
-                                <a class="btn btn-outline-dark ms-4" asp-controller="Restaurant" asp-action="Details" asp-route-id="@Model.RestaurantAsCook.Id">@Model.RestaurantAsCook.Name</a>
-                            </div>
+                        <div class="col-2 justify-content-center">
+                            <span class="fs-5">Cooks</span>
+                        </div>
+                        <div class="col ps-1">
+                            <a class="btn btn-outline-dark" asp-controller="Restaurant" asp-action="Details" asp-route-id="@Model.RestaurantAsCook.Id">@Model.RestaurantAsCook.Name</a>
+                        </div>
                     </div>
                 }
             }
         </div>
-
         <div class="col-2 offset-1">
             <div class="card">
                 <div class="card-header">Actions</div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col">
-                            <p>Edit profile</p>
+                            <p onclick="showEditUserWindow()">Edit profile</p>
                         </div>
                     </div>
                     <div class="row">
@@ -80,3 +178,19 @@
         </div>
     </div>
 </div>
+@section Scripts {
+    <script>
+        showEditUserWindow = () => $(".modal").modal('show');
+
+        $("#addressField").hide();
+
+        $('#roleCustomerCheck').change(function () {
+            if (this.checked) {
+                $("#addressField").show();
+                return;
+            }
+
+            $("#addressField").hide();
+        });
+    </script>
+}

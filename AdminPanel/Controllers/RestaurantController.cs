@@ -52,7 +52,7 @@ namespace AdminPanel.Controllers
             var restaurants = await _restaurantService.GetRestaurantInfo(id, page);
             var response = _mapper.Map<RestaurantModel>(restaurants);
 
-            return PartialView("~/Views/Shared/Partial/UserCommonListPartial.cshtml", response.Staff);
+            return PartialView("~/Views/Shared/Partial/StaffListPartial.cshtml", response);
         }
 
         [HttpPost]
@@ -72,6 +72,13 @@ namespace AdminPanel.Controllers
         {
             await _restaurantService.AddStaffToRestaurant(restaurantId, _mapper.Map<StaffDto>(data));
             return NoContent();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DismissStaff(Guid restaurantId, Guid staffId, RoleType fromRole)
+        {
+            await _restaurantService.DismissStaffFromRestaurant(restaurantId, staffId, fromRole);
+            return RedirectToAction("Details", new {id = restaurantId});
         }
         
 

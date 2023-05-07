@@ -49,39 +49,47 @@ namespace AdminPanel.BLL.Services
                 .FirstOrDefaultAsync(r => r.Id == id)
                 ?? throw new BadHttpRequestException("No such restaurant");
 
-            var staff = new List<UserShortDto>();
+            var cooks = new List<StaffDto>();
+            var managers = new List<StaffDto>();
+
             if (staffRoles.IsNullOrEmpty() || staffRoles.Contains(RoleType.Cook))
             {
-                var cooks = await _authContext.Cooks
-                    .Where(x => restaurant.Cooks.Contains(x.Id))
-                    .Include(x => x.User.Roles)
-                        .ThenInclude(r => r.Role)
-                    .Select(x => x.User)
-                    .ToListAsync();
+                cooks = (
+                        await _authContext.Cooks
+                        .Where(x => restaurant.Cooks.Contains(x.Id))
+                        .Select(x => x.User)
+                        .ToListAsync()
+                    )
+                    .Select(_mapper.Map<StaffDto>)
+                    .ToList();
 
-                staff.AddRange(cooks.Select(_mapper.Map<UserShortDto>).ToList());
+                cooks.ForEach(x => x.Role = RoleType.Cook);
             }
 
             if (staffRoles.IsNullOrEmpty() || staffRoles.Contains(RoleType.Manager))
             {
-                var managers = await _authContext.Managers
-                    .Where(x => restaurant.Managers.Contains(x.Id))
-                    .Include(x => x.User.Roles)
-                        .ThenInclude(r => r.Role)
-                    .Select(x => x.User)
-                    .ToListAsync();
+                managers = (
+                        await _authContext.Managers
+                        .Where(x => restaurant.Managers.Contains(x.Id))
+                        .Select(x => x.User)
+                        .ToListAsync()
+                    )
+                    .Select(_mapper.Map<StaffDto>)
+                    .ToList();
 
-                staff.AddRange(managers.Select(_mapper.Map<UserShortDto>).ToList());
+                managers.ForEach(x => x.Role = RoleType.Manager);
             }
+
+            var staff = managers.Concat(cooks);
 
             return new RestaurantDto
             {
                 Id = id,
                 Name = restaurant.Name,
-                Staff = new PagedUsersDto
+                Staff = new PagedStaffDto
                 {
-                    Users = staff.Skip((page - 1) * _RestaurantPageSize).Take(_RestaurantPageSize).ToList(),
-                    PageInfo = new PageInfo(staff.Count, _RestaurantPageSize, page)
+                    Staff = staff.Skip((page - 1) * _RestaurantPageSize).Take(_RestaurantPageSize).ToList(),
+                    PageInfo = new PageInfo(staff.Count(), _RestaurantPageSize, page)
                 }
             };
         }
@@ -125,7 +133,7 @@ namespace AdminPanel.BLL.Services
             var restaurant = await _backendContext.Restaurants.FirstOrDefaultAsync(x => x.Id == restaurantId)
                 ?? throw new BadHttpRequestException("No such restaurant");
 
-            if(await _backendContext.Restaurants.AnyAsync(r => r.Managers.Concat(r.Cooks).Contains(data.Id)))
+            if(await _backendContext.Restaurants.AnyAsync(r => r.Managers.Contains(data.Id) && r.Cooks.Contains(data.Id)))
             {
                 throw new BadHttpRequestException("User is already taken");
             }
@@ -141,6 +149,24 @@ namespace AdminPanel.BLL.Services
             else
             {
                 throw new BadHttpRequestException("Unsupported restaurant staff type");
+            }
+
+            await _backendContext.SaveChangesAsync();
+        }
+
+        public async Task DismissStaffFromRestaurant(Guid restaurantId, Guid staffId, RoleType fromRole)
+        {
+            var restaurant = await _backendContext.Restaurants.FirstOrDefaultAsync(x => x.Id == restaurantId)
+                ?? throw new BadHttpRequestException("No such restaurant");
+
+            if (fromRole == RoleType.Cook)
+            {
+                restaurant.Cooks.Remove(staffId);
+            }
+
+            else if (fromRole == RoleType.Manager)
+            {
+                restaurant.Managers.Remove(staffId);
             }
 
             await _backendContext.SaveChangesAsync();

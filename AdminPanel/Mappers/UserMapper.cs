@@ -11,7 +11,11 @@ namespace AdminPanel.Mappers
             CreateMap<PagedUsersDto, UserListModel>();
             CreateMap<UserShortDto, UserShortModel>()
                 .ForMember(dest => dest.FullName, ost => ost.MapFrom(src => src.Name));
+
             CreateMap<UserExtendedDto, UserModel>();
+
+            CreateMap<AvailableStaffDto, AvailableStaffModel>();
+            CreateMap<PagedAvailableStaffDto, AvailableStaffListModel>();
 
             CreateMap<UserCreateModel, UserCreateDto>();
         }

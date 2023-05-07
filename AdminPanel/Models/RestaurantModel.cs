@@ -2,6 +2,6 @@
 {
     public class RestaurantModel : RestaurantShortModel
     {
-        public UserListModel Staff { get; set; }
+        public StaffListModel Staff { get; set; }
     }
 }

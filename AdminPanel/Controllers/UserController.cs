@@ -24,22 +24,16 @@ namespace AdminPanel.Controllers
             return View("Index",response);
         }
 
-        public async Task<IActionResult> UsersPage(int page = 1, List<RoleType>? roles = default)
+        public async Task<IActionResult> UsersPage(int page = 1)
         {
-            return PartialView("~/Views/Shared/Partial/UserListPartial.cshtml", _mapper.Map<UserListModel>(await _userService.GetUsers(page, roles)));
+            return PartialView("~/Views/Shared/Partial/UserListPartial.cshtml", _mapper.Map<UserListModel>(await _userService.GetUsers(page)));
         }
 
         public async Task<IActionResult> UsersChoosePage(int page = 1)
         {
-            var response = _mapper.Map<UserListModel>(await _userService.GetUsers(page, new List<RoleType> { RoleType.Manager, RoleType.Cook }, true));
+            var response = _mapper.Map<AvailableStaffListModel>(await _userService.GetAvailableStaff(page));
             ViewBag.PageInfo = response.PageInfo;
             return PartialView("~/Views/Shared/Partial/UserChooseListPartial.cshtml", response);
-        }
-
-        [HttpGet]
-        public IActionResult Create()
-        {
-            return View("Create");
         }
 
         [HttpPost]
@@ -47,6 +41,13 @@ namespace AdminPanel.Controllers
         {
             await _userService.CreateUser(_mapper.Map<UserCreateDto>(data));
             return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Update(Guid id, UserCreateModel data)
+        {
+            await _userService.UpdateUser(id, _mapper.Map<UserCreateDto>(data));
+            return RedirectToAction("Details", new {id});
         }
 
         public async Task<IActionResult> Delete(Guid id)

@@ -1,9 +1,9 @@
 ﻿@model CardCRUDElementsModel
 <div class="col d-flex justify-content-end my-auto">
-    <form asp-controller="@Model.Controller" asp-action="Delete" asp-route-id="@Model.Id" method="post">
-        <button type="submit" class="btn btn-outline-danger mx-2">D</button>
-    </form>
     <form asp-controller="@Model.Controller" asp-action="Details" asp-route-id="@Model.Id" method="get">
         <button type="submit" class="btn btn-outline-secondary mx-2">Details</button>
+    </form>
+    <form asp-controller="@Model.Controller" asp-action="Delete" asp-route-id="@Model.Id" method="post">
+        <button type="submit" class="btn btn-outline-danger mx-2">D</button>
     </form>
 </div>

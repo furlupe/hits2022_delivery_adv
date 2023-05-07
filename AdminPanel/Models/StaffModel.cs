@@ -5,6 +5,7 @@ namespace AdminPanel.Models
     public class StaffModel
     {
         public Guid Id { get; set; }
+        public string FullName { get; set; }
         public RoleType Role { get; set; }
     }
 }

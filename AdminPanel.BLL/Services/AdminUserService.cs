@@ -2,7 +2,6 @@
 using DeliveryDeck_Backend_Final.Auth.DAL;
 using DeliveryDeck_Backend_Final.Auth.DAL.Entities;
 using DeliveryDeck_Backend_Final.Backend.DAL;
-using DeliveryDeck_Backend_Final.Backend.DAL.Entities;
 using DeliveryDeck_Backend_Final.Common.DTO.AdminPanel;
 using DeliveryDeck_Backend_Final.Common.DTO.Backend;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
@@ -10,7 +9,6 @@ using DeliveryDeck_Backend_Final.Common.Interfaces.AdminPanel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 
 namespace AdminPanel.BLL.Services
 {
@@ -39,11 +37,6 @@ namespace AdminPanel.BLL.Services
                 Gender = data.Gender,
                 Email = data.Email
             };
-
-            if(data.Roles.Contains(RoleType.Customer))
-            {
-                user.Customer = new Customer { Address = data.Address };
-            }
 
             foreach(var roletype in data.Roles)
             {
@@ -78,6 +71,39 @@ namespace AdminPanel.BLL.Services
             await _authContext.SaveChangesAsync();
         }
 
+        public async Task<PagedAvailableStaffDto> GetAvailableStaff(int page = 1)
+        {
+            var query = await _authContext.Users
+               .Include(x => x.Roles)
+                   .ThenInclude(r => r.Role)
+               .ToListAsync();
+
+            var available = new List<AvailableStaffDto>();
+            foreach(var user in query)
+            {
+                var availableAsCook = await _backendContext.Restaurants.AllAsync(r => !r.Cooks.Contains(user.Id));
+                var availableAsManager = await _backendContext.Restaurants.AllAsync(r => !r.Managers.Contains(user.Id));
+
+                if (availableAsCook || availableAsManager)
+                {
+                    available.Add(new AvailableStaffDto 
+                    {
+                        Id = user.Id,
+                        FullName = user.FullName,
+                        AvailableAsCook = availableAsCook,
+                        AvailableAsManager = availableAsManager
+                    });
+
+                }
+            }
+
+            return new PagedAvailableStaffDto
+            {
+                PageInfo = new PageInfo(available.Count, _UserPageSize, page),
+                Users = available.Skip((page - 1) * _UserPageSize).Take(_UserPageSize).ToList()
+            };
+        }
+
         public async Task<UserExtendedDto> GetUserInfo(Guid id)
         {
             var user = await _authContext.Users
@@ -110,22 +136,12 @@ namespace AdminPanel.BLL.Services
             return response;
         }
 
-        public async Task<PagedUsersDto> GetUsers(int page = 1, List<RoleType>? roles = default, bool availableOnly = false)
+        public async Task<PagedUsersDto> GetUsers(int page = 1)
         {
             var query = await _authContext.Users
                 .Include(x => x.Roles)
                     .ThenInclude(r => r.Role)
-                .Where(x => roles.IsNullOrEmpty() || x.Roles.Any(r => roles.Contains(r.Role.Type)))
                 .ToListAsync();
-
-            if (availableOnly)
-            {
-                var restaurants = await _backendContext.Restaurants
-                    .Select(r => new {r.Managers, r.Cooks})
-                    .ToListAsync();
-
-                query = query.Where(x => ! restaurants.Any(r => r.Managers.Concat(r.Cooks).Contains(x.Id))).ToList();
-            }
 
             var response = new PagedUsersDto
             {
@@ -136,14 +152,84 @@ namespace AdminPanel.BLL.Services
                 .Take(_UserPageSize)
                 .ToList();
 
-            foreach (var user in users)
-            {
-                response.Users.Add(_mapper.Map<UserShortDto>(user));
-            }
+            response.Users = users.Select(_mapper.Map<UserShortDto>).ToList();
 
             return response;
         }
 
+        public async Task UpdateUser(Guid id, UserCreateDto data)
+        {
+            var user = await _authContext.Users
+                .Include(x => x.Roles)
+                    .ThenInclude(r => r.Role)
+                .Include(x => x.Manager)
+                .Include(x => x.Cook)
+                .Include(x => x.Customer)
+                .FirstOrDefaultAsync(x => x.Id == id)
+                ?? throw new BadHttpRequestException("No such user");
 
+            if (await _userMgr.IsInRoleAsync(user, RoleType.Manager.ToString()) && ! data.Roles.Contains(RoleType.Manager))
+            {
+                var restaurant = await _backendContext.Restaurants.FirstOrDefaultAsync(x => x.Managers.Contains(id));
+                restaurant?.Managers.Remove(id);
+            }
+
+            if (await _userMgr.IsInRoleAsync(user, RoleType.Cook.ToString()) && ! data.Roles.Contains(RoleType.Cook))
+            {
+                var restaurant = await _backendContext.Restaurants.FirstOrDefaultAsync(x => x.Cooks.Contains(id));
+                restaurant?.Cooks.Remove(id);
+            }
+
+            user.FullName = data.FullName;
+            user.BirthDate = data.BirthDate;
+            user.Gender = data.Gender;
+
+            var removedRoles = user.Roles
+                .Where(r => !data.Roles.Contains(r.Role.Type))
+                .Select(x => x.Role.Type)
+                .ToList();
+
+            await _userMgr.RemoveFromRolesAsync(user, removedRoles.Select(x => x.ToString()));
+
+            foreach (var role in removedRoles)
+            {
+                switch (role)
+                {
+                    case RoleType.Customer:
+                        _authContext.Customers.Remove(user.Customer); break;
+                    case RoleType.Manager:
+                        _authContext.Managers.Remove(user.Manager); break;
+                    case RoleType.Cook:
+                        _authContext.Cooks.Remove(user.Cook); break;
+                    case RoleType.Courier:
+                        _authContext.Couriers.Remove(user.Courier); break;
+                }
+            }
+
+            foreach(var role in data.Roles.Where(r => ! user.Roles.Select(r => r.Role.Type).Contains(r)))
+            {
+                switch (role)
+                {
+                    case RoleType.Customer:
+                        user.Customer = new Customer { Address = data.Address }; break;
+                    case RoleType.Manager:
+                        user.Manager = new Manager(); break;
+                    case RoleType.Cook:
+                        user.Cook = new Cook(); break;
+                    case RoleType.Courier:
+                        user.Courier = new Courier(); break;
+                }
+
+                await _userMgr.AddToRoleAsync(user, role.ToString());
+            }
+
+            if (data.Roles.Contains(RoleType.Customer))
+            {
+                user.Customer.Address = data.Address;
+            }
+
+            await _backendContext.SaveChangesAsync();
+            await _authContext.SaveChangesAsync();
+        }
     }
 }

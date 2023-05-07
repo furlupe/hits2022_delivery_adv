@@ -13,6 +13,9 @@ namespace AdminPanel.BLL.Mappers
             CreateMap<RestaurantDto, Restaurant>()
                 .ReverseMap();
 
+            CreateMap<AppUser, StaffDto>();
+            CreateMap<AppUser, AvailableStaffDto>();
+
             CreateMap<Restaurant, RestaurantShortDto>();
 
             CreateMap<AppUser, UserShortDto>()
