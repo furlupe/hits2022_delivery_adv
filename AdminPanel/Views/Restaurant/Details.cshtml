@@ -8,7 +8,7 @@
     <div class="modal-dialog modal-xl">
         <div class="modal-content p-2" id="dialogContent"></div>
     </div>
-    <div id="modalPagination mb-2"></div>
+    <div id="modalPagination" class="mb-2"></div>
 </div>
 
 <div class="row">
@@ -17,8 +17,8 @@
     </div>
 </div>
 
-<div class="container bg-white" id="main">
-    <div class="row p-3">
+<div class="container bg-white p-2" id="main">
+    <div class="row p-2">
         <div class="col d-flex justify-content-end">
             <button class="btn btn-outline-success" id="addStaffButton">+ Add staff</button>
         </div>
@@ -69,7 +69,6 @@
                         .then(function(result) {
                             $("#modalPagination").html(result);
                             $("#addStaffDialog").find(".page-link").click(function () {
-                                console.log($(this));
 
                                 var url = "@Html.Raw(Url.Action("UsersChoosePage", "User", new { page = "__page__"}))";
 
@@ -79,7 +78,7 @@
                                     .then(function (result) {
                                         $("#dialogContent").html(result)
 
-                                        console.log($("#asCookButton"));
+                                        console.log(result);
 
                                         $(".asCookButton").click(function () {
                                             console.log("asd");
