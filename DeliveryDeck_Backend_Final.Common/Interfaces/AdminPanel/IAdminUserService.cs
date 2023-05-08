@@ -8,7 +8,7 @@ namespace DeliveryDeck_Backend_Final.Common.Interfaces.AdminPanel
         public Task<PagedUsersDto> GetUsers(int page = 1);
         public Task<PagedAvailableStaffDto> GetAvailableStaff(int page = 1);
         public Task CreateUser(UserCreateDto data);
-        public Task UpdateUser(Guid id, UserCreateDto data);
+        public Task UpdateUser(Guid id, UserUpdateDto data);
         public Task DeleteUser(Guid id);
         public Task<UserExtendedDto> GetUserInfo(Guid id);
     }

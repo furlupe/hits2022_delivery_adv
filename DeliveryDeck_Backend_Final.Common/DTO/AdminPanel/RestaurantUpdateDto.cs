@@ -2,7 +2,7 @@
 
 namespace DeliveryDeck_Backend_Final.Common.DTO.AdminPanel
 {
-    public class RestaurantCreateDto
+    public class RestaurantUpdateDto
     {
         [Required(ErrorMessage = "Name field must not be empty")]
         [MinLength(1)]

@@ -1,7 +1,6 @@
 ﻿using AdminPanel.Models;
 using AutoMapper;
 using DeliveryDeck_Backend_Final.Common.DTO.AdminPanel;
-using DeliveryDeck_Backend_Final.Common.DTO.Backend;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
 using DeliveryDeck_Backend_Final.Common.Interfaces.AdminPanel;
 using Microsoft.AspNetCore.Mvc;
@@ -29,7 +28,7 @@ namespace AdminPanel.Controllers
         {
             ViewBag.Name = name;
             return PartialView(
-                "~/Views/Shared/Partial/RestaurantListPartial.cshtml", 
+                "RestaurantListPartial", 
                 _mapper.Map<RestaurantListModel>(await _restaurantService.GetRestaurants(page, name))
             );
         }
@@ -52,7 +51,7 @@ namespace AdminPanel.Controllers
             var restaurants = await _restaurantService.GetRestaurantInfo(id, page);
             var response = _mapper.Map<RestaurantModel>(restaurants);
 
-            return PartialView("~/Views/Shared/Partial/StaffListPartial.cshtml", response);
+            return PartialView("StaffListPartial", response);
         }
 
         [HttpPost]
@@ -90,9 +89,12 @@ namespace AdminPanel.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Update(Guid id, RestaurantCreateModel data)
+        public async Task<IActionResult> Update(Guid id, RestaurantUpdateModel data)
         {
-            await _restaurantService.UpdateRestaurant(id, _mapper.Map<RestaurantCreateDto>(data));
+            if (ModelState.IsValid)
+            {
+                await _restaurantService.UpdateRestaurant(id, _mapper.Map<RestaurantUpdateDto>(data));
+            }
             return RedirectToAction("Details", new { id });
         }
     }

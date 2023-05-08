@@ -11,30 +11,14 @@
                 <h5 class="modal-title display-5">Add restaurant</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form class="border border-1 py-3 px-5 bg-white" asp-controller="Restaurant" asp-action="CreateRestaurant" method="post">
-                <div class="modal-body">
-                    <div class="row">
-                        <label for="name" class="col">Name</label>
-                    </div>
-                    <div class="form-group row">
-                        <div class="col">
-                            <input type="text" id="name" name="Name" placeholder="Name..." />
-                        </div>
-                    </div>
-                </div>
-                <div class="row mt-3 modal-footer">
-                    <div class="col">
-                        <button type="submit" class="btn btn-primary">Create</button>
-                    </div>
-                </div>
-            </form>
+            @await Html.PartialAsync("RestaurantCreateForm", new RestaurantCreateModel())
         </div>
     </div>
 </div>
 
 <div class="container">
     <div class="row">
-        @await Html.PartialAsync("~/Views/Shared/Partial/SearchByName.cshtml", new SearchFieldModel {Controller = "Restaurant"})
+        @await Html.PartialAsync("SearchByName", new SearchFieldModel {Controller = "Restaurant"})
         <div class="col d-flex justify-content-end">
             <a class="btn btn-outline-success" onclick="showRestaurantCreationForm()">+ Add restaurant</a>
         </div>

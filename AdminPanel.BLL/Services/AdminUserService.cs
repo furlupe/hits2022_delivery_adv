@@ -157,7 +157,7 @@ namespace AdminPanel.BLL.Services
             return response;
         }
 
-        public async Task UpdateUser(Guid id, UserCreateDto data)
+        public async Task UpdateUser(Guid id, UserUpdateDto data)
         {
             var user = await _authContext.Users
                 .Include(x => x.Roles)

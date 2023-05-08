@@ -26,14 +26,14 @@ namespace AdminPanel.Controllers
 
         public async Task<IActionResult> UsersPage(int page = 1)
         {
-            return PartialView("~/Views/Shared/Partial/UserListPartial.cshtml", _mapper.Map<UserListModel>(await _userService.GetUsers(page)));
+            return PartialView("UserListPartial", _mapper.Map<UserListModel>(await _userService.GetUsers(page)));
         }
 
         public async Task<IActionResult> UsersChoosePage(int page = 1)
         {
             var response = _mapper.Map<AvailableStaffListModel>(await _userService.GetAvailableStaff(page));
             ViewBag.PageInfo = response.PageInfo;
-            return PartialView("~/Views/Shared/Partial/UserChooseListPartial.cshtml", response);
+            return PartialView("UserChooseListPartial", response);
         }
 
         [HttpPost]
@@ -44,9 +44,9 @@ namespace AdminPanel.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Update(Guid id, UserCreateModel data)
+        public async Task<IActionResult> Update(Guid id, UserUpdateModel data)
         {
-            await _userService.UpdateUser(id, _mapper.Map<UserCreateDto>(data));
+            await _userService.UpdateUser(id, _mapper.Map<UserUpdateDto>(data));
             return RedirectToAction("Details", new {id});
         }
 

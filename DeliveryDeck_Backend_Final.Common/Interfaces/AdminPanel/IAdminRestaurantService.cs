@@ -13,7 +13,7 @@ namespace DeliveryDeck_Backend_Final.Common.Interfaces.AdminPanel
         public Task<RestaurantDto> GetRestaurantInfo(Guid id, int page = 1, List<RoleType>? staffRoles = default);
         public Task AddStaffToRestaurant(Guid restaurantId, StaffDto data);
         public Task DismissStaffFromRestaurant(Guid restaurantId, Guid staffId, RoleType fromRole);
-        public Task UpdateRestaurant(Guid restaurantId, RestaurantCreateDto data);
+        public Task UpdateRestaurant(Guid restaurantId, RestaurantUpdateDto data);
         public Task DeleteRestaurant(Guid id);
     }
 }

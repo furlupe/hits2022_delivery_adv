@@ -172,7 +172,7 @@ namespace AdminPanel.BLL.Services
             await _backendContext.SaveChangesAsync();
         }
 
-        public async Task UpdateRestaurant(Guid restaurantId, RestaurantCreateDto data)
+        public async Task UpdateRestaurant(Guid restaurantId, RestaurantUpdateDto data)
         {
             var restaurant = await _backendContext.Restaurants.FirstOrDefaultAsync(x => x.Id == restaurantId)
                 ?? throw new BadHttpRequestException("No such restaurant");

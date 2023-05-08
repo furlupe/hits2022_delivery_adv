@@ -9,8 +9,7 @@ namespace AdminPanel.Mappers
         public UserMapper() 
         {
             CreateMap<PagedUsersDto, UserListModel>();
-            CreateMap<UserShortDto, UserShortModel>()
-                .ForMember(dest => dest.FullName, ost => ost.MapFrom(src => src.Name));
+            CreateMap<UserShortDto, UserShortModel>();
 
             CreateMap<UserExtendedDto, UserModel>();
 
@@ -18,6 +17,7 @@ namespace AdminPanel.Mappers
             CreateMap<PagedAvailableStaffDto, AvailableStaffListModel>();
 
             CreateMap<UserCreateModel, UserCreateDto>();
+            CreateMap<UserUpdateModel, UserUpdateDto>();
         }
     }
 }

@@ -1,0 +1,81 @@
+﻿@using DeliveryDeck_Backend_Final.Common.Enumerations;
+@model UserCreateModel
+<form class="border border-1 py-3 px-5 bg-white" asp-controller="User" asp-action="Create" method="post">
+    <div class="modal-body">
+        <div class="form-group row">
+            <div class="col">
+                <label asp-for="FullName" class="col fs-5">Name</label>
+                <input class="w-75 ms-3" type="text" id="name" asp-for="FullName" />
+                <p><span asp-validation-for="FullName" class="text-danger"></span></p>
+            </div>
+        </div>
+
+        <div class="form-group row my-3">
+            <div class="col">
+                <label asp-for="Email" class="col fs-5">E-mail</label>
+                <input class="ms-3 w-75" type="email" id="email" asp-for="Email" />
+                <p><span asp-validation-for="Email" class="text-danger"></span></p>
+            </div>
+        </div>
+
+        <div class="form-group row my-3">
+            <div class="col">
+                <label asp-for="Password" class="col fs-5">Password</label>
+                <input class="ms-3 w-75" type="password" id="password" asp-for="Password" />
+                <p><span asp-validation-for="Password" class="text-danger"></span></p>
+            </div>
+        </div>
+
+        <div class="form-group row my-3">
+            <div class="col">
+                <label asp-for="BirthDate" class="col fs-5">Date of birth</label>
+                <input class="ms-3" type="date" id="birthdate" asp-for="BirthDate" />
+                <p><span asp-validation-for="BirthDate" class="text-danger"></span></p>
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col">
+                <label class="fs-5">Sex</label>
+                <div class="form-check form-check-inline ms-3">
+                    <input class="form-check-input" type="radio" asp-for="Gender" value="@Gender.Male" id="genderRadioMale" />
+                    <label class="form-check-label" asp-for="Gender">Male</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" asp-for="Gender" value="@Gender.Female" id="genderRadioFemale" />
+                    <label class="form-check-label" asp-for="Gender">Female</label>
+                </div>
+                <p><span asp-validation-for="Gender" class="text-danger"></span></p>
+            </div>
+        </div>
+
+        <div class="form-group row my-3">
+            <div class="col">
+                <label class="col fs-5">Roles</label>
+                @{
+                    var roleTypes = Enum.GetValues(typeof(RoleType)).Cast<RoleType>();
+                    foreach (var role in roleTypes)
+                    {
+                        <div class="form-check form-check-inline ms-3">
+                            <input class="form-check-input" type="checkbox" value="@role" id="roleCustomerCheck" name="Roles" />
+                            <label class="form-check-label" for="Roles">@role.ToString()</label>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+        <div class="form-group row my-3" id="addressField">
+            <div class="col">
+                <label for="Address" class="col fs-5">Address</label>
+                <input class="ms-3" type="text" id="Address" name="Address" />
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <div class="row mt-3">
+            <div class="col">
+                <button type="submit" class="btn btn-primary">Create</button>
+            </div>
+        </div>
+    </div>
+</form>

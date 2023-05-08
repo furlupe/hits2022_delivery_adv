@@ -19,8 +19,7 @@ namespace AdminPanel.BLL.Mappers
             CreateMap<Restaurant, RestaurantShortDto>();
 
             CreateMap<AppUser, UserShortDto>()
-                .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => src.RoleTypes))
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.FullName));
+                .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => src.RoleTypes));
 
             CreateMap<AppUser, UserExtendedDto>()
                 .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => src.RoleTypes));

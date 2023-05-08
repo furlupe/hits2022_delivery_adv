@@ -24,6 +24,7 @@ namespace AdminPanel.Mappers
                 .ForMember(dest => dest.Staff, ost => ost.MapFrom(src => src.Staff));
 
             CreateMap<RestaurantCreateModel, RestaurantCreateDto>();
+            CreateMap<RestaurantUpdateModel, RestaurantUpdateDto>();
         }
     }
 }
