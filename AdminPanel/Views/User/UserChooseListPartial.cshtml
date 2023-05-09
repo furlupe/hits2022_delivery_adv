@@ -8,7 +8,7 @@
 @{
     foreach (var user in Model.Users)
     {
-        <div class="container card card-body my-2">
+        <div class="container card card-body my-2 @(user.IsBanned ? "bg-danger" : "bg-white")">
             <div class="row">
                 <div class="col-2 d-flex">
                     <div class="container">

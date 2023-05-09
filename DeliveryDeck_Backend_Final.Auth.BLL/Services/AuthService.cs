@@ -33,6 +33,11 @@ namespace DeliveryDeck_Backend_Final.Auth.BLL.Services
                 throw new BadHttpRequestException("Invalid credentials");
             }
 
+            if (user.IsBanned)
+            {
+                throw new BadHttpRequestException("You are banned lmaoooo");
+            }
+
             return await CreateTokenPair(user);
 
         }

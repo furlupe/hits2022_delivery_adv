@@ -60,5 +60,11 @@ namespace AdminPanel.Controllers
         {
             return View("Details", _mapper.Map<UserModel>(await _userService.GetUserInfo(id)));
         }
+
+        public async Task<IActionResult> BanUser(Guid id)
+        {
+            await _userService.BanUser(id);
+            return RedirectToAction("Details", new {id});
+        }
     }
 }

@@ -63,6 +63,23 @@
                     <span>@string.Join(", ", Model.Roles)</span>
                 </div>
             </div>
+            <div class="row mt-3">
+                <div class="col-2">
+                    <span class="fs-5">Status</span>
+                </div>
+                <div class="col border-bottom p-1">
+                    @{
+                        if (Model.IsBanned)
+                        {
+                            <span class="text-danger">Banned</span>
+                        }
+                        else
+                        {
+                            <span>Active</span>
+                        }
+                    }
+                </div>
+            </div>
             @{
                 if (Model.Roles.Contains(RoleType.Customer))
                 {
@@ -107,12 +124,14 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col">
-                            <p onclick="showEditUserWindow()">Edit profile</p>
+                            <button class="btn" onclick="showEditUserWindow()">Edit profile</button>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col">
-                            <p>Kill yourself</p>
+                            <form asp-controller="User" asp-action="BanUser" asp-route-id="@Model.Id">
+                                <button type="submit" class="btn text-danger">Ban</button>
+                            </form>
                         </div>
                     </div>
                 </div>

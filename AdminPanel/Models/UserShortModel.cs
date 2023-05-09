@@ -6,6 +6,7 @@ namespace AdminPanel.Models
     {
         public Guid Id { get; set; }
         public string FullName { get; set; }
+        public bool IsBanned { get; set; }
         public List<RoleType> Roles { get; set; }
     }
 }

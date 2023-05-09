@@ -28,6 +28,15 @@ namespace AdminPanel.BLL.Services
             _userMgr = userMgr;
         }
 
+        public async Task BanUser(Guid id)
+        {
+            var user = await _authContext.Users.FirstOrDefaultAsync(x => x.Id == id)
+                ?? throw new BadHttpRequestException("No such user");
+
+            user.IsBanned = true;
+            await _authContext.SaveChangesAsync();
+        }
+
         public async Task CreateUser(UserCreateDto data)
         {
             var user = new AppUser
