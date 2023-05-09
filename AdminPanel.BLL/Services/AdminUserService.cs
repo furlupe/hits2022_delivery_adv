@@ -85,8 +85,13 @@ namespace AdminPanel.BLL.Services
             var available = new List<AvailableStaffDto>();
             foreach(var user in query)
             {
-                var availableAsCook = await _backendContext.Restaurants.AllAsync(r => !r.Cooks.Contains(user.Id)) && await _userMgr.IsInRoleAsync(user, RoleType.Cook.ToString());
-                var availableAsManager = await _backendContext.Restaurants.AllAsync(r => !r.Managers.Contains(user.Id)) && await _userMgr.IsInRoleAsync(user, RoleType.Manager.ToString());
+                var availableAsCook = 
+                    await _backendContext.Restaurants.AllAsync(r => !r.Cooks.Contains(user.Id)) 
+                    && await _userMgr.IsInRoleAsync(user, RoleType.Cook.ToString());
+
+                var availableAsManager = 
+                    await _backendContext.Restaurants.AllAsync(r => !r.Managers.Contains(user.Id)) 
+                    && await _userMgr.IsInRoleAsync(user, RoleType.Manager.ToString());
 
                 if (availableAsCook || availableAsManager)
                 {
@@ -120,6 +125,11 @@ namespace AdminPanel.BLL.Services
                 .FirstOrDefaultAsync(x => x.Id == id)
                 ?? throw new BadHttpRequestException("No such user");
 
+            if (await _userMgr.IsInRoleAsync(user, RoleType.Admin.ToString()))
+            {
+                throw new BadHttpRequestException("Denied", StatusCodes.Status403Forbidden);
+            }
+
             var response = _mapper.Map<UserExtendedDto>(user);
 
             if (user.Customer is not null)
@@ -145,6 +155,7 @@ namespace AdminPanel.BLL.Services
             var query = await _authContext.Users
                 .Include(x => x.Roles)
                     .ThenInclude(r => r.Role)
+                .Where(x => x.Roles.All(x => x.Role.Type != RoleType.Admin))
                 .ToListAsync();
 
             var response = new PagedUsersDto

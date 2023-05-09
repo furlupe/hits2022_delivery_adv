@@ -85,22 +85,22 @@ namespace DeliveryDeck_Backend_Final.Auth.BLL.Extensions
             using var scope = app.Services.CreateScope();
             var userMgr = scope.ServiceProvider.GetService<UserManager<AppUser>>();
 
-            if (await userMgr.FindByEmailAsync("manager@example.com") is not null)
+            if (await userMgr.FindByEmailAsync("admin@example.com") is not null)
             {
                 return app;
             }
 
-            var mgr = new AppUser
+            var admin = new AppUser
             {
-                FullName = "manag",
+                FullName = "admin",
                 BirthDate = DateTime.UtcNow,
                 Gender = Gender.Female,
-                Email = "manager@example.com"
+                Email = "admin@example.com"
             };
 
-            var result = await userMgr.CreateAsync(mgr, "_String1");
+            var result = await userMgr.CreateAsync(admin, "_String1");
             if (!result.Succeeded) { return app; }
-            await userMgr.AddToRoleAsync(mgr, RoleType.Manager.ToString());
+            await userMgr.AddToRoleAsync(admin, RoleType.Admin.ToString());
 
             return app;
         }

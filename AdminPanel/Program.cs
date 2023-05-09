@@ -1,5 +1,6 @@
 using AdminPanel.Mappers;
 using AdminPanel.BLL.Extensions;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,7 +11,16 @@ builder.Services
 
 builder.Services.AddAutoMapper(typeof(RestaurantMapper));
 builder.Services.AddAutoMapper(typeof(UserMapper));
+builder.Services.AddAutoMapper(typeof(AuthMapper));
+
 builder.UseAdminComponent();
+
+builder.Services
+    .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(opt =>
+    {
+        opt.AccessDeniedPath = "/Account/Login";
+    });
 
 var app = builder.Build();
 
@@ -28,6 +38,7 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
+app.UseAuthentication();
 
 app.MapControllerRoute(
     name: "default",

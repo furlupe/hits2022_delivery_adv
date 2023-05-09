@@ -1,0 +1,9 @@
+﻿@{
+    ViewData["Title"] = "Oops";
+}
+@model ErrorModel
+<div class="text-center">
+    <h1 class="display-4">Oops! An error occured...</h1>
+    <p>Status code: @Model.StatusCode</p>
+    <p Message: @Model.Message></p>
+</div>

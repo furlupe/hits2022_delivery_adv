@@ -3,10 +3,13 @@ using AutoMapper;
 using DeliveryDeck_Backend_Final.Common.DTO.AdminPanel;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
 using DeliveryDeck_Backend_Final.Common.Interfaces.AdminPanel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static DeliveryDeck_Backend_Final.Common.Filters.RoleRequirementAuthorization;
 
 namespace AdminPanel.Controllers
 {
+    [RoleRequirementAuthorization(RoleType.Admin)]
     public class UserController : Controller
     {
         private readonly IAdminUserService _userService;

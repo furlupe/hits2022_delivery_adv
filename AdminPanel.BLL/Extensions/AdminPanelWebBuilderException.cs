@@ -23,10 +23,12 @@ namespace AdminPanel.BLL.Extensions
             builder.Services.AddIdentity<AppUser, Role>()
                .AddEntityFrameworkStores<AuthContext>()
                .AddDefaultTokenProviders()
-               .AddUserManager<UserManager<AppUser>>();
+               .AddUserManager<UserManager<AppUser>>()
+               .AddSignInManager<SignInManager<AppUser>>();
 
             builder.Services.AddScoped<IAdminRestaurantService, AdminRestaurantService>();
             builder.Services.AddScoped<IAdminUserService, AdminUserService>();
+            builder.Services.AddScoped<IAdminAuthService, AdminAuthService>();
 
             return builder;
         }

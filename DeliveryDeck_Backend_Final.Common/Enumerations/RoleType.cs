@@ -5,6 +5,7 @@
         Customer,
         Manager,
         Cook,
-        Courier
+        Courier,
+        Admin
     }
 }
