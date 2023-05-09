@@ -11,6 +11,7 @@ namespace DeliveryDeck_Backend_Final.Common.Interfaces.AdminPanel
         public Task UpdateUser(Guid id, UserUpdateDto data);
         public Task DeleteUser(Guid id);
         public Task BanUser(Guid id);
+        public Task UnbanUser(Guid id);
         public Task<UserExtendedDto> GetUserInfo(Guid id);
     }
 }

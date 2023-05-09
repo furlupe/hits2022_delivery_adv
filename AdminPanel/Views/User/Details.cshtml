@@ -129,9 +129,20 @@
                     </div>
                     <div class="row">
                         <div class="col">
-                            <form asp-controller="User" asp-action="BanUser" asp-route-id="@Model.Id">
-                                <button type="submit" class="btn text-danger">Ban</button>
-                            </form>
+                            @{
+                                if(!Model.IsBanned)
+                                {
+                                    <form asp-controller="User" asp-action="BanUser" asp-route-id="@Model.Id">
+                                        <button type="submit" class="btn text-danger">Ban</button>
+                                    </form>
+                                } 
+                                else
+                                {
+                                    <form asp-controller="User" asp-action="UnbanUser" asp-route-id="@Model.Id">
+                                        <button type="submit" class="btn text-success">Unban</button>
+                                    </form>
+                                }
+                            }
                         </div>
                     </div>
                 </div>

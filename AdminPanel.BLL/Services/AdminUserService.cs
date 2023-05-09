@@ -29,13 +29,7 @@ namespace AdminPanel.BLL.Services
         }
 
         public async Task BanUser(Guid id)
-        {
-            var user = await _authContext.Users.FirstOrDefaultAsync(x => x.Id == id)
-                ?? throw new BadHttpRequestException("No such user");
-
-            user.IsBanned = true;
-            await _authContext.SaveChangesAsync();
-        }
+            => await ChangeUserStatus(id, true);
 
         public async Task CreateUser(UserCreateDto data)
         {
@@ -85,13 +79,14 @@ namespace AdminPanel.BLL.Services
             var query = await _authContext.Users
                .Include(x => x.Roles)
                    .ThenInclude(r => r.Role)
+               .Where(x => ! x.IsBanned)
                .ToListAsync();
 
             var available = new List<AvailableStaffDto>();
             foreach(var user in query)
             {
-                var availableAsCook = await _backendContext.Restaurants.AllAsync(r => !r.Cooks.Contains(user.Id));
-                var availableAsManager = await _backendContext.Restaurants.AllAsync(r => !r.Managers.Contains(user.Id));
+                var availableAsCook = await _backendContext.Restaurants.AllAsync(r => !r.Cooks.Contains(user.Id)) && await _userMgr.IsInRoleAsync(user, RoleType.Cook.ToString());
+                var availableAsManager = await _backendContext.Restaurants.AllAsync(r => !r.Managers.Contains(user.Id)) && await _userMgr.IsInRoleAsync(user, RoleType.Manager.ToString());
 
                 if (availableAsCook || availableAsManager)
                 {
@@ -166,6 +161,9 @@ namespace AdminPanel.BLL.Services
             return response;
         }
 
+        public async Task UnbanUser(Guid id)
+            => await ChangeUserStatus(id, false);
+
         public async Task UpdateUser(Guid id, UserUpdateDto data)
         {
             var user = await _authContext.Users
@@ -238,6 +236,15 @@ namespace AdminPanel.BLL.Services
             }
 
             await _backendContext.SaveChangesAsync();
+            await _authContext.SaveChangesAsync();
+        }
+
+        private async Task ChangeUserStatus(Guid id, bool isBanned)
+        {
+            var user = await _authContext.Users.FirstOrDefaultAsync(x => x.Id == id)
+                ?? throw new BadHttpRequestException("No such user");
+
+            user.IsBanned = isBanned;
             await _authContext.SaveChangesAsync();
         }
     }

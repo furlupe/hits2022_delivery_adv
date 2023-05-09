@@ -66,5 +66,10 @@ namespace AdminPanel.Controllers
             await _userService.BanUser(id);
             return RedirectToAction("Details", new {id});
         }
+        public async Task<IActionResult> UnbanUser(Guid id)
+        {
+            await _userService.UnbanUser(id);
+            return RedirectToAction("Details", new { id });
+        }
     }
 }

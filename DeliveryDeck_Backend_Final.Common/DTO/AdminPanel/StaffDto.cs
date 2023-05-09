@@ -6,6 +6,7 @@ namespace DeliveryDeck_Backend_Final.Common.DTO.AdminPanel
     {
         public Guid Id { get; set; }
         public string FullName { get; set; }
+        public bool IsBanned { get; set; }
         public RoleType Role { get; set; }
     }
 }

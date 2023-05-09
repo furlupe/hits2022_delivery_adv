@@ -2,7 +2,7 @@
 @{
     foreach (var user in Model.Staff.Staff)
     {
-        <div class="container card card-body my-2" id="@user.Id">
+        <div class="container card card-body my-2 @(user.IsBanned ? "border-danger" : "")" id="@user.Id">
             <div class="row">
                 <div class="col-2 d-flex">
                     <p class="fs-5 my-auto ms-2">@user.Role.ToString()</p>
