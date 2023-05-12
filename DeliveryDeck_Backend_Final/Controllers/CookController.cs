@@ -1,6 +1,8 @@
-﻿using DeliveryDeck_Backend_Final.Common.DTO.Backend;
+﻿using DeliveryDeck_Backend_Final.Backend.DAL.Entities;
+using DeliveryDeck_Backend_Final.Common.DTO.Backend;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
 using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
+using DeliveryDeck_Backend_Final.Common.Interfaces.RabbitMQ;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -16,6 +18,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
     {
         private readonly IOrderService _orderService;
         private readonly IResourceAuthorizationService _resAuthorizationService;
+
         public CookController(IOrderService orderService, IResourceAuthorizationService resAuthorizationService)
         {
             _orderService = orderService;
@@ -104,39 +107,37 @@ namespace DeliveryDeck_Backend_Final.Controllers
 
         }*/
 
-        [HttpPatch("restaurant/orders/{orderId}/{act}")]
-        public async Task<IActionResult> PerformActionOnOrder(int orderId, OrderAction act)
+        [HttpPatch("restaurant/orders/{orderNumber}/{act}")]
+        public async Task<IActionResult> PerformActionOnOrder(int orderNumber, OrderAction act)
         {
 
-            if (!await _resAuthorizationService.StaffRestaurantOrderResourceExists(UserId, orderId))
+            if (!await _resAuthorizationService.StaffRestaurantOrderResourceExists(UserId, orderNumber))
             {
                 return NotFound();
             }
 
             switch (act)
             {
-                case OrderAction.kitchen: await _orderService.TakeOrderToKitchen(UserId, orderId); break;
+                case OrderAction.kitchen: await _orderService.TakeOrderToKitchen(UserId, orderNumber); break;
                 case OrderAction.package:
                 case OrderAction.deliverable:
-                    if (!await _resAuthorizationService.OrderCookRelationExists(UserId, orderId))
-                    {
+                    if (!await _resAuthorizationService.OrderCookRelationExists(UserId, orderNumber))
+                    {   
                         return Forbid();
                     }
 
                     if (act == OrderAction.package)
                     {
-                        await _orderService.TakeOrderToPackaging(orderId);
+                        await _orderService.TakeOrderToPackaging(orderNumber);
                     }
                     else if (act == OrderAction.deliverable)
                     {
-                        await _orderService.SetOrderToDeliveryAvailable(orderId);
+                        await _orderService.SetOrderToDeliveryAvailable(orderNumber);
                     }
 
                     break;
                 default: return NotFound();
-
             }
-
             return NoContent();
         }
     }

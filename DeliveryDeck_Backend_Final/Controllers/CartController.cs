@@ -17,18 +17,15 @@ namespace DeliveryDeck_Backend_Final.Controllers
     {
         private readonly ICartService _cartService;
         private readonly IResourceAuthorizationService _resourceAuthorizationService;
-        private readonly IRabbitMqService _rabbitService;
-        public CartController(ICartService cartService, IResourceAuthorizationService resourceAuthorizationService, IRabbitMqService rabbitService)
+        public CartController(ICartService cartService, IResourceAuthorizationService resourceAuthorizationService)
         {
             _cartService = cartService;
             _resourceAuthorizationService = resourceAuthorizationService;
-            _rabbitService = rabbitService;
         }
 
         [HttpGet]
         public async Task<ActionResult<CartDto>> GetCart()
         {
-            _rabbitService.SendMessage(UserId.ToString(), "Gotcha cart, m8");
             return Ok(await _cartService.GetCart(UserId));
         }
 

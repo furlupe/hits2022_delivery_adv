@@ -3,6 +3,7 @@ using DeliveryDeck_Backend_Final.Backend.DAL.Entities;
 using DeliveryDeck_Backend_Final.Common.DTO.Backend;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
 using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
+using DeliveryDeck_Backend_Final.Common.Interfaces.RabbitMQ;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -15,9 +16,11 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
         private const int _MinimalCookingTime = 30;
         private const int _OrdersPageSize = 1;
         private readonly BackendContext _backendContext;
-        public OrderService(BackendContext backendContext)
+        private readonly IRabbitMqService _rabbitService;
+        public OrderService(BackendContext backendContext, IRabbitMqService rabbitService)
         {
             _backendContext = backendContext;
+            _rabbitService = rabbitService;
         }
 
         public async Task CancelOrder(int orderId)
@@ -228,6 +231,9 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
             order.Status = OrderStatus.ReadyForDelivery;
             await _backendContext.SaveChangesAsync();
+
+            _rabbitService.SendMessage(order.CustomerId.ToString(), $"Order [No. {order.Id}] now has status [{order.Status}]");
+
         }
 
         public async Task TakeOrderToKitchen(Guid userId, int orderId)
@@ -244,6 +250,8 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             order.Cook = userId;
 
             await _backendContext.SaveChangesAsync();
+
+            _rabbitService.SendMessage(order.CustomerId.ToString(), $"Order [No. {order.Id}] now has status [{order.Status}]");
         }
 
         public async Task TakeOrderToPackaging(int orderId)
@@ -259,6 +267,9 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             order.Status = OrderStatus.Packaging;
 
             await _backendContext.SaveChangesAsync();
+
+            _rabbitService.SendMessage(order.CustomerId.ToString(), $"Order [No. {order.Id}] now has status [{order.Status}]");
+
         }
 
         public async Task<OrderPagedDto> GetCookHistory(
@@ -347,6 +358,9 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             order.Status = OrderStatus.Delivering;
 
             await _backendContext.SaveChangesAsync();
+
+            _rabbitService.SendMessage(order.CustomerId.ToString(), $"Order [No. {order.Id}] now has status [{order.Status}]");
+
         }
 
         public async Task<OrderAvailablePagedDto> GetAvailableForDelivery(Guid userId, OrderSortingType? sortBy, int page = 1)
@@ -356,6 +370,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
                 .ToListAsync();
 
             return CreateOrderAvailablePagedResponse(orders, page);
+
         }
 
         public async Task SetOrderAsDelivered(int orderId)
@@ -370,6 +385,9 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
             order.Status = OrderStatus.Delivered;
             await _backendContext.SaveChangesAsync();
+
+            _rabbitService.SendMessage(order.CustomerId.ToString(), $"Order [No. {order.Id}] now has status [{order.Status}]");
+
         }
 
         private static OrderPagedDto CreateOrderPagedResponse(IEnumerable<Order> collection, int page)

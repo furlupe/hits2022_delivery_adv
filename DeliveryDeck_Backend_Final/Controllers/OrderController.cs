@@ -1,6 +1,8 @@
-﻿using DeliveryDeck_Backend_Final.Common.DTO.Backend;
+﻿using DeliveryDeck_Backend_Final.Backend.DAL.Entities;
+using DeliveryDeck_Backend_Final.Common.DTO.Backend;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
 using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
+using DeliveryDeck_Backend_Final.Common.Interfaces.RabbitMQ;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -16,10 +18,13 @@ namespace DeliveryDeck_Backend_Final.Controllers
     {
         private readonly IOrderService _orderService;
         private readonly IResourceAuthorizationService _resourceAuthorizationService;
-        public OrderController(IOrderService orderService, IResourceAuthorizationService resourceAuthorizationService)
+        private readonly IRabbitMqService _rabbitService;
+
+        public OrderController(IOrderService orderService, IResourceAuthorizationService resourceAuthorizationService, IRabbitMqService rabbitService)
         {
             _orderService = orderService;
             _resourceAuthorizationService = resourceAuthorizationService;
+            _rabbitService = rabbitService;
         }
 
         [HttpPost]
@@ -36,6 +41,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
                 return NotFound();
             }
             await _orderService.CancelOrder(orderNumber);
+            _rabbitService.SendMessage(UserId.ToString(), $"Order [No. {orderNumber}] now has status [{OrderStatus.Cancelled}]");
             return NoContent();
         }
 

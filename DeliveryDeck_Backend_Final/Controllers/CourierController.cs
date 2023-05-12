@@ -1,6 +1,8 @@
-﻿using DeliveryDeck_Backend_Final.Common.DTO.Backend;
+﻿using DeliveryDeck_Backend_Final.Backend.DAL.Entities;
+using DeliveryDeck_Backend_Final.Common.DTO.Backend;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
 using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
+using DeliveryDeck_Backend_Final.Common.Interfaces.RabbitMQ;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using static DeliveryDeck_Backend_Final.Common.Filters.RoleRequirementAuthorization;
@@ -14,10 +16,13 @@ namespace DeliveryDeck_Backend_Final.Controllers
     {
         private readonly IOrderService _orderService;
         private readonly IResourceAuthorizationService _resourceAuthorizationService;
-        public CourierController(IOrderService orderService, IResourceAuthorizationService resourceAuthorizationService)
+        private readonly IRabbitMqService _rabbitService;
+
+        public CourierController(IOrderService orderService, IResourceAuthorizationService resourceAuthorizationService, IRabbitMqService rabbitService)
         {
             _orderService = orderService;
             _resourceAuthorizationService = resourceAuthorizationService;
+            _rabbitService = rabbitService;
         }
 
         [HttpGet("orders")]
@@ -84,6 +89,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
                 default: return NotFound();
 
             }
+            _rabbitService.SendMessage(UserId.ToString(), $"Order [No. {orderNumber}] now has status [{act}]");
             return NoContent();
         }
     }
