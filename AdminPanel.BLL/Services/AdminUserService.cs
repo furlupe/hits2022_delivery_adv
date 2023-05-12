@@ -41,9 +41,9 @@ namespace AdminPanel.BLL.Services
                 Email = data.Email
             };
 
-            foreach(var roletype in data.Roles)
+            foreach (var roletype in data.Roles)
             {
-                switch(roletype)
+                switch (roletype)
                 {
                     case RoleType.Customer:
                         user.Customer = new Customer { Address = data.Address }; break;
@@ -58,7 +58,7 @@ namespace AdminPanel.BLL.Services
 
             await _userMgr.CreateAsync(user, data.Password);
 
-            foreach(var roletype in data.Roles)
+            foreach (var roletype in data.Roles)
             {
                 await _userMgr.AddToRoleAsync(user, roletype.ToString());
             }
@@ -79,23 +79,23 @@ namespace AdminPanel.BLL.Services
             var query = await _authContext.Users
                .Include(x => x.Roles)
                    .ThenInclude(r => r.Role)
-               .Where(x => ! x.IsBanned)
+               .Where(x => !x.IsBanned)
                .ToListAsync();
 
             var available = new List<AvailableStaffDto>();
-            foreach(var user in query)
+            foreach (var user in query)
             {
-                var availableAsCook = 
-                    await _backendContext.Restaurants.AllAsync(r => !r.Cooks.Contains(user.Id)) 
+                var availableAsCook =
+                    await _backendContext.Restaurants.AllAsync(r => !r.Cooks.Contains(user.Id))
                     && await _userMgr.IsInRoleAsync(user, RoleType.Cook.ToString());
 
-                var availableAsManager = 
-                    await _backendContext.Restaurants.AllAsync(r => !r.Managers.Contains(user.Id)) 
+                var availableAsManager =
+                    await _backendContext.Restaurants.AllAsync(r => !r.Managers.Contains(user.Id))
                     && await _userMgr.IsInRoleAsync(user, RoleType.Manager.ToString());
 
                 if (availableAsCook || availableAsManager)
                 {
-                    available.Add(new AvailableStaffDto 
+                    available.Add(new AvailableStaffDto
                     {
                         Id = user.Id,
                         FullName = user.FullName,
@@ -137,7 +137,7 @@ namespace AdminPanel.BLL.Services
                 response.Address = user.Customer.Address;
             }
 
-            response.RestaurantAsManager = 
+            response.RestaurantAsManager =
                 user.Manager is not null ? _mapper.Map<RestaurantShortDto>(
                     await _backendContext.Restaurants.FirstOrDefaultAsync(r => r.Managers.Contains(user.Manager.Id))
                     ) : null;
@@ -160,7 +160,7 @@ namespace AdminPanel.BLL.Services
 
             var response = new PagedUsersDto
             {
-                PageInfo = new PageInfo( query.Count, _UserPageSize, page)
+                PageInfo = new PageInfo(query.Count, _UserPageSize, page)
             };
 
             var users = query.Skip((page - 1) * _UserPageSize)
@@ -186,13 +186,13 @@ namespace AdminPanel.BLL.Services
                 .FirstOrDefaultAsync(x => x.Id == id)
                 ?? throw new BadHttpRequestException("No such user");
 
-            if (await _userMgr.IsInRoleAsync(user, RoleType.Manager.ToString()) && ! data.Roles.Contains(RoleType.Manager))
+            if (await _userMgr.IsInRoleAsync(user, RoleType.Manager.ToString()) && !data.Roles.Contains(RoleType.Manager))
             {
                 var restaurant = await _backendContext.Restaurants.FirstOrDefaultAsync(x => x.Managers.Contains(id));
                 restaurant?.Managers.Remove(id);
             }
 
-            if (await _userMgr.IsInRoleAsync(user, RoleType.Cook.ToString()) && ! data.Roles.Contains(RoleType.Cook))
+            if (await _userMgr.IsInRoleAsync(user, RoleType.Cook.ToString()) && !data.Roles.Contains(RoleType.Cook))
             {
                 var restaurant = await _backendContext.Restaurants.FirstOrDefaultAsync(x => x.Cooks.Contains(id));
                 restaurant?.Cooks.Remove(id);
@@ -224,7 +224,7 @@ namespace AdminPanel.BLL.Services
                 }
             }
 
-            foreach(var role in data.Roles.Where(r => ! user.Roles.Select(r => r.Role.Type).Contains(r)))
+            foreach (var role in data.Roles.Where(r => !user.Roles.Select(r => r.Role.Type).Contains(r)))
             {
                 switch (role)
                 {

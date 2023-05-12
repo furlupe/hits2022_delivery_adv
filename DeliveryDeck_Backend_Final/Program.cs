@@ -1,4 +1,6 @@
 using DeliveryDeck_Backend_Final.Backend.BLL.Extensions;
+using DeliveryDeck_Backend_Final.JWT.Classes;
+using DeliveryDeck_Backend_Final.JWT.Extenions;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 
@@ -37,8 +39,11 @@ builder.Services.AddSwaggerGen(option =>
         }
     });
 });
-
 builder.UseBackendComponent();
+
+builder.UseJwtOptions(builder.Configuration.GetSection("jwt"))
+    .AddJwtAuthentification(builder.Configuration.GetSection("jwt").Get<JwtConfig>()!);
+
 builder.Services.AddAuthorization();
 
 var app = builder.Build();

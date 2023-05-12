@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using System.Data;
-using System.Linq;
 using System.Security.Claims;
 
 namespace AdminPanel.BLL.Services
@@ -25,7 +24,7 @@ namespace AdminPanel.BLL.Services
             var user = await _userMgr.FindByEmailAsync(credentials.Email)
                 ?? throw new BadHttpRequestException("No such email");
 
-            if (! await _userMgr.IsInRoleAsync(user, RoleType.Admin.ToString()))
+            if (!await _userMgr.IsInRoleAsync(user, RoleType.Admin.ToString()))
             {
                 throw new BadHttpRequestException("Access denied", StatusCodes.Status403Forbidden);
             }

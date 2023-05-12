@@ -3,10 +3,10 @@
     public abstract class NamedEntity
     {
         string name;
-        public string Name 
+        public string Name
         {
             get { return name; }
-            set 
+            set
             {
                 name = value;
                 NormalizedName = value.ToUpper().Normalize();

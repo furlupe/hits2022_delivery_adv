@@ -7,7 +7,7 @@ namespace AdminPanel.Mappers
 {
     public class RestaurantMapper : Profile
     {
-        public RestaurantMapper() 
+        public RestaurantMapper()
         {
             CreateMap<RestaurantShortModel, RestaurantShortDto>()
                 .ReverseMap();

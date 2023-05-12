@@ -8,7 +8,7 @@ namespace AdminPanel.BLL.Mappers
 {
     public class DtoToEntityMapper : Profile
     {
-        public DtoToEntityMapper() 
+        public DtoToEntityMapper()
         {
             CreateMap<RestaurantDto, Restaurant>()
                 .ReverseMap();

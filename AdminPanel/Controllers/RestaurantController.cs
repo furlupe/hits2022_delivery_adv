@@ -3,7 +3,6 @@ using AutoMapper;
 using DeliveryDeck_Backend_Final.Common.DTO.AdminPanel;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
 using DeliveryDeck_Backend_Final.Common.Interfaces.AdminPanel;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static DeliveryDeck_Backend_Final.Common.Filters.RoleRequirementAuthorization;
 
@@ -31,7 +30,7 @@ namespace AdminPanel.Controllers
         {
             ViewBag.Name = name;
             return PartialView(
-                "RestaurantListPartial", 
+                "RestaurantListPartial",
                 _mapper.Map<RestaurantListModel>(await _restaurantService.GetRestaurants(page, name))
             );
         }
@@ -41,7 +40,7 @@ namespace AdminPanel.Controllers
             return Redirect("https://www.youtube.com/watch?v=VZrDxD0Za9I&list=PLu4wnki9NI_8VmJ7Qz_byhKwCquXcy6u9");
         }
 
-        public async Task<IActionResult>Details(Guid id)
+        public async Task<IActionResult> Details(Guid id)
         {
             var restaurants = await _restaurantService.GetRestaurantInfo(id);
             var response = _mapper.Map<RestaurantModel>(restaurants);
@@ -49,7 +48,7 @@ namespace AdminPanel.Controllers
             return View("Details", response);
         }
 
-        public async Task<IActionResult>StaffPage(Guid id, int page = 1)
+        public async Task<IActionResult> StaffPage(Guid id, int page = 1)
         {
             var restaurants = await _restaurantService.GetRestaurantInfo(id, page);
             var response = _mapper.Map<RestaurantModel>(restaurants);
@@ -60,7 +59,7 @@ namespace AdminPanel.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateRestaurant(RestaurantCreateModel model)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return RedirectToAction("Index");
             }
@@ -80,9 +79,9 @@ namespace AdminPanel.Controllers
         public async Task<IActionResult> DismissStaff(Guid restaurantId, Guid staffId, RoleType fromRole)
         {
             await _restaurantService.DismissStaffFromRestaurant(restaurantId, staffId, fromRole);
-            return RedirectToAction("Details", new {id = restaurantId});
+            return RedirectToAction("Details", new { id = restaurantId });
         }
-        
+
 
         [HttpPost]
         public async Task<IActionResult> Delete(Guid id)

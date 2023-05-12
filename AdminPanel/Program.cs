@@ -1,5 +1,5 @@
-using AdminPanel.Mappers;
 using AdminPanel.BLL.Extensions;
+using AdminPanel.Mappers;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);

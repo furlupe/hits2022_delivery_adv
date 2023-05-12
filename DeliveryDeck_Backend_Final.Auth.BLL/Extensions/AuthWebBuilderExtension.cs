@@ -5,7 +5,6 @@ using DeliveryDeck_Backend_Final.Auth.DAL.Extensions;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
 using DeliveryDeck_Backend_Final.Common.Interfaces.Auth;
 using DeliveryDeck_Backend_Final.Common.Middlewares;
-using DeliveryDeck_Backend_Final.JWT.Extenions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -30,8 +29,6 @@ namespace DeliveryDeck_Backend_Final.Auth.BLL.Extensions
             builder.Services.AddScoped<IKeyProvider, RandomKeyProvider>();
             builder.Services.AddScoped<IUserService, UserService>();
 
-            builder.AddJwtAuthentification();
-            builder.Services.AddAuthorization();
         }
 
         public static async Task<WebApplication> UseAuth(this WebApplication app)

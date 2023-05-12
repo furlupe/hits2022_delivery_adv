@@ -1,6 +1,7 @@
 ﻿using DeliveryDeck_Backend_Final.Common.DTO.Backend;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
 using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
+using DeliveryDeck_Backend_Final.Common.Interfaces.RabbitMQ;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -16,15 +17,18 @@ namespace DeliveryDeck_Backend_Final.Controllers
     {
         private readonly ICartService _cartService;
         private readonly IResourceAuthorizationService _resourceAuthorizationService;
-        public CartController(ICartService cartService, IResourceAuthorizationService resourceAuthorizationService)
+        private readonly IRabbitMqService _rabbitService;
+        public CartController(ICartService cartService, IResourceAuthorizationService resourceAuthorizationService, IRabbitMqService rabbitService)
         {
             _cartService = cartService;
             _resourceAuthorizationService = resourceAuthorizationService;
+            _rabbitService = rabbitService;
         }
 
         [HttpGet]
         public async Task<ActionResult<CartDto>> GetCart()
         {
+            _rabbitService.SendMessage(UserId.ToString(), "Gotcha cart, m8");
             return Ok(await _cartService.GetCart(UserId));
         }
 

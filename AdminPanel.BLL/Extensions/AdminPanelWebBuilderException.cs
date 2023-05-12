@@ -1,7 +1,7 @@
 ﻿using AdminPanel.BLL.Mappers;
 using AdminPanel.BLL.Services;
-using DeliveryDeck_Backend_Final.Auth.DAL.Entities;
 using DeliveryDeck_Backend_Final.Auth.DAL;
+using DeliveryDeck_Backend_Final.Auth.DAL.Entities;
 using DeliveryDeck_Backend_Final.Auth.DAL.Extensions;
 using DeliveryDeck_Backend_Final.Backend.DAL.Extensions;
 using DeliveryDeck_Backend_Final.Common.Interfaces.AdminPanel;

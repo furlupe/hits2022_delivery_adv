@@ -2,8 +2,8 @@
 using DeliveryDeck_Backend_Final.Backend.DAL;
 using DeliveryDeck_Backend_Final.Backend.DAL.Extensions;
 using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
+using DeliveryDeck_Backend_Final.Common.Interfaces.RabbitMQ;
 using DeliveryDeck_Backend_Final.Common.Middlewares;
-using DeliveryDeck_Backend_Final.JWT.Extenions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,7 +21,8 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Extensions
             builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.AddScoped<IResourceAuthorizationService, ResourceAuthorizationService>();
 
-            builder.AddJwtAuthentification();
+            builder.Services.AddSingleton<IRabbitMqService, RabbitMqService>();
+
             return builder;
         }
 

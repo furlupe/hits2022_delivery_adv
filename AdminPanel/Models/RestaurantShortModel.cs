@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace AdminPanel.Models
+﻿namespace AdminPanel.Models
 {
     public class RestaurantShortModel
     {
