@@ -1,13 +1,20 @@
 ﻿using DeliveryDeck_Backend_Final.JWT.Classes;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace DeliveryDeck_Backend_Final.JWT.Extenions
 {
     public static class AddJwtAuthentificationExtension
     {
-        public static WebApplicationBuilder AddJwtAuthentification(this WebApplicationBuilder builder, JwtConfig jwtConfig)
+        public static WebApplicationBuilder AddJwtAuthentification(
+            this WebApplicationBuilder builder,
+            string issuer,
+            string audience,
+            string key)
         {
             builder.Services.AddAuthentication(option =>
             {
@@ -17,15 +24,15 @@ namespace DeliveryDeck_Backend_Final.JWT.Extenions
             })
             .AddJwtBearer(options =>
             {
-                options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
-                    ValidIssuer = jwtConfig.Issuer,
+                    ValidIssuer = issuer,
                     ValidateAudience = true,
-                    ValidAudience = jwtConfig.Audience,
+                    ValidAudience = audience,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = jwtConfig.GetSymmetricSecurityKey(),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key)),
                     ClockSkew = TimeSpan.Zero
                 };
             });

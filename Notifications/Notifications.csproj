@@ -16,10 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\DeliveryDeck_Backend_Final.Common\DeliveryDeck_Backend_Final.Common.csproj" />
     <ProjectReference Include="..\DeliveryDeck_Backend_Final.JWT\DeliveryDeck_Backend_Final.JWT.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\" />
+    <ProjectReference Include="..\Notifications.BLL\Notifications.BLL.csproj" />
   </ItemGroup>
 
 </Project>

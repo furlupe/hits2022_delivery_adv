@@ -42,10 +42,19 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
-builder.AddAuth(); // наш auth BLL
+builder.AddAuth(builder.Configuration["AUTH_DB_CONNECTION"]!); // наш auth BLL
 
-builder.UseJwtOptions(builder.Configuration.GetSection("jwt"))
-    .AddJwtAuthentification(builder.Configuration.GetSection("jwt").Get<JwtConfig>()!);
+builder.UseJwtOptions(
+    builder.Configuration["JWT_ISSUER"]!,
+    builder.Configuration["JWT_AUDIENCE"]!,
+    int.Parse(builder.Configuration["JWT_LIFETIME"]!),
+    builder.Configuration["JWT_KEY"]!
+    )
+.AddJwtAuthentification(
+    builder.Configuration["JWT_ISSUER"]!,
+    builder.Configuration["JWT_AUDIENCE"]!,
+    builder.Configuration["JWT_KEY"]!
+    );
 
 builder.Services.AddAuthorization();
 

@@ -7,9 +7,19 @@ namespace DeliveryDeck_Backend_Final.JWT.Extenions
 {
     public static class UseJwtOptionsExtension
     {
-        public static WebApplicationBuilder UseJwtOptions(this WebApplicationBuilder builder, IConfigurationSection section)
+        public static WebApplicationBuilder UseJwtOptions(
+            this WebApplicationBuilder builder,
+            string issuer,
+            string audience,
+            int lifetime,
+            string key)
         {
-            builder.Services.Configure<JwtConfig>(section);
+            builder.Services.AddOptions()
+                .Configure<JwtConfig>(x => x.Issuer = issuer)
+                .Configure<JwtConfig>(x => x.Audience = audience)
+                .Configure<JwtConfig>(x => x.Lifetime = lifetime)
+                .Configure<JwtConfig>(x => x.Key = key);
+
             return builder;
         }
     }

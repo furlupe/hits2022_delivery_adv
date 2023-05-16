@@ -1,8 +1,7 @@
-﻿using DeliveryDeck_Backend_Final.Backend.DAL.Entities;
-using DeliveryDeck_Backend_Final.Common.DTO.Backend;
+﻿using DeliveryDeck_Backend_Final.Common.DTO.Backend;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
 using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
-using DeliveryDeck_Backend_Final.Common.Interfaces.RabbitMQ;
+using DeliveryDeck_Backend_Final.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -57,57 +56,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
             return await _orderService.GetOrderDetails(orderNumber);
         }
 
-        /*[HttpPatch("restaurant/orders/{orderId}/take-to-kitchen")]
-        [ClaimPermissionRequirement(OrderPermissions.ChangeStatusUntilDelivery)]
-        public async Task<IActionResult> TakeOrderToKitchen(int orderId)
-        {
-            if (! await _resAuthorizationService.RestaurantOrderExists(UserId, orderId))
-            {
-                return NotFound();
-            }
-
-            await _orderService.TakeOrderToKitchen(UserId, orderId);
-            return NoContent();
-        }
-
-        [HttpPatch("restaurant/orders/{orderId}/package")]
-        [ClaimPermissionRequirement(OrderPermissions.ChangeStatusUntilDelivery)]
-        public async Task<IActionResult> PackageOrder(int orderId)
-        {
-            if (! await _resAuthorizationService.RestaurantOrderExists(UserId, orderId))
-            {
-                return NotFound();
-            }
-
-            if (! await _resAuthorizationService.OrderCookRelationExists(UserId, orderId))
-            {
-                return Forbid();
-            }
-
-            await _orderService.TakeOrderToPackaging(orderId);
-            return NoContent();
-        }
-
-        [HttpPatch("restaurant/orders/{orderId}/set-ready-for-delivery")]
-        [ClaimPermissionRequirement(OrderPermissions.ChangeStatusUntilDelivery)]
-        public async Task<IActionResult> SetOrderReadyForDelivery(int orderId)
-        {
-            if (!await _resAuthorizationService.RestaurantOrderExists(UserId, orderId))
-            {
-                return NotFound();
-            }
-
-            if (!await _resAuthorizationService.OrderCookRelationExists(UserId, orderId))
-            {
-                return Forbid();
-            }
-
-            await _orderService.SetOrderToDeliveryAvailable(orderId);
-            return NoContent();
-
-        }*/
-
-        [HttpPatch("restaurant/orders/{orderNumber}/{act}")]
+        [HttpPut("restaurant/orders/{orderNumber}/{act}")]
         public async Task<IActionResult> PerformActionOnOrder(int orderNumber, OrderAction act)
         {
 
@@ -122,7 +71,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
                 case OrderAction.package:
                 case OrderAction.deliverable:
                     if (!await _resAuthorizationService.OrderCookRelationExists(UserId, orderNumber))
-                    {   
+                    {
                         return Forbid();
                     }
 

@@ -1,33 +1,29 @@
-﻿{
-  "$schema": "https://json.schemastore.org/launchsettings.json",
-  "iisSettings": {
-    "windowsAuthentication": false,
-    "anonymousAuthentication": true,
-    "iisExpress": {
-      "applicationUrl": "http://localhost:15431",
-      "sslPort": 44364
-    }
-  },
+{
   "profiles": {
     "http": {
       "commandName": "Project",
-      "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "swagger",
-      "applicationUrl": "http://localhost:5068",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "http://localhost:5068"
     },
     "https": {
       "commandName": "Project",
-      "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "swagger",
-      "applicationUrl": "https://localhost:7222;http://localhost:5068",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_JWT_ISSUER": "Furlupe",
+        "ASPNETCORE_JWT_AUDIENCE": "Not furlupe",
+        "ASPNETCORE_JWT_LIFETIME": "60",
+        "ASPNETCORE_JWT_KEY": "obamahamburgersussyballs",
+        "ASPNETCORE_RABBIT_CONNECTION": "localhost"
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "https://localhost:7222;http://localhost:5068"
     },
     "IIS Express": {
       "commandName": "IISExpress",
@@ -36,6 +32,15 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
+    }
+  },
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:15431",
+      "sslPort": 44364
     }
   }
 }

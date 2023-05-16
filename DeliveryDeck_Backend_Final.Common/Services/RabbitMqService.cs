@@ -4,15 +4,14 @@ using RabbitMQ.Client;
 using System.Text;
 using System.Text.Json;
 
-namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
+namespace DeliveryDeck_Backend_Final.Common
 {
     public class RabbitMqService : IRabbitMqService
     {
         private readonly IConnection _connection;
-        public RabbitMqService()
+        public RabbitMqService(IConnection connection)
         {
-            var factory = new ConnectionFactory { HostName = "localhost" };
-            _connection = factory.CreateConnection();
+            _connection = connection;
         }
         public void SendMessage(string userId, string message)
         {

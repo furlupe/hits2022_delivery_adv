@@ -1,9 +1,7 @@
 using DeliveryDeck_Backend_Final.JWT.Classes;
 using DeliveryDeck_Backend_Final.JWT.Extenions;
-using Microsoft.AspNetCore.SignalR;
-using Notifications.Hubs;
-using Notifications.Listeners;
-using Notifications.Providers;
+using Notifications.BLL.Extensions;
+using Notifications.BLL.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,9 +11,6 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-builder.Services.AddSignalR();
-builder.Services.AddSingleton<IUserIdProvider, NameUserIdProvider>();
 
 builder.Services.AddCors(options =>
 {
@@ -28,13 +23,21 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.UseJwtOptions(builder.Configuration.GetSection("jwt"))
-    .AddJwtAuthentificationWithMessageEvent(builder.Configuration.GetSection("jwt").Get<JwtConfig>()!);
+builder.UseJwtOptions(
+    builder.Configuration["JWT_ISSUER"]!,
+    builder.Configuration["JWT_AUDIENCE"]!,
+    int.Parse(builder.Configuration["JWT_LIFETIME"]!),
+    builder.Configuration["JWT_KEY"]!
+    )
+.AddJwtAuthentification(
+    builder.Configuration["JWT_ISSUER"]!,
+    builder.Configuration["JWT_AUDIENCE"]!,
+    builder.Configuration["JWT_KEY"]!
+    );
+
 builder.Services.AddAuthorization();
 
-
-builder.Services.AddHostedService<RabbitListener>();
-
+builder.AddNotificationsListener(builder.Configuration["RABBIT_CONNECTION"]!);
 
 var app = builder.Build();
 

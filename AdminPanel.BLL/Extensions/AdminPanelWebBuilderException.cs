@@ -13,10 +13,10 @@ namespace AdminPanel.BLL.Extensions
 {
     public static class AdminPanelWebBuilderException
     {
-        public static WebApplicationBuilder? UseAdminComponent(this WebApplicationBuilder? builder)
+        public static WebApplicationBuilder UseAdminComponent(this WebApplicationBuilder builder, string authConnectionString, string backendConnectionString)
         {
-            builder.UseAuthDAL();
-            builder.UseBackendDAL();
+            builder.UseAuthDAL(authConnectionString);
+            builder.UseBackendDAL(backendConnectionString);
 
             builder.Services.AddAutoMapper(typeof(DtoToEntityMapper));
 

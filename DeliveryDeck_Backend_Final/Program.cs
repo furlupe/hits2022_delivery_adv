@@ -39,10 +39,20 @@ builder.Services.AddSwaggerGen(option =>
         }
     });
 });
-builder.UseBackendComponent();
 
-builder.UseJwtOptions(builder.Configuration.GetSection("jwt"))
-    .AddJwtAuthentification(builder.Configuration.GetSection("jwt").Get<JwtConfig>()!);
+builder.UseBackendComponent(builder.Configuration["BACKEND_DB_CONNECTION"]!);
+
+builder.UseJwtOptions(
+    builder.Configuration["JWT_ISSUER"]!,
+    builder.Configuration["JWT_AUDIENCE"]!,
+    int.Parse(builder.Configuration["JWT_LIFETIME"]!),
+    builder.Configuration["JWT_KEY"]!
+    )
+.AddJwtAuthentification(
+    builder.Configuration["JWT_ISSUER"]!,
+    builder.Configuration["JWT_AUDIENCE"]!,
+    builder.Configuration["JWT_KEY"]!
+    );
 
 builder.Services.AddAuthorization();
 

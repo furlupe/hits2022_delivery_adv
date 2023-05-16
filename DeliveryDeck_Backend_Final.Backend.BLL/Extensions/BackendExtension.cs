@@ -1,20 +1,22 @@
 ﻿using DeliveryDeck_Backend_Final.Backend.BLL.Services;
 using DeliveryDeck_Backend_Final.Backend.DAL;
 using DeliveryDeck_Backend_Final.Backend.DAL.Extensions;
+using DeliveryDeck_Backend_Final.Common;
 using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
 using DeliveryDeck_Backend_Final.Common.Interfaces.RabbitMQ;
 using DeliveryDeck_Backend_Final.Common.Middlewares;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using RabbitMQ.Client;
 
 namespace DeliveryDeck_Backend_Final.Backend.BLL.Extensions
 {
-    public static class BackendWebBuilderExtension
+    public static class BackendExtension
     {
-        public static WebApplicationBuilder UseBackendComponent(this WebApplicationBuilder builder)
+        public static WebApplicationBuilder UseBackendComponent(this WebApplicationBuilder builder, string connectionString)
         {
-            builder.UseBackendDAL();
+            builder.UseBackendDAL(connectionString);
             builder.Services.AddScoped<ICartService, CartService>();
             builder.Services.AddScoped<IRestaurantService, RestaurantService>();
             builder.Services.AddScoped<IDishService, DishService>();
@@ -22,6 +24,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Extensions
             builder.Services.AddScoped<IResourceAuthorizationService, ResourceAuthorizationService>();
 
             builder.Services.AddSingleton<IRabbitMqService, RabbitMqService>();
+            builder.Services.AddSingleton(x => new ConnectionFactory { HostName = "localhost" }.CreateConnection());
 
             return builder;
         }

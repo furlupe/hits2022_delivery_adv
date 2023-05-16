@@ -12,11 +12,11 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace DeliveryDeck_Backend_Final.Auth.BLL.Extensions
 {
-    public static class AuthWebBuilderExtension
+    public static class AuthExtension
     {
-        public static void AddAuth(this WebApplicationBuilder builder)
+        public static void AddAuth(this WebApplicationBuilder builder, string connectionString)
         {
-            builder.UseAuthDAL();
+            builder.UseAuthDAL(connectionString);
 
             builder.Services.AddIdentity<AppUser, Role>()
                 .AddEntityFrameworkStores<AuthContext>()

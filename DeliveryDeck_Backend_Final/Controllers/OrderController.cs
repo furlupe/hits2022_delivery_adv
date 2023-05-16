@@ -1,8 +1,8 @@
-﻿using DeliveryDeck_Backend_Final.Backend.DAL.Entities;
-using DeliveryDeck_Backend_Final.Common.DTO.Backend;
+﻿using DeliveryDeck_Backend_Final.Common.DTO.Backend;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
 using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
 using DeliveryDeck_Backend_Final.Common.Interfaces.RabbitMQ;
+using DeliveryDeck_Backend_Final.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -33,7 +33,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
             return Ok(await _orderService.CreateOrder(UserId, data));
         }
 
-        [HttpPatch("{orderNumber}/cancel")]
+        [HttpPut("{orderNumber}/cancel")]
         public async Task<IActionResult> CancelOrder(int orderNumber)
         {
             if (!await _resourceAuthorizationService.OrderCustomerRelationExists(UserId, orderNumber))

@@ -1,7 +1,7 @@
 ﻿using DeliveryDeck_Backend_Final.Common.DTO.Backend;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
 using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
-using DeliveryDeck_Backend_Final.Common.Interfaces.RabbitMQ;
+using DeliveryDeck_Backend_Final.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -41,7 +41,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
             return NoContent();
         }
 
-        [HttpPatch("{dishId}/remove")]
+        [HttpPut("{dishId}/remove")]
         public async Task<IActionResult> RemoveDish(Guid dishId, [FromQuery, BindRequired] int amount = 1)
         {
             if (

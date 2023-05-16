@@ -1,8 +1,8 @@
-﻿using DeliveryDeck_Backend_Final.Backend.DAL.Entities;
-using DeliveryDeck_Backend_Final.Common.DTO.Backend;
+﻿using DeliveryDeck_Backend_Final.Common.DTO.Backend;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
 using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
 using DeliveryDeck_Backend_Final.Common.Interfaces.RabbitMQ;
+using DeliveryDeck_Backend_Final.Common.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using static DeliveryDeck_Backend_Final.Common.Filters.RoleRequirementAuthorization;
@@ -58,7 +58,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
             return await _orderService.GetOrderDetails(orderNumber);
         }
 
-        [HttpPatch("orders/{orderNumber}/{act}")]
+        [HttpPut("orders/{orderNumber}/{act}")]
         public async Task<IActionResult> PerformActionOnOrder(int orderNumber, OrderAction act)
         {
             if (!await _resourceAuthorizationService.OrderIsAccessibleForCourier(UserId, orderNumber))
