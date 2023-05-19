@@ -7,10 +7,10 @@ namespace DeliveryDeck_Backend_Final.Auth.DAL.Extensions
 {
     public static class AuthDALExtension
     {
-        public static void UseAuthDAL(this WebApplicationBuilder builder)
+        public static void UseAuthDAL(this WebApplicationBuilder builder, string connectionString)
         {
             builder.Services.AddDbContext<AuthContext>(options =>
-                options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+                options.UseNpgsql(connectionString));
         }
     }
 }

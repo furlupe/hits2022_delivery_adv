@@ -1,4 +1,7 @@
 ﻿using DeliveryDeck_Backend_Final.Auth.BLL.Extensions;
+using DeliveryDeck_Backend_Final.JWT.Classes;
+using DeliveryDeck_Backend_Final.JWT.Extenions;
+
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 
@@ -10,6 +13,7 @@ builder.Services.AddControllers()
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen(option =>
 {
     option.SwaggerDoc("v1", new OpenApiInfo { Title = "Demo API", Version = "v1" });
@@ -38,7 +42,21 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
-builder.AddAuth(); // наш auth BLL
+builder.AddAuth(builder.Configuration["AUTH_DB_CONNECTION"]!); // наш auth BLL
+
+builder.UseJwtOptions(
+    builder.Configuration["JWT_ISSUER"]!,
+    builder.Configuration["JWT_AUDIENCE"]!,
+    int.Parse(builder.Configuration["JWT_LIFETIME"]!),
+    builder.Configuration["JWT_KEY"]!
+    )
+.AddJwtAuthentification(
+    builder.Configuration["JWT_ISSUER"]!,
+    builder.Configuration["JWT_AUDIENCE"]!,
+    builder.Configuration["JWT_KEY"]!
+    );
+
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 

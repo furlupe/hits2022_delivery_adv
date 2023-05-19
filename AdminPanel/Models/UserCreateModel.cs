@@ -10,9 +10,10 @@ namespace AdminPanel.Models
         public string FullName { get; set; }
         public DateTime birthdate;
         [Required(ErrorMessage = "User must have been born in order to be")]
-        public DateTime BirthDate {
+        public DateTime BirthDate
+        {
             get { return birthdate; }
-            set 
+            set
             {
                 birthdate = DateTime.SpecifyKind(value, DateTimeKind.Utc);
             }

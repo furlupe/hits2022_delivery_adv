@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
-namespace DeliveryDeck_Backend_Final.Controllers
+namespace DeliveryDeck_Backend_Final.Common.Utils
 {
-    [ApiController]
-    public abstract class AuthorizeController : ControllerBase
+    public class AuthorizeController : ControllerBase
     {
         protected Guid UserId => Guid.Parse(User.FindFirst(ClaimTypes.Name).Value);
     }

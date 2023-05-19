@@ -1,5 +1,5 @@
-using AdminPanel.Mappers;
 using AdminPanel.BLL.Extensions;
+using AdminPanel.Mappers;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using AdminPanel.Middlewares;
 
@@ -14,7 +14,7 @@ builder.Services.AddAutoMapper(typeof(RestaurantMapper));
 builder.Services.AddAutoMapper(typeof(UserMapper));
 builder.Services.AddAutoMapper(typeof(AuthMapper));
 
-builder.UseAdminComponent();
+builder.UseAdminComponent(builder.Configuration["AUTH_DB_CONNECTION"]!, builder.Configuration["BACKEND_DB_CONNECTION"]!);
 
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -25,10 +25,11 @@ builder.Services
 
 var app = builder.Build();
 
+app.UseExceptionHandler("/Home/Error");
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 

@@ -3,7 +3,6 @@ using AutoMapper;
 using DeliveryDeck_Backend_Final.Common.DTO.AdminPanel;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
 using DeliveryDeck_Backend_Final.Common.Interfaces.AdminPanel;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static DeliveryDeck_Backend_Final.Common.Filters.RoleRequirementAuthorization;
 
@@ -24,7 +23,7 @@ namespace AdminPanel.Controllers
         {
             var users = await _userService.GetUsers(page);
             var response = _mapper.Map<UserListModel>(users);
-            return View("Index",response);
+            return View("Index", response);
         }
 
         public async Task<IActionResult> UsersPage(int page = 1)
@@ -50,7 +49,7 @@ namespace AdminPanel.Controllers
         public async Task<IActionResult> Update(Guid id, UserUpdateModel data)
         {
             await _userService.UpdateUser(id, _mapper.Map<UserUpdateDto>(data));
-            return RedirectToAction("Details", new {id});
+            return RedirectToAction("Details", new { id });
         }
 
         public async Task<IActionResult> Delete(Guid id)
@@ -67,7 +66,7 @@ namespace AdminPanel.Controllers
         public async Task<IActionResult> BanUser(Guid id)
         {
             await _userService.BanUser(id);
-            return RedirectToAction("Details", new {id});
+            return RedirectToAction("Details", new { id });
         }
         public async Task<IActionResult> UnbanUser(Guid id)
         {

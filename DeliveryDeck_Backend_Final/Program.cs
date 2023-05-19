@@ -1,4 +1,6 @@
 using DeliveryDeck_Backend_Final.Backend.BLL.Extensions;
+using DeliveryDeck_Backend_Final.JWT.Classes;
+using DeliveryDeck_Backend_Final.JWT.Extenions;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 
@@ -38,7 +40,20 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
-builder.UseBackendComponent();
+builder.UseBackendComponent(builder.Configuration["BACKEND_DB_CONNECTION"]!);
+
+builder.UseJwtOptions(
+    builder.Configuration["JWT_ISSUER"]!,
+    builder.Configuration["JWT_AUDIENCE"]!,
+    int.Parse(builder.Configuration["JWT_LIFETIME"]!),
+    builder.Configuration["JWT_KEY"]!
+    )
+.AddJwtAuthentification(
+    builder.Configuration["JWT_ISSUER"]!,
+    builder.Configuration["JWT_AUDIENCE"]!,
+    builder.Configuration["JWT_KEY"]!
+    );
+
 builder.Services.AddAuthorization();
 
 var app = builder.Build();

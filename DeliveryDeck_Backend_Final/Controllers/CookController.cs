@@ -1,6 +1,7 @@
 ﻿using DeliveryDeck_Backend_Final.Common.DTO.Backend;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
 using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
+using DeliveryDeck_Backend_Final.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -16,6 +17,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
     {
         private readonly IOrderService _orderService;
         private readonly IResourceAuthorizationService _resAuthorizationService;
+
         public CookController(IOrderService orderService, IResourceAuthorizationService resAuthorizationService)
         {
             _orderService = orderService;
@@ -54,89 +56,37 @@ namespace DeliveryDeck_Backend_Final.Controllers
             return await _orderService.GetOrderDetails(orderNumber);
         }
 
-        /*[HttpPatch("restaurant/orders/{orderId}/take-to-kitchen")]
-        [ClaimPermissionRequirement(OrderPermissions.ChangeStatusUntilDelivery)]
-        public async Task<IActionResult> TakeOrderToKitchen(int orderId)
-        {
-            if (! await _resAuthorizationService.RestaurantOrderExists(UserId, orderId))
-            {
-                return NotFound();
-            }
-
-            await _orderService.TakeOrderToKitchen(UserId, orderId);
-            return NoContent();
-        }
-
-        [HttpPatch("restaurant/orders/{orderId}/package")]
-        [ClaimPermissionRequirement(OrderPermissions.ChangeStatusUntilDelivery)]
-        public async Task<IActionResult> PackageOrder(int orderId)
-        {
-            if (! await _resAuthorizationService.RestaurantOrderExists(UserId, orderId))
-            {
-                return NotFound();
-            }
-
-            if (! await _resAuthorizationService.OrderCookRelationExists(UserId, orderId))
-            {
-                return Forbid();
-            }
-
-            await _orderService.TakeOrderToPackaging(orderId);
-            return NoContent();
-        }
-
-        [HttpPatch("restaurant/orders/{orderId}/set-ready-for-delivery")]
-        [ClaimPermissionRequirement(OrderPermissions.ChangeStatusUntilDelivery)]
-        public async Task<IActionResult> SetOrderReadyForDelivery(int orderId)
-        {
-            if (!await _resAuthorizationService.RestaurantOrderExists(UserId, orderId))
-            {
-                return NotFound();
-            }
-
-            if (!await _resAuthorizationService.OrderCookRelationExists(UserId, orderId))
-            {
-                return Forbid();
-            }
-
-            await _orderService.SetOrderToDeliveryAvailable(orderId);
-            return NoContent();
-
-        }*/
-
-        [HttpPatch("restaurant/orders/{orderId}/{act}")]
-        public async Task<IActionResult> PerformActionOnOrder(int orderId, OrderAction act)
+        [HttpPut("restaurant/orders/{orderNumber}/{act}")]
+        public async Task<IActionResult> PerformActionOnOrder(int orderNumber, OrderAction act)
         {
 
-            if (!await _resAuthorizationService.StaffRestaurantOrderResourceExists(UserId, orderId))
+            if (!await _resAuthorizationService.StaffRestaurantOrderResourceExists(UserId, orderNumber))
             {
                 return NotFound();
             }
 
             switch (act)
             {
-                case OrderAction.kitchen: await _orderService.TakeOrderToKitchen(UserId, orderId); break;
+                case OrderAction.kitchen: await _orderService.TakeOrderToKitchen(UserId, orderNumber); break;
                 case OrderAction.package:
                 case OrderAction.deliverable:
-                    if (!await _resAuthorizationService.OrderCookRelationExists(UserId, orderId))
+                    if (!await _resAuthorizationService.OrderCookRelationExists(UserId, orderNumber))
                     {
                         return Forbid();
                     }
 
                     if (act == OrderAction.package)
                     {
-                        await _orderService.TakeOrderToPackaging(orderId);
+                        await _orderService.TakeOrderToPackaging(orderNumber);
                     }
                     else if (act == OrderAction.deliverable)
                     {
-                        await _orderService.SetOrderToDeliveryAvailable(orderId);
+                        await _orderService.SetOrderToDeliveryAvailable(orderNumber);
                     }
 
                     break;
                 default: return NotFound();
-
             }
-
             return NoContent();
         }
     }

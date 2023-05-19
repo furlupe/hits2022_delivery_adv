@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using DeliveryDeck_Backend_Final.Auth.DAL;
-using DeliveryDeck_Backend_Final.Auth.DAL.Entities;
 using DeliveryDeck_Backend_Final.Backend.DAL;
 using DeliveryDeck_Backend_Final.Backend.DAL.Entities;
 using DeliveryDeck_Backend_Final.Common.DTO.AdminPanel;
@@ -10,7 +9,6 @@ using DeliveryDeck_Backend_Final.Common.Interfaces.AdminPanel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Net;
 
 namespace AdminPanel.BLL.Services
 {
@@ -133,7 +131,7 @@ namespace AdminPanel.BLL.Services
             var restaurant = await _backendContext.Restaurants.FirstOrDefaultAsync(x => x.Id == restaurantId)
                 ?? throw new BadHttpRequestException("No such restaurant");
 
-            if(await _backendContext.Restaurants.AnyAsync(r => r.Managers.Contains(data.Id) && r.Cooks.Contains(data.Id)))
+            if (await _backendContext.Restaurants.AnyAsync(r => r.Managers.Contains(data.Id) && r.Cooks.Contains(data.Id)))
             {
                 throw new BadHttpRequestException("User is already taken");
             }
@@ -177,7 +175,7 @@ namespace AdminPanel.BLL.Services
             var restaurant = await _backendContext.Restaurants.FirstOrDefaultAsync(x => x.Id == restaurantId)
                 ?? throw new BadHttpRequestException("No such restaurant");
 
-            if(await _backendContext.Restaurants.AnyAsync(r => r.Name == data.Name))
+            if (await _backendContext.Restaurants.AnyAsync(r => r.Name == data.Name))
             {
                 throw new BadHttpRequestException("Name is already taken");
             }

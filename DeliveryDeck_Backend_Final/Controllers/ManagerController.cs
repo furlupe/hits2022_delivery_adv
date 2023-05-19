@@ -1,6 +1,7 @@
 ﻿using DeliveryDeck_Backend_Final.Common.DTO.Backend;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
 using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
+using DeliveryDeck_Backend_Final.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -55,7 +56,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
             return Ok(await _restaurantService.GetMenuDetails(UserId, menuId, page));
         }
 
-        [HttpPatch("menus/{menuId}/active")]
+        [HttpPut("menus/{menuId}/active")]
         public async Task<IActionResult> SetMenuActive(Guid menuId)
         {
             if (!await _resourceAuthorizationService.ManagerRestaurantMenuResourceExists(UserId, menuId))
@@ -67,7 +68,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
             return NoContent();
         }
 
-        [HttpPatch("menus/{menuId}/non-active")]
+        [HttpPut("menus/{menuId}/non-active")]
         public async Task<IActionResult> SetMenuNonActive(Guid menuId)
         {
             if (!await _resourceAuthorizationService.ManagerRestaurantMenuResourceExists(UserId, menuId))
@@ -79,7 +80,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
             return NoContent();
         }
 
-        [HttpPatch("menus/{menuId}")]
+        [HttpPut("menus/{menuId}")]
         public async Task<IActionResult> UpdateMenu(Guid menuId, UpdateMenuDto data)
         {
             if (!await _resourceAuthorizationService.ManagerRestaurantMenuResourceExists(UserId, menuId))
@@ -150,7 +151,7 @@ namespace DeliveryDeck_Backend_Final.Controllers
             return NoContent();
         }
 
-        [HttpPatch("dishes/{dishId}")]
+        [HttpPut("dishes/{dishId}")]
         public async Task<IActionResult> UpdateDish(Guid dishId, CreateDishDto data)
         {
             if (!await _resourceAuthorizationService.ManagerRestaurantDishResourceExists(UserId, dishId))

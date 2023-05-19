@@ -6,7 +6,7 @@ namespace AdminPanel.Mappers
 {
     public class AuthMapper : Profile
     {
-        public AuthMapper() 
+        public AuthMapper()
         {
             CreateMap<LoginModel, LoginDto>();
         }

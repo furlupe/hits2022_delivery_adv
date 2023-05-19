@@ -1,7 +1,7 @@
 ﻿using DeliveryDeck_Backend_Final.Common.DTO.Auth;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
 using DeliveryDeck_Backend_Final.Common.Interfaces.Auth;
-using DeliveryDeck_Backend_Final.Controllers;
+using DeliveryDeck_Backend_Final.Common.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static DeliveryDeck_Backend_Final.Common.Filters.RoleRequirementAuthorization;
@@ -26,7 +26,7 @@ namespace DeliveryDeck_Backend_Final.Auth.Controllers
             return Ok(await _userService.GetProfile(UserId));
         }
 
-        [HttpPatch]
+        [HttpPut]
         [Authorize]
         [RoleRequirementAuthorization(RoleType.Customer)]
         public async Task<IActionResult> UpdateProfile(UserUpdateProfileDto data)

@@ -1,7 +1,7 @@
 ﻿using AdminPanel.BLL.Mappers;
 using AdminPanel.BLL.Services;
-using DeliveryDeck_Backend_Final.Auth.DAL.Entities;
 using DeliveryDeck_Backend_Final.Auth.DAL;
+using DeliveryDeck_Backend_Final.Auth.DAL.Entities;
 using DeliveryDeck_Backend_Final.Auth.DAL.Extensions;
 using DeliveryDeck_Backend_Final.Backend.DAL.Extensions;
 using DeliveryDeck_Backend_Final.Common.Interfaces.AdminPanel;
@@ -13,10 +13,10 @@ namespace AdminPanel.BLL.Extensions
 {
     public static class AdminPanelWebBuilderException
     {
-        public static WebApplicationBuilder? UseAdminComponent(this WebApplicationBuilder? builder)
+        public static WebApplicationBuilder UseAdminComponent(this WebApplicationBuilder builder, string authConnectionString, string backendConnectionString)
         {
-            builder.UseAuthDAL();
-            builder.UseBackendDAL();
+            builder.UseAuthDAL(authConnectionString);
+            builder.UseBackendDAL(backendConnectionString);
 
             builder.Services.AddAutoMapper(typeof(DtoToEntityMapper));
 

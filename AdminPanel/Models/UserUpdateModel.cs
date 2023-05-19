@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace AdminPanel.Models
 {
-    public class UserUpdateModel 
+    public class UserUpdateModel
     {
         public Guid Id { get; set; }
 

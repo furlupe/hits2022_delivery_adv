@@ -6,7 +6,7 @@ namespace AdminPanel.Mappers
 {
     public class UserMapper : Profile
     {
-        public UserMapper() 
+        public UserMapper()
         {
             CreateMap<PagedUsersDto, UserListModel>();
             CreateMap<UserShortDto, UserShortModel>();
