@@ -35,7 +35,7 @@ namespace AdminPanel.Controllers
         public async Task<IActionResult> UsersChoosePage(int page = 1)
         {
             var response = _mapper.Map<AvailableStaffListModel>(await _userService.GetAvailableStaff(page));
-            ViewBag.PageInfo = response.PageInfo;
+            ViewBag.PageInfo = response.PageInfo;       
             return PartialView("UserChooseListPartial", response);
         }
 

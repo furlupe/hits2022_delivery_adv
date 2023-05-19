@@ -24,6 +24,10 @@ namespace AdminPanel.Controllers
 
         public async Task<IActionResult> Login(LoginModel credentials)
         {
+            if (! ModelState.IsValid)
+            {
+                ModelState.AddModelError("Error", "Wrong credentials");
+            }
             await _authService.Login(_mapper.Map<LoginDto>(credentials));
             return RedirectToAction("Index", "Home");
         }

@@ -5,22 +5,30 @@
 <div class="container bg-white p-2">
     <form asp-controller="Account" asp-action="Login">
         <div class="row m-2">
-            <div class="col-2 d-flex mx-auto">
+            <div class="col-1">
                 <label asp-for="Email" class="fs-5 me-2">Email</label>
-                <input asp-for="Email" type="email"/>
+            </div>
+            <div class="col-2">
+                <input asp-for="Email" type="email" />
+            </div>
+            <div class="col">
                 <span asp-validation-for="Email"></span>
             </div>
         </div>
         <div class="row m-2">
-            <div class="col-2 d-flex mx-auto">
+            <div class="col-1">
                 <label asp-for="Password" class="fs-5 me-2">Password</label>
+            </div>
+            <div class="col-2">
                 <input asp-for="Password" type="password"/>
+            </div>
+            <div class="col">
                 <span asp-validation-for="Password"></span>
             </div>
         </div>
         <div class="row m-2">
             <div class="col d-flex">
-                <div class="mx-auto">
+                <div class="me-auto">
                     <button type="submit" class="btn btn-primary">Login</button>
                 </div>
             </div>

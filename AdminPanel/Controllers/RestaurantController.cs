@@ -60,12 +60,11 @@ namespace AdminPanel.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateRestaurant(RestaurantCreateModel model)
         {
-            if(!ModelState.IsValid)
+            if(ModelState.IsValid)
             {
-                return RedirectToAction("Index");
+                await _restaurantService.CreateRestaurant(_mapper.Map<RestaurantCreateDto>(model));
             }
 
-            await _restaurantService.CreateRestaurant(_mapper.Map<RestaurantCreateDto>(model));
             return RedirectToAction("Index");
         }
 
