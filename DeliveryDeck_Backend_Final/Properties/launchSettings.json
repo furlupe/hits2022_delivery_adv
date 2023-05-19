@@ -20,7 +20,7 @@
         "ASPNETCORE_JWT_AUDIENCE": "Not furlupe",
         "ASPNETCORE_JWT_LIFETIME": "60",
         "ASPNETCORE_JWT_KEY": "obamahamburgersussyballs",
-        "ASPNETCORE_BACKEND_DB_CONNECTION": "Server=localhost;Port=5432;Database=DeliveryBackendDb;User ID=postgres;password=ilikehex;"
+        "ASPNETCORE_BACKEND_DB_CONNECTION": "Server=localhost;Port=5432;Database=DeliveryBackendDb;User ID=postgres;password=1234;"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "https://localhost:7047;http://localhost:5014"

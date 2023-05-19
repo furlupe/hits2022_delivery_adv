@@ -4,6 +4,7 @@ using DeliveryDeck_Backend_Final.Auth.DAL;
 using DeliveryDeck_Backend_Final.Auth.DAL.Entities;
 using DeliveryDeck_Backend_Final.Auth.DAL.Extensions;
 using DeliveryDeck_Backend_Final.Backend.DAL.Extensions;
+using DeliveryDeck_Backend_Final.Common;
 using DeliveryDeck_Backend_Final.Common.Interfaces.AdminPanel;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
@@ -11,7 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace AdminPanel.BLL.Extensions
 {
-    public static class AdminPanelWebBuilderException
+    public static class AdminPanelExtension
     {
         public static WebApplicationBuilder UseAdminComponent(this WebApplicationBuilder builder, string authConnectionString, string backendConnectionString)
         {
@@ -31,6 +32,12 @@ namespace AdminPanel.BLL.Extensions
             builder.Services.AddScoped<IAdminAuthService, AdminAuthService>();
 
             return builder;
+        }
+
+        public static WebApplication ConfigureAdminComponent(this WebApplication app)
+        {
+            app.UseMiddleware<ExceptionRedirectMiddleware>();
+            return app;
         }
     }
 }

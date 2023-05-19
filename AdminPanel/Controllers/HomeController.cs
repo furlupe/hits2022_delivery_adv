@@ -25,7 +25,7 @@ namespace AdminPanel.Controllers
 
         public IActionResult Error(ErrorModel error)
         {
-            return View("Error", error);
+            return View("~/Views/Shared/Error.cshtml", error);
         }
     }
 }

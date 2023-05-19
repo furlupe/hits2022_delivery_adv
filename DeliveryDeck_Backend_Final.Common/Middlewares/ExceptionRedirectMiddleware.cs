@@ -1,4 +1,6 @@
-﻿namespace AdminPanel.Middlewares
+﻿using Microsoft.AspNetCore.Http;
+
+namespace DeliveryDeck_Backend_Final.Common
 {
     public class ExceptionRedirectMiddleware
     {
@@ -9,6 +11,7 @@
         }
         public async Task InvokeAsync(HttpContext context)
         {
+            var message = "";
             try
             {
                 await _next(context);
@@ -16,12 +19,12 @@
             catch (BadHttpRequestException ex)
             {
                 context.Response.StatusCode = ex.StatusCode;
-                context.Response.Redirect($"/Home/error?message={ex.Message}");
+                message = ex.Message;
+                context.Response.Redirect($"/Home/error?message={message}");
             }
-            catch (Exception ex)
+            catch
             {
-                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                context.Response.Redirect($"/Home/error?message={ex.Message}");
+                throw;
             }
         }
     }

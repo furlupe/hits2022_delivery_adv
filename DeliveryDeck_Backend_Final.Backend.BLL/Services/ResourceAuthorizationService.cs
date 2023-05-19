@@ -38,8 +38,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             => await ResourceIsAvailable<Menu>(menuId);
 
         public async Task<bool> RestaurantResourceExists(Guid restaurantId)
-            => await _backendContext.Restaurants
-            .FirstOrDefaultAsync(r => r.Id == restaurantId) is not null;
+            => await ResourceIsAvailable<Restaurant>(restaurantId);
 
         public async Task<bool> ManagerRestaurantMenuResourceExists(Guid manager, Guid menuId)
             => await _backendContext.Menus

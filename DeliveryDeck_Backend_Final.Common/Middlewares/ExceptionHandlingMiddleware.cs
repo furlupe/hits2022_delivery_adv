@@ -30,9 +30,10 @@ namespace DeliveryDeck_Backend_Final.Common.Middlewares
             {
                 await WriteResponse(context, ex.StatusCode, new { ex.Message });
             }
-            catch (Exception e)
+            catch
             {
-                await WriteResponse(context, StatusCodes.Status500InternalServerError, new { Message = e.Message });
+                // log here idk idc
+                throw;
             }
         }
 
