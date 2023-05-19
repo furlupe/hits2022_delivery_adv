@@ -18,9 +18,9 @@ namespace AdminPanel.Controllers
             return View();
         }
 
-        public IActionResult Privacy()
+        public IActionResult About()
         {
-            return View();
+            return Redirect("https://www.youtube.com/watch?v=VZrDxD0Za9I");
         }
 
         public IActionResult Error(ErrorModel error)

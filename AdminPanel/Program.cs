@@ -1,8 +1,6 @@
 using AdminPanel.BLL.Extensions;
 using AdminPanel.Mappers;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using AdminPanel.Middlewares;
-using DeliveryDeck_Backend_Final.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 
