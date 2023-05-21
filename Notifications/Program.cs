@@ -1,4 +1,3 @@
-using DeliveryDeck_Backend_Final.JWT.Classes;
 using DeliveryDeck_Backend_Final.JWT.Extenions;
 using Notifications.BLL.Extensions;
 using Notifications.BLL.Hubs;

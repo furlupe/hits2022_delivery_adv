@@ -1,5 +1,4 @@
 ﻿using DeliveryDeck_Backend_Final.Auth.BLL.Extensions;
-using DeliveryDeck_Backend_Final.JWT.Classes;
 using DeliveryDeck_Backend_Final.JWT.Extenions;
 
 using Microsoft.OpenApi.Models;

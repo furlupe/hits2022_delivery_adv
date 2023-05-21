@@ -1,5 +1,4 @@
 using DeliveryDeck_Backend_Final.Backend.BLL.Extensions;
-using DeliveryDeck_Backend_Final.JWT.Classes;
 using DeliveryDeck_Backend_Final.JWT.Extenions;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;

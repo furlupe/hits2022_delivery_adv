@@ -14,7 +14,7 @@ builder.Services.AddAutoMapper(typeof(UserMapper));
 builder.Services.AddAutoMapper(typeof(AuthMapper));
 
 builder.UseAdminComponent(
-    builder.Configuration["AUTH_DB_CONNECTION"]!, 
+    builder.Configuration["AUTH_DB_CONNECTION"]!,
     builder.Configuration["BACKEND_DB_CONNECTION"]!
     );
 

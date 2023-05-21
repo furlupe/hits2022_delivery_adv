@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using DeliveryDeck_Backend_Final.Common.DTO.RabbitMQ;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Hosting;
 using Notifications.BLL.Hubs;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
 using System.Text.Json;
-using DeliveryDeck_Backend_Final.Common.DTO.RabbitMQ;
 
 namespace Notifications.Listeners
 {
@@ -20,23 +20,23 @@ namespace Notifications.Listeners
         }
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            using var channel = _connection.CreateModel();
+            var channel = _connection.CreateModel();
 
             channel.QueueDeclare(
                 queue: "Notifications",
-                durable: false,
+                durable: true,
                 exclusive: false,
                 autoDelete: false,
                 arguments: null
                 );
 
-            var consumer = new AsyncEventingBasicConsumer(channel);
-            consumer.Received += async (sender, args) =>
+            var consumer = new EventingBasicConsumer(channel);
+            consumer.Received += (sender, args) =>
             {
                 var content = JsonSerializer.Deserialize<UserMessage>(Encoding.UTF8.GetString(args.Body.ToArray()));
                 if (content != null)
                 {
-                    await _hubContext.Clients.User(content.Id).SendAsync("ReceiveMessage", content.Message);
+                    _hubContext.Clients.User(content.Id).SendAsync("ReceiveMessage", content.Message);
                 }
             };
 

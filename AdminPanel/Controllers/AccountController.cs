@@ -24,7 +24,7 @@ namespace AdminPanel.Controllers
 
         public async Task<IActionResult> Login(LoginModel credentials)
         {
-            if (! ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 ModelState.AddModelError("Error", "Wrong credentials");
             }

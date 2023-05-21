@@ -8,18 +8,17 @@ namespace DeliveryDeck_Backend_Final.Common
 {
     public class RabbitMqService : IRabbitMqService
     {
-        private readonly IConnection _connection;
+        private readonly IModel _channel;
         public RabbitMqService(IConnection connection)
         {
-            _connection = connection;
+            _channel = connection.CreateModel();
         }
         public void SendMessage(string userId, string message)
         {
-            var channel = _connection.CreateModel();
 
-            channel.QueueDeclare(
+            _channel.QueueDeclare(
                 queue: "Notifications",
-                durable: false,
+                durable: true,
                 exclusive: false,
                 autoDelete: false,
                 arguments: null
@@ -31,7 +30,7 @@ namespace DeliveryDeck_Backend_Final.Common
                 Id = userId
             };
 
-            channel.BasicPublish(
+            _channel.BasicPublish(
                 exchange: string.Empty,
                 routingKey: "Notifications",
                 basicProperties: null,

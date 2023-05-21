@@ -59,7 +59,7 @@ namespace AdminPanel.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateRestaurant(RestaurantCreateModel model)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 await _restaurantService.CreateRestaurant(_mapper.Map<RestaurantCreateDto>(model));
             }

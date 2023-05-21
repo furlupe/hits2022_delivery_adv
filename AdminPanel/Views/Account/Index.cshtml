@@ -4,26 +4,18 @@
 @model LoginModel
 <div class="container bg-white p-2">
     <form asp-controller="Account" asp-action="Login">
-        <div class="row m-2">
-            <div class="col-1">
-                <label asp-for="Email" class="fs-5 me-2">Email</label>
-            </div>
-            <div class="col-2">
-                <input asp-for="Email" type="email" />
-            </div>
+        <div class="form-group row m-2">
             <div class="col">
-                <span asp-validation-for="Email"></span>
+                <label asp-for="Email" class="fs-5 me-2">Email</label>
+                <input asp-for="Email" type="email" />
+                <p><span asp-validation-for="Email" class="text-danger"></span></p>
             </div>
         </div>
-        <div class="row m-2">
-            <div class="col-1">
-                <label asp-for="Password" class="fs-5 me-2">Password</label>
-            </div>
-            <div class="col-2">
-                <input asp-for="Password" type="password"/>
-            </div>
+        <div class="form-group row m-2">
             <div class="col">
-                <span asp-validation-for="Password"></span>
+                <label asp-for="Password" class="fs-5 me-2">Password</label>
+                <input asp-for="Password" type="password" />
+                <p><span asp-validation-for="Password" class="text-danger"></span></p>
             </div>
         </div>
         <div class="row m-2">
