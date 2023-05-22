@@ -5,6 +5,7 @@ using DeliveryDeck_Backend_Final.Backend.DAL;
 using DeliveryDeck_Backend_Final.Common.DTO.AdminPanel;
 using DeliveryDeck_Backend_Final.Common.DTO.Backend;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
+using DeliveryDeck_Backend_Final.Common.Exceptions;
 using DeliveryDeck_Backend_Final.Common.Interfaces.AdminPanel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -68,7 +69,7 @@ namespace AdminPanel.BLL.Services
         {
             var user = await _authContext.Users
                 .FirstOrDefaultAsync(x => x.Id == id)
-                ?? throw new BadHttpRequestException("No such user");
+                ?? throw new RepositoryEntityNotFoundException($"No such user w/ id = {id}");
 
             _authContext.Users.Remove(user);
             await _authContext.SaveChangesAsync();
@@ -123,7 +124,7 @@ namespace AdminPanel.BLL.Services
                 .Include(x => x.Cook)
                 .Include(x => x.Courier)
                 .FirstOrDefaultAsync(x => x.Id == id)
-                ?? throw new BadHttpRequestException("No such user");
+                ?? throw new RepositoryEntityNotFoundException($"No such user w/ id = ${id}");
 
             if (await _userMgr.IsInRoleAsync(user, RoleType.Admin.ToString()))
             {
@@ -184,7 +185,7 @@ namespace AdminPanel.BLL.Services
                 .Include(x => x.Cook)
                 .Include(x => x.Customer)
                 .FirstOrDefaultAsync(x => x.Id == id)
-                ?? throw new BadHttpRequestException("No such user");
+                ?? throw new RepositoryEntityNotFoundException($"No such user w/ id={id}");
 
             if (await _userMgr.IsInRoleAsync(user, RoleType.Manager.ToString()) && !data.Roles.Contains(RoleType.Manager))
             {
@@ -253,7 +254,7 @@ namespace AdminPanel.BLL.Services
         private async Task ChangeUserStatus(Guid id, bool isBanned)
         {
             var user = await _authContext.Users.FirstOrDefaultAsync(x => x.Id == id)
-                ?? throw new BadHttpRequestException("No such user");
+                ?? throw new RepositoryEntityNotFoundException($"No such user w/ id = {id}");
 
             user.IsBanned = isBanned;
             await _authContext.SaveChangesAsync();

@@ -1,5 +1,6 @@
 ﻿using DeliveryDeck_Backend_Final.Common.Exceptions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Newtonsoft.Json;
 
 namespace DeliveryDeck_Backend_Final.Common.Middlewares
@@ -29,6 +30,22 @@ namespace DeliveryDeck_Backend_Final.Common.Middlewares
             catch (BadHttpRequestException ex)
             {
                 await WriteResponse(context, ex.StatusCode, new { ex.Message });
+            }
+            catch (RepositoryEntityNotFoundException ex)
+            {
+                await WriteResponse(context, StatusCodes.Status404NotFound, new
+                {
+                    ex.Message,
+                    ex.Optional
+                });
+            }
+            catch (RepositoryEntityAlreadyExistsException ex)
+            {
+                await WriteResponse(context, StatusCodes.Status409Conflict, new { ex.Message });
+            }
+            catch (Exception ex) when (ex is PersonUnemployedException || ex is OrderUnableToChangeStatusException)
+            {
+                await WriteResponse(context, StatusCodes.Status400BadRequest, new {ex.Message});
             }
             catch
             {

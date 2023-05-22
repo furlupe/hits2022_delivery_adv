@@ -2,6 +2,7 @@
 using DeliveryDeck_Backend_Final.Backend.DAL.Entities;
 using DeliveryDeck_Backend_Final.Common.DTO.Backend;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
+using DeliveryDeck_Backend_Final.Common.Exceptions;
 using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
 using DeliveryDeck_Backend_Final.Common.Interfaces.RabbitMQ;
 using Microsoft.AspNetCore.Http;
@@ -29,7 +30,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
             if (order.Status != OrderStatus.Created)
             {
-                throw new BadHttpRequestException($"Can't change status from {order.Status} to Cancelled");
+                throw new OrderUnableToChangeStatusException($"Can't change status from {order.Status} to Cancelled");
             }
 
             order.Status = OrderStatus.Cancelled;
@@ -172,7 +173,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
                 .Where(r => r.Id == order.Restaurant.Id)
                 .Select(r => r.Dishes)
                 .FirstOrDefaultAsync()
-                ?? throw new BadHttpRequestException("The restaurant does not exist");
+                ?? throw new RepositoryEntityNotFoundException($"The restaurant w/ id = {order.Restaurant.Id} does not exist");
 
             var dishes = order.Dishes
                 .IntersectBy(restaurantDishes, x => x.Dish);
@@ -226,7 +227,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
             if (order.Status > OrderStatus.Packaging)
             {
-                throw new BadHttpRequestException("Order is already waiting for being delivered");
+                throw new OrderUnableToChangeStatusException("Order is already waiting for being delivered");
             }
 
             order.Status = OrderStatus.ReadyForDelivery;
@@ -243,7 +244,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
             if (order.Cook is not null || order.Status != OrderStatus.Created)
             {
-                throw new BadHttpRequestException("Order has been taken by someone else");
+                throw new OrderUnableToChangeStatusException("Order has been taken by someone else");
             }
 
             order.Status = OrderStatus.Cooking;
@@ -261,7 +262,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
             if (order.Status != OrderStatus.Cooking)
             {
-                throw new BadHttpRequestException("Order is being packaged or has been packaged already");
+                throw new OrderUnableToChangeStatusException("Order is being packaged or has been packaged already");
             }
 
             order.Status = OrderStatus.Packaging;
@@ -351,7 +352,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
             if (order.CourierId is not null || order.Status != OrderStatus.ReadyForDelivery)
             {
-                throw new BadHttpRequestException($"Can't change status from {order.Status} to ReadyForDelivery");
+                throw new OrderUnableToChangeStatusException($"Can't change status from {order.Status} to ReadyForDelivery");
             }
 
             order.CourierId = courierId;
@@ -380,7 +381,7 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
             if (order.Status != OrderStatus.Delivering)
             {
-                throw new BadHttpRequestException($"Can't change status from {order.Status} to Delivering");
+                throw new OrderUnableToChangeStatusException($"Can't change status from {order.Status} to Delivering");
             }
 
             order.Status = OrderStatus.Delivered;

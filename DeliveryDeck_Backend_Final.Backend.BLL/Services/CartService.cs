@@ -2,6 +2,7 @@
 using DeliveryDeck_Backend_Final.Backend.DAL.Entities;
 using DeliveryDeck_Backend_Final.Common.DTO.Backend;
 using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
+using DeliveryDeck_Backend_Final.Common.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
@@ -26,7 +27,9 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             }
             else
             {
-                var dish = await _backendContext.Dishes.FirstAsync(d => d.Id == dishId);
+                var dish = await _backendContext.Dishes
+                    .FirstOrDefaultAsync(d => d.Id == dishId)
+                    ?? throw new RepositoryEntityNotFoundException($"No such dish w/ id = {dishId}");
 
                 cart.Dishes.Add(new DishInCart
                 {
@@ -83,7 +86,9 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
         {
             var cart = await GetCartByUserId(userId);
 
-            var dishInCart = cart.Dishes.First(d => d.Dish.Id == dishId);
+            var dishInCart = cart.Dishes
+                .FirstOrDefault(d => d.Dish.Id == dishId)
+                ?? throw new RepositoryEntityNotFoundException($"Cart does not containt dish w/ id = {dishId}");
 
             dishInCart.Amount -= amount;
 

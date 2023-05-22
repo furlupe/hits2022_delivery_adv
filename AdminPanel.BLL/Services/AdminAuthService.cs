@@ -1,6 +1,7 @@
 ﻿using DeliveryDeck_Backend_Final.Auth.DAL.Entities;
 using DeliveryDeck_Backend_Final.Common.DTO.AdminPanel;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
+using DeliveryDeck_Backend_Final.Common.Exceptions;
 using DeliveryDeck_Backend_Final.Common.Interfaces.AdminPanel;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
@@ -22,7 +23,7 @@ namespace AdminPanel.BLL.Services
         public async Task Login(LoginDto credentials)
         {
             var user = await _userMgr.FindByEmailAsync(credentials.Email)
-                ?? throw new BadHttpRequestException("No such email");
+                ?? throw new RepositoryEntityNotFoundException($"{credentials.Email} was not found");
 
             if (!await _userMgr.IsInRoleAsync(user, RoleType.Admin.ToString()))
             {

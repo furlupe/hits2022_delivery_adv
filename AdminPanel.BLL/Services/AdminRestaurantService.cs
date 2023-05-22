@@ -5,6 +5,7 @@ using DeliveryDeck_Backend_Final.Backend.DAL.Entities;
 using DeliveryDeck_Backend_Final.Common.DTO.AdminPanel;
 using DeliveryDeck_Backend_Final.Common.DTO.Backend;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
+using DeliveryDeck_Backend_Final.Common.Exceptions;
 using DeliveryDeck_Backend_Final.Common.Interfaces.AdminPanel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -30,7 +31,7 @@ namespace AdminPanel.BLL.Services
         {
             if (await _backendContext.Restaurants.AnyAsync(r => r.Name == data.Name))
             {
-                throw new BadHttpRequestException("Name is already taken");
+                throw new RepositoryEntityAlreadyExistsException($"Name {data.Name} is already taken");
             }
 
             await _backendContext.Restaurants.AddAsync(new Restaurant
@@ -45,7 +46,7 @@ namespace AdminPanel.BLL.Services
         {
             var restaurant = await _backendContext.Restaurants
                 .FirstOrDefaultAsync(r => r.Id == id)
-                ?? throw new BadHttpRequestException("No such restaurant");
+                ?? throw new RepositoryEntityNotFoundException($"No such restaurant w/ id = {id}");
 
             var cooks = new List<StaffDto>();
             var managers = new List<StaffDto>();
@@ -120,7 +121,7 @@ namespace AdminPanel.BLL.Services
         public async Task DeleteRestaurant(Guid id)
         {
             var restaurant = await _backendContext.Restaurants.FirstOrDefaultAsync(x => x.Id == id)
-                ?? throw new BadHttpRequestException("No such restaurant");
+                ?? throw new RepositoryEntityNotFoundException($"No such restaurant w/ id = {id}");
 
             _backendContext.Restaurants.Remove(restaurant);
             await _backendContext.SaveChangesAsync();
@@ -129,7 +130,7 @@ namespace AdminPanel.BLL.Services
         public async Task AddStaffToRestaurant(Guid restaurantId, StaffDto data)
         {
             var restaurant = await _backendContext.Restaurants.FirstOrDefaultAsync(x => x.Id == restaurantId)
-                ?? throw new BadHttpRequestException("No such restaurant");
+                ?? throw new RepositoryEntityNotFoundException($"No such restaurant w/ id = {restaurantId}");
 
             if (await _backendContext.Restaurants.AnyAsync(r => r.Managers.Contains(data.Id) && r.Cooks.Contains(data.Id)))
             {
@@ -155,7 +156,7 @@ namespace AdminPanel.BLL.Services
         public async Task DismissStaffFromRestaurant(Guid restaurantId, Guid staffId, RoleType fromRole)
         {
             var restaurant = await _backendContext.Restaurants.FirstOrDefaultAsync(x => x.Id == restaurantId)
-                ?? throw new BadHttpRequestException("No such restaurant");
+                ?? throw new RepositoryEntityNotFoundException($"No such restaurant w/ id = {restaurantId}");
 
             if (fromRole == RoleType.Cook)
             {
@@ -173,11 +174,11 @@ namespace AdminPanel.BLL.Services
         public async Task UpdateRestaurant(Guid restaurantId, RestaurantUpdateDto data)
         {
             var restaurant = await _backendContext.Restaurants.FirstOrDefaultAsync(x => x.Id == restaurantId)
-                ?? throw new BadHttpRequestException("No such restaurant");
+                ?? throw new RepositoryEntityNotFoundException($"No such restaurant w/ id = {restaurantId}");
 
             if (await _backendContext.Restaurants.AnyAsync(r => r.Name == data.Name))
             {
-                throw new BadHttpRequestException("Name is already taken");
+                throw new RepositoryEntityAlreadyExistsException($"Name {data.Name} is already taken");
             }
 
             restaurant.Name = data.Name;

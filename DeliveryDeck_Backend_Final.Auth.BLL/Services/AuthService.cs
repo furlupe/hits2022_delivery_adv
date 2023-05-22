@@ -14,15 +14,13 @@ namespace DeliveryDeck_Backend_Final.Auth.BLL.Services
     public class AuthService : IAuthService
     {
         private readonly UserManager<AppUser> _userMgr;
-        private readonly RoleManager<Role> _roleMgr;
         private readonly AuthContext _authContext;
         private readonly ITokenService _tokenService;
-        public AuthService(UserManager<AppUser> userManager, RoleManager<Role> roleManager, AuthContext authContext, ITokenService tokenService)
+        public AuthService(UserManager<AppUser> userManager, AuthContext authContext, ITokenService tokenService)
         {
             _userMgr = userManager;
             _authContext = authContext;
             _tokenService = tokenService;
-            _roleMgr = roleManager;
         }
         public async Task<TokenPairDto> Login(LoginCredentials credentials)
         {
@@ -35,7 +33,7 @@ namespace DeliveryDeck_Backend_Final.Auth.BLL.Services
 
             if (user.IsBanned)
             {
-                throw new BadHttpRequestException("You are banned lmaoooo");
+                throw new BadHttpRequestException("You are banned lmaoooo", StatusCodes.Status403Forbidden);
             }
 
             return await CreateTokenPair(user);

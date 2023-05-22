@@ -31,7 +31,7 @@ namespace DeliveryDeck_Backend_Final.Auth.BLL.Services
                 FullName = user.FullName,
                 BirthDate = user.BirthDate,
                 Gender = user.Gender,
-                Address = user.Customer.Address,
+                Address = user.Customer?.Address,
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber
             };
@@ -40,7 +40,7 @@ namespace DeliveryDeck_Backend_Final.Auth.BLL.Services
         public async Task<ResetPasswordToken> GetResetPasswordToken(string email)
         {
             var user = await _userMgr.FindByEmailAsync(email)
-                ?? throw new BadHttpRequestException(string.Format($"No such user with email {0}", email));
+                ?? throw new RepositoryEntityNotFoundException($"No such user with email {email}");
 
             return new ResetPasswordToken
             {
@@ -51,7 +51,7 @@ namespace DeliveryDeck_Backend_Final.Auth.BLL.Services
         public async Task ResetPassword(ResetPasswordDto data)
         {
             var user = await _userMgr.FindByEmailAsync(data.Email)
-                ?? throw new BadHttpRequestException(string.Format($"No such user with email {0}", data.Email));
+                ?? throw new RepositoryEntityNotFoundException($"No such user with email {data.Email}");
 
             var result = await _userMgr.ResetPasswordAsync(user, data.ResetToken, data.NewPassword);
             if (!result.Succeeded)
@@ -70,7 +70,7 @@ namespace DeliveryDeck_Backend_Final.Auth.BLL.Services
             user.PhoneNumber = data.PhoneNumber;
             user.BirthDate = data.BirthDate;
             user.Gender = data.Gender;
-            user.Customer.Address = data.Address;
+            user.Customer!.Address = data.Address;
 
             await _userMgr.UpdateAsync(user);
 

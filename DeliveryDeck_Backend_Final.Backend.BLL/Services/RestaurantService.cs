@@ -2,6 +2,7 @@
 using DeliveryDeck_Backend_Final.Backend.DAL.Entities;
 using DeliveryDeck_Backend_Final.Common.DTO.Backend;
 using DeliveryDeck_Backend_Final.Common.Enumerations;
+using DeliveryDeck_Backend_Final.Common.Exceptions;
 using DeliveryDeck_Backend_Final.Common.Interfaces.Backend;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -39,14 +40,14 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             var uncatched = dishesIds.Where(d => !dishes.Select(x => x.Id).Contains(d));
             if (!uncatched.IsNullOrEmpty())
             {
-                throw new BadHttpRequestException("Some dishes do not exist");
+                throw new RepositoryEntityNotFoundException($"Some dishes do not exist", new {NonExistingDishes = uncatched});
             }
 
             dishes = dishes.Except(menu.Dishes);
 
             if (dishes.IsNullOrEmpty())
             {
-                throw new BadHttpRequestException("Such dishes are already in the menu");
+                throw new RepositoryEntityAlreadyExistsException("All of those dishes are already in the menu");
             }
 
             menu.Dishes.AddRange(dishes);
@@ -193,10 +194,12 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
                     .ThenInclude(m => m.Dishes)
                 .Where(r => r.Managers.Contains(manager))
                 .Select(r => new { r.Menus, r.Dishes })
-                .FirstAsync();
+                .FirstOrDefaultAsync()
+                ?? throw new PersonUnemployedException($"{manager} is unemployed");
 
             var menu = restaurant.Menus
-                .First(m => m.Id == menuId);
+                .FirstOrDefault(m => m.Id == menuId)
+                ?? throw new RepositoryEntityNotFoundException($"No such menu w/ id = {menuId}");
 
             var dishes = restaurant.Dishes
                 .IntersectBy(dishesIds, d => d.Id);
@@ -208,12 +211,13 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
 
         public async Task<PagedDishesDto> GetAllRestaurantDishes(Guid manager, int page)
         {
-            var dishes = await _backendContext.Restaurants
+            var restaurant = await _backendContext.Restaurants
                 .Include(m => m.Dishes)
                     .ThenInclude(d => d.Ratings)
-                .Where(m => m.Managers.Contains(manager))
-                .SelectMany(x => x.Dishes)
-                .ToListAsync();
+                .FirstOrDefaultAsync(m => m.Managers.Contains(manager))
+                ?? throw new PersonUnemployedException($"{manager} is unemployed");
+
+            var dishes = restaurant.Dishes;
 
             var response = new PagedDishesDto();
             foreach (var dish in dishes)
@@ -243,7 +247,8 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
         {
             var restaurant = await _backendContext.Restaurants
                 .Include(r => r.Dishes)
-                .FirstAsync(r => r.Managers.Contains(manager));
+                .FirstOrDefaultAsync(r => r.Managers.Contains(manager))
+                ?? throw new PersonUnemployedException($"{manager} is unemployed");
 
             restaurant.Dishes.Add(new Dish
             {
@@ -263,7 +268,8 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
             var menus = await _backendContext.Restaurants.Include(r => r.Menus).ThenInclude(m => m.Dishes)
                 .Where(r => r.Managers.Contains(manager))
                 .Select(r => r.Menus)
-                .FirstAsync();
+                .FirstOrDefaultAsync()
+                ?? throw new PersonUnemployedException($"{manager} is unemployed"); ;
 
             var response = new PagedMenusDto
             {
@@ -291,7 +297,8 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
         {
             var restaurant = await _backendContext.Restaurants
                 .Include(r => r.Dishes)
-                .FirstAsync(r => r.Managers.Contains(manager));
+                .FirstAsync(r => r.Managers.Contains(manager))
+                ?? throw new PersonUnemployedException($"{manager} is unemployed");
 
             restaurant.Dishes.Remove(
                 restaurant.Dishes.First(d => d.Id == dishId)
@@ -306,9 +313,12 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
                 .Include(r => r.Menus)
                     .ThenInclude(m => m.Dishes)
                         .ThenInclude(d => d.Ratings)
-                .FirstAsync(r => r.Managers.Contains(manager));
+                .FirstAsync(r => r.Managers.Contains(manager))
+                ?? throw new PersonUnemployedException($"{manager} is unemployed");
 
-            var menu = restaurant.Menus.First(m => m.Id == menuId);
+            var menu = restaurant.Menus
+                .FirstOrDefault(m => m.Id == menuId)
+                ?? throw new RepositoryEntityNotFoundException($"No such menu w/ id = {menuId}");
 
             var dishesInfo = new PagedDishesDto
             {
@@ -345,9 +355,11 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
                 await _backendContext.Restaurants.Include(r => r.Menus).ThenInclude(m => m.Dishes)
                     .Where(r => r.Managers.Contains(manager))
                     .Select(r => r.Menus)
-                    .FirstAsync()
+                    .FirstOrDefaultAsync()
+                    ?? throw new PersonUnemployedException($"{manager} is unemployed")
                 )
-                .First(m => m.Id == menuId);
+                .FirstOrDefault(m => m.Id == menuId)
+                ?? throw new RepositoryEntityNotFoundException($"No such menu w/ id = {menuId}");
 
             menu.Name = data.Name;
             menu.IsActive = data.IsActive;
@@ -361,8 +373,10 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
                     .Where(r => r.Managers.Contains(manager))
                     .Select(r => r.Menus)
                     .FirstAsync()
+                    ?? throw new PersonUnemployedException($"{manager} is unemployed")
                 )
-                .First(m => m.Id == menuId);
+                .FirstOrDefault(m => m.Id == menuId)
+                ?? throw new RepositoryEntityNotFoundException($"No such menu w/ id = {menuId}");
 
             menu.IsActive = isActive;
             await _backendContext.SaveChangesAsync();
@@ -375,8 +389,10 @@ namespace DeliveryDeck_Backend_Final.Backend.BLL.Services
                     .Where(r => r.Managers.Contains(manager))
                     .Select(r => r.Dishes)
                     .FirstAsync()
+                    ?? throw new PersonUnemployedException($"{manager} is unemployed")
                 )
-                .First(d => d.Id == dishId);
+                .FirstOrDefault(d => d.Id == dishId)
+                ?? throw new RepositoryEntityNotFoundException($"No such dish w/ id = {dishId}");
 
             dish.Name = data.Name;
             dish.Description = data.Description;
