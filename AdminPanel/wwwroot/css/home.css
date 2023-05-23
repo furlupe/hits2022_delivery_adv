@@ -1,0 +1,17 @@
+﻿.btn {
+    background-color: lightgrey;
+    transition: all 0.25s ease-out;
+    text-align: center;
+}
+
+.btn:hover {
+    background-color: darkgrey;
+}
+
+.btn:active {
+    transform: scale(0.9);
+}
+
+a {
+    text-decoration: none !important;
+}

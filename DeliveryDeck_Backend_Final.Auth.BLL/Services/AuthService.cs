@@ -1,12 +1,13 @@
-﻿using DeliveryDeck_Backend_Final.Common.DTO;
-using DeliveryDeck_Backend_Final.Common.Interfaces;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
-using DeliveryDeck_Backend_Final.Common.Enumerations;
-using System.Security.Claims;
+﻿using DeliveryDeck_Backend_Final.Auth.DAL;
 using DeliveryDeck_Backend_Final.Auth.DAL.Entities;
-using DeliveryDeck_Backend_Final.Auth.DAL;
+using DeliveryDeck_Backend_Final.Common.DTO.Auth;
+using DeliveryDeck_Backend_Final.Common.Enumerations;
+using DeliveryDeck_Backend_Final.Common.Exceptions;
+using DeliveryDeck_Backend_Final.Common.Interfaces.Auth;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace DeliveryDeck_Backend_Final.Auth.BLL.Services
 {
@@ -21,25 +22,18 @@ namespace DeliveryDeck_Backend_Final.Auth.BLL.Services
             _authContext = authContext;
             _tokenService = tokenService;
         }
-
-        public async Task ChangePassword(Guid userId, ChangePasswordDto passwords)
-        {
-            var user = await _userMgr.FindByIdAsync(userId.ToString());
-            var result = await _userMgr.ChangePasswordAsync(user, passwords.OldPassword, passwords.NewPassword);
-
-            if (!result.Succeeded)
-            {
-                throw new BadHttpRequestException("Could not change the password");
-            }
-
-        }
-
         public async Task<TokenPairDto> Login(LoginCredentials credentials)
         {
-            var user = await _userMgr.FindByEmailAsync(credentials.Email);
+            var user = await _userMgr
+                .FindByEmailAsync(credentials.Email);
             if (user == null || !await _userMgr.CheckPasswordAsync(user, credentials.Password))
             {
                 throw new BadHttpRequestException("Invalid credentials");
+            }
+
+            if (user.IsBanned)
+            {
+                throw new BadHttpRequestException("You are banned lmaoooo", StatusCodes.Status403Forbidden);
             }
 
             return await CreateTokenPair(user);
@@ -62,6 +56,12 @@ namespace DeliveryDeck_Backend_Final.Auth.BLL.Services
                 .SingleOrDefaultAsync(rt => rt.Value == refreshToken)
                 ?? throw new BadHttpRequestException("Invalid refresh token");
 
+            if (rt.User.IsBanned)
+            {
+                await _authContext.RefreshTokens.Where(t => t == rt).ExecuteDeleteAsync();
+                throw new BadHttpRequestException("You are banned lmaoooo", StatusCodes.Status403Forbidden);
+            }
+
             return await CreateTokenPair(rt.User);
         }
 
@@ -80,10 +80,18 @@ namespace DeliveryDeck_Backend_Final.Auth.BLL.Services
 
             if (!result.Succeeded)
             {
-                throw new BadImageFormatException("Could not register");
+                throw new IdentityException("Could not register", StatusCodes.Status400BadRequest, result.Errors);
             }
 
             await _userMgr.AddToRoleAsync(user, RoleType.Customer.ToString());
+
+            await _authContext.Customers.AddAsync(new Customer
+            {
+                User = user,
+                Address = data.Address
+            });
+
+            await _authContext.SaveChangesAsync();
         }
 
         private async Task<TokenPairDto> CreateTokenPair(AppUser user)

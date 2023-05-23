@@ -1,0 +1,46 @@
+﻿@using DeliveryDeck_Backend_Final.Common.Enumerations;
+@model AvailableStaffListModel
+<link rel="stylesheet" href="~/css/chooselist.css"/>
+<input id="viewbagcurrpage" value="@ViewBag.PageInfo.CurrentPage" style="display: none"/>
+<input id="viewbagpages" value="@ViewBag.PageInfo.Pages" style="display: none"/>
+<input id="viewbagsize" value="@ViewBag.PageInfo.PageSize" style="display: none" />
+
+@{
+    foreach (var user in Model.Users)
+    {
+        <div class="container card card-body my-2 @(user.IsBanned ? "border-danger" : "")">
+            <div class="row">
+                <div class="col-2 d-flex">
+                    <div class="container">
+                        @{
+                            if (user.AvailableAsCook)
+                            {
+                                <div class="row">
+                                    <div class="col">
+                                        <p class="fs-5 my-auto">@RoleType.Cook.ToString()</p>
+                                    </div>
+                                </div>
+                            }
+
+                            if (user.AvailableAsManager)
+                            {
+                                <div class="row">
+                                    <div class="col">
+                                        <p class="fs-5 my-auto">@RoleType.Manager.ToString()</p>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+                <div class="col d-flex" id="userName">
+                    <p class="fs-5 my-auto">@user.FullName</p>
+                </div>
+                <div class="col d-flex justify-content-end">
+                    <button class="mx-2 btn btn-outline-secondary asManagerButton @(user.AvailableAsManager ? "" : "invisible")" value="@user.Id">Add as manager</button>
+                    <button class="mx-2 btn btn-outline-secondary asCookButton @(user.AvailableAsCook ? "" : "invisible")" value="@user.Id">Add as cook</button>
+                </div>
+            </div>
+        </div>
+    }
+}

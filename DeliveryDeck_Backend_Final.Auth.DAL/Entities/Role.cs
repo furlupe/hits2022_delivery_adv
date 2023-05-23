@@ -7,6 +7,5 @@ namespace DeliveryDeck_Backend_Final.Auth.DAL.Entities
     {
         public RoleType Type { get; set; }
         public ICollection<UserRole> Users { get; set; }
-
     }
 }

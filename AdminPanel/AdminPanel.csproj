@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Views\Users\**" />
+    <Content Remove="Views\Users\**" />
+    <EmbeddedResource Remove="Views\Users\**" />
+    <None Remove="Views\Users\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="12.0.1" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+    <PackageReference Include="jQuery.Validation" Version="1.19.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="7.0.5" />
+    <PackageReference Include="Microsoft.jQuery.Unobtrusive.Validation" Version="4.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AdminPanel.BLL\AdminPanel.BLL.csproj" />
+    <ProjectReference Include="..\DeliveryDeck_Backend_Final.Common\DeliveryDeck_Backend_Final.Common.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -8,26 +8,51 @@ namespace DeliveryDeck_Backend_Final.Auth.DAL
     public class AuthContext : IdentityDbContext<AppUser, Role, Guid, IdentityUserClaim<Guid>, UserRole, IdentityUserLogin<Guid>, IdentityRoleClaim<Guid>, IdentityUserToken<Guid>>
     {
         public AuthContext(DbContextOptions<AuthContext> options) : base(options) { }
-        public override DbSet<AppUser> Users { get; set; }
-        public override DbSet<Role> Roles { get; set; }
-        public override DbSet<UserRole> UserRoles { get; set; }
         public DbSet<RefreshUserToken> RefreshTokens { get; set; }
+        public DbSet<Cook> Cooks { get; set; }
+        public DbSet<Manager> Managers { get; set; }
+        public DbSet<Courier> Couriers { get; set; }
+        public DbSet<Customer> Customers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-            builder.Entity<UserRole>(o =>
+
+            builder.Entity<AppUser>(o =>
             {
-                o.HasOne(x => x.Role)
-                    .WithMany(x => x.Users)
-                    .HasForeignKey(x => x.RoleId)
+                o.HasMany(o => o.Roles)
+                    .WithOne(e => e.User)
+                    .HasForeignKey(ur => ur.UserId)
+                    .IsRequired();
+
+                o.HasOne(x => x.Cook)
+                    .WithOne(c => c.User)
+                    .HasForeignKey<Cook>()
                     .OnDelete(DeleteBehavior.Cascade);
-                o.HasOne(x => x.User)
-                    .WithMany(x => x.Roles)
-                    .HasForeignKey(x => x.UserId)
+
+                o.HasOne(x => x.Manager)
+                    .WithOne(c => c.User)
+                    .HasForeignKey<Manager>()
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                o.HasOne(x => x.Courier)
+                    .WithOne(c => c.User)
+                    .HasForeignKey<Courier>()
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                o.HasOne(x => x.Customer)
+                    .WithOne(c => c.User)
+                    .HasForeignKey<Customer>()
                     .OnDelete(DeleteBehavior.Cascade);
             });
 
+            builder.Entity<Role>(o =>
+            {
+                o.HasMany(r => r.Users)
+                    .WithOne(r => r.Role)
+                    .HasForeignKey(r => r.RoleId)
+                    .IsRequired();
+            });
         }
     }
 }

@@ -1,0 +1,24 @@
+﻿@model RestaurantModel
+@{
+    foreach (var user in Model.Staff.Staff)
+    {
+        <div class="container card card-body my-2 @(user.IsBanned ? "border-danger" : "")" id="@user.Id">
+            <div class="row">
+                <div class="col-2 d-flex">
+                    <p class="fs-5 my-auto ms-2">@user.Role.ToString()</p>
+                </div>
+                <div class="col d-flex" id="userName">
+                    <p class="fs-5 my-auto">@user.FullName</p>
+                </div>
+                <div class="col d-flex justify-content-end">
+                    <form asp-controller="User" asp-action="Details" asp-route-id="@user.Id">
+                        <button class="btn btn-outline-secondary mx-2" type="submit">Profile</button>
+                    </form>
+                    <form asp-controller="Restaurant" asp-action="DismissStaff" asp-route-restaurantId="@Model.Id" asp-route-staffId="@user.Id" asp-route-fromRole="@user.Role.ToString()">
+                        <button class="btn btn-outline-danger" type="submit">Dismiss</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+}

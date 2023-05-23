@@ -1,0 +1,57 @@
+﻿    @model RestaurantListModel
+@{
+    ViewData["Title"] = "Restaurants";
+}
+
+<link rel="stylesheet" href="~/css/restaurant.css"/>
+<div class="modal fade">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title display-5">Add restaurant</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            @await Html.PartialAsync("RestaurantCreateForm", new RestaurantCreateModel())
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        @await Html.PartialAsync("SearchByName", new SearchFieldModel {Controller = "Restaurant"})
+        <div class="col d-flex justify-content-end">
+            <a class="btn btn-outline-success" onclick="showRestaurantCreationForm()">+ Add restaurant</a>
+        </div>
+    </div>
+    <div id="restaurantsList">
+
+    </div>
+</div>
+@await Html.PartialAsync("~/Views/Shared/Partial/PaginationAjax.cshtml", new PaginationModel { PageInfo = Model.PageInfo })
+
+@section Scripts {
+    <script src="~/js/pagination.js"></script>
+    <script>
+        showRestaurantCreationForm = () => {
+            console.log($(".modal").html())
+            $(".modal").modal('show');
+        }
+
+        $(".page-link").on("click", function() {
+            var url = "";
+            var url = "@Html.Raw(
+                (ViewBag.Name is not null) ?
+                    Url.Action("RestaurantsPage", "Restaurant", new { page = "__page__", name = "__name__"})
+                    : Url.Action("RestaurantsPage", "Restaurant", new { page = "__page__"})
+            )";
+
+            url = url.replace("__page__", $(this).val());
+            url = url.replace("__name__", "@ViewBag.Name");
+            getPage(url)
+                .then(result => $("#restaurantsList").html(result));
+        });
+
+        $(".page-link").first().click();
+
+    </script>
+}
