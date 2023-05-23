@@ -1,0 +1,28 @@
+﻿@model UserListModel
+@{
+    foreach (var user in Model.Users)
+    {
+        <div class="container card card-body my-2 @(user.IsBanned ? "border-danger" : "")" id="@user.Id">
+            <div class="row">
+                <div class="col-2 d-flex">
+                    <div class="container">
+                        @{
+                            foreach (var role in user.Roles)
+                            {
+                                <div class="row">
+                                    <div class="col">
+                                        <p class="fs-5 my-auto">@role.ToString()</p>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+                <div class="col d-flex" id="userName">
+                    <p class="fs-5 my-auto">@user.FullName</p>
+                </div>
+                @await Html.PartialAsync("~/Views/Shared/Partial/CardCRUDElements.cshtml", new CardCRUDElementsModel {Id = user.Id, Controller="User"})
+            </div>
+        </div>
+    }
+}

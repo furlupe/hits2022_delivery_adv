@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.4" />
+    <PackageReference Include="RabbitMQ.Client" Version="6.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DeliveryDeck_Backend_Final.Backend.DAL\DeliveryDeck_Backend_Final.Backend.DAL.csproj" />
+    <ProjectReference Include="..\DeliveryDeck_Backend_Final.Common\DeliveryDeck_Backend_Final.Common.csproj" />
+    <ProjectReference Include="..\DeliveryDeck_Backend_Final.JWT\DeliveryDeck_Backend_Final.JWT.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Utils\" />
+  </ItemGroup>
+
+</Project>

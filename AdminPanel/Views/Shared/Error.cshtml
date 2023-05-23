@@ -1,0 +1,10 @@
+﻿@model ErrorModel
+@{
+    ViewData["Title"] = "Home";
+}
+<h1 class="display-4">Error?</h1>
+<p class="fs-4">Sowwy, but an error has occurred. Shit happens sometimes, amarite?</p>
+<p class="fs-4 text-danger">
+    Message: @Model.Message
+</p>
+<button type="button" class="btn btn-outline-secondary" onclick="history.back()">Go back</button>

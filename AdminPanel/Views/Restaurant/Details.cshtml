@@ -1,0 +1,159 @@
+﻿@using DeliveryDeck_Backend_Final.Common.Enumerations;
+@model RestaurantModel
+@{
+    ViewData["Title"] = "Restaurants";
+}
+
+<div id="addStaffDialog" class="modal fade">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content p-2">
+            <div class="modal-header">
+                <h5 class="modal-title display-4">Add staff</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="dialogContent">
+
+            </div>
+            <div class="modal-footer justify-content-center">
+                <div id="modalPagination"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="updateRestaurantDialog" class="modal fade">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content p-2">
+            <div class="modal-header">
+                <h5 class="modal-title display-4">Update restaurant</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            @await Html.PartialAsync("RestaurantUpdateForm", new RestaurantUpdateModel {Id = Model.Id, Name = Model.Name})
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col d-flex justify-content-center mb-4">
+        <h3 class="display-4">@Model.Name</h3>
+    </div>
+</div>
+
+<div class="container bg-white p-4" id="main">
+    <div class="row">
+        <div class="col-9">
+            <div id="user-list">
+                @await Html.PartialAsync("StaffListPartial", Model)
+            </div>
+            @await Html.PartialAsync("~/Views/Shared/Partial/PaginationAjax.cshtml", new PaginationModel { PageInfo = Model.Staff.PageInfo })
+        </div>
+        <div class="col-2 offset-1">
+            <div class="card">
+                <div class="card-header">Actions</div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <button class="btn" id="updateRestaurantButton">Edit restaurant</button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <button class="btn" id="addStaffButton">Add staff</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script src="~/js/pagination.js"></script>
+    <script>
+        $("#updateRestaurantButton").click(function (e) {
+            $("#updateRestaurantDialog").modal('show');
+        })
+
+        $("#main").find(".page-link").on("click", function (e) {
+            e.preventDefault();
+
+            var url = "@Html.Raw(Url.Action("StaffPage", "Restaurant", new { id = "__id__", page = "__page__"}))";
+
+            url = url.replace("__page__", $(this).val());
+            url = url.replace("__id__", "@Model.Id");
+
+            getPage(url)
+                .then(result => $("#user-list").html(result));
+        });
+
+        $("#addStaffButton").click(function(e) {
+            e.preventDefault();
+
+            var url = "@Html.Raw(Url.Action("UsersChoosePage", "User"))";
+
+            getPage(url)
+                .then(function (result) {
+                    $("#dialogContent").html(result);
+
+                    initStaffButtons();
+
+                    var url = "@Html.Raw(Url.Action("Pagination", "Utils", new { currpage = "__curr__", pages = "__pages__", pagesize = "__size__"}))";
+                    url = url.replace("__curr__", $("#viewbagcurrpage").val());
+                    url = url.replace("__pages__", $("#viewbagpages").val());
+                    url = url.replace("__size__", $("#viewbagsize").val());
+
+                    $.ajax({
+                        url: url,
+                        type: "Get",
+                        async: true
+                    })
+                        .then(function(result) {
+                            $("#modalPagination").html(result);
+                            $("#addStaffDialog").find(".page-link").click(function () {
+
+                                var url = "@Html.Raw(Url.Action("UsersChoosePage", "User", new { page = "__page__"}))";
+
+                                url = url.replace("__page__", $(this).val());
+
+                                getPage(url)
+                                    .then(function (result) {
+                                        $("#dialogContent").html(result)
+                                        initStaffButtons();
+                                    });
+                            });
+                        })
+
+                    $("#addStaffDialog").modal('show');
+                });
+        })
+
+        function addStaff(data) {
+            var url = "@Html.Raw(Url.Action("AddStaffToRestaurant", "Restaurant", new {restaurantId = "__id__"}))";
+            url = url.replace("__id__", "@Model.Id")
+
+            $.ajax({
+                url: url,
+                type: "POST",
+                async: true,
+                data: data
+             })
+                .then(result => location.reload());
+        }
+
+        function initStaffButtons() {
+            $(".asCookButton").click(function () {
+                console.log("asd");
+                addStaff({
+                    Id: $(this).val(),
+                    Role: "@RoleType.Cook"
+                });
+            })
+
+            $(".asManagerButton").click(function () {
+                addStaff({
+                    Id: $(this).val(),
+                    Role: "@RoleType.Manager"
+                });
+            })
+        }
+    </script>
+}

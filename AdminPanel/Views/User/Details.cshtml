@@ -1,0 +1,168 @@
+﻿@model UserModel
+@using DeliveryDeck_Backend_Final.Common.Enumerations
+@{
+    ViewData["Title"] = "User details";
+}
+<div class="modal fade">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title display-5">Update user</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            @await Html.PartialAsync("UserUpdateForm", new UserUpdateModel {
+                Id = Model.Id,
+                FullName = Model.FullName,
+                BirthDate = Model.BirthDate,
+                Gender = Model.Gender,
+                Roles = Model.Roles,
+                Address = Model.Address
+            });
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col d-flex justify-content-center">
+        <h3 class="display-4">@Model.FullName</h3> 
+    </div>
+</div>
+<br/>
+<div class="container border bg-white p-4">
+    <div class="row">
+        <div class="col-9">
+            <div class="row">
+                <div class="col-2">
+                    <span class="fs-5">Email</span>
+                </div>
+                <div class="col border-bottom p-1">
+                    <span>@Model.Email</span>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-2">
+                    <span class="fs-5">Birthdate</span>
+                </div>
+                <div class="col border-bottom p-1">
+                    <span>@string.Format("{0:yyyy-MM-dd}", Model.BirthDate)</span>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-2">
+                    <span class="fs-5">Sex</span>
+                </div>
+                <div class="col border-bottom p-1">
+                    <span class="">@(Model.Gender.ToString())</span>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-2">
+                    <span class="fs-5">Roles</span>
+                </div>
+                <div class="col border-bottom p-1">
+                    <span>@string.Join(", ", Model.Roles)</span>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-2">
+                    <span class="fs-5">Status</span>
+                </div>
+                <div class="col border-bottom p-1">
+                    @{
+                        if (Model.IsBanned)
+                        {
+                            <span class="text-danger">Banned</span>
+                        }
+                        else
+                        {
+                            <span>Active</span>
+                        }
+                    }
+                </div>
+            </div>
+            @{
+                if (Model.Roles.Contains(RoleType.Customer))
+                {
+                    <div class="row mt-3">
+                        <div class="col-2">
+                            <span class="fs-5">Address</span>
+                        </div>
+                        <div class="col border-bottom p-1">
+                            <span class="">@(Model.Address ?? "")</span>
+                        </div>
+                    </div>
+                }
+
+                if (Model.RestaurantAsManager is not null)
+                {
+                    <div class="row mt-5">
+                        <div class="col-2">
+                            <span class="fs-5">Manages</span>
+                        </div>
+                        <div class="col ps-1">
+                            <a class="btn btn-outline-dark" asp-controller="Restaurant" asp-action="Details" asp-route-id="@Model.RestaurantAsManager.Id">@Model.RestaurantAsManager.Name</a>
+                        </div>
+                    </div>
+                }
+
+                if (Model.RestaurantAsCook is not null)
+                {
+                    <div class="row mt-3">
+                        <div class="col-2 justify-content-center">
+                            <span class="fs-5">Cooks</span>
+                        </div>
+                        <div class="col ps-1">
+                            <a class="btn btn-outline-dark" asp-controller="Restaurant" asp-action="Details" asp-route-id="@Model.RestaurantAsCook.Id">@Model.RestaurantAsCook.Name</a>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+        <div class="col-2 offset-1">
+            <div class="card">
+                <div class="card-header">Actions</div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <button class="btn" onclick="showEditUserWindow()">Edit profile</button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            @{
+                                if(!Model.IsBanned)
+                                {
+                                    <form asp-controller="User" asp-action="BanUser" asp-route-id="@Model.Id">
+                                        <button type="submit" class="btn text-danger">Ban</button>
+                                    </form>
+                                } 
+                                else
+                                {
+                                    <form asp-controller="User" asp-action="UnbanUser" asp-route-id="@Model.Id">
+                                        <button type="submit" class="btn text-success">Unban</button>
+                                    </form>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        showEditUserWindow = () => $(".modal").modal('show');
+
+        $("#addressField").hide();
+
+        $('#roleCustomerCheck').change(function () {
+            if (this.checked) {
+                $("#addressField").show();
+                return;
+            }
+
+            $("#addressField").hide();
+        });
+    </script>
+}
