@@ -56,6 +56,12 @@ namespace DeliveryDeck_Backend_Final.Auth.BLL.Services
                 .SingleOrDefaultAsync(rt => rt.Value == refreshToken)
                 ?? throw new BadHttpRequestException("Invalid refresh token");
 
+            if (rt.User.IsBanned)
+            {
+                await _authContext.RefreshTokens.Where(t => t == rt).ExecuteDeleteAsync();
+                throw new BadHttpRequestException("You are banned lmaoooo", StatusCodes.Status403Forbidden);
+            }
+
             return await CreateTokenPair(rt.User);
         }
 
